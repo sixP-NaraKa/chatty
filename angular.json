@@ -76,6 +76,9 @@
             },
             "development": {
               "browserTarget": "chatty:build:development"
+            },
+            "options": {
+              "port": 4300
             }
           },
           "defaultConfiguration": "development"
