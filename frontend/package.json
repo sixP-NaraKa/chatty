@@ -19,6 +19,8 @@
     "@angular/platform-browser": "~13.3.0",
     "@angular/platform-browser-dynamic": "~13.3.0",
     "@angular/router": "~13.3.0",
+    "@nestjs/cli": "^8.2.6",
+    "@nestjs/serve-static": "^2.2.2",
     "@prisma/client": "^3.15.2",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",

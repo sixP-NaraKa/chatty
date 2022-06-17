@@ -8,5 +8,7 @@ datasource db {
 }
 
 model chatty {
-  chat_id Int @id @map("chatId")
+  chat_id           Int    @id @map("chatId")
+  chat_partner_id   Int    @map("chatPartnerId")
+  chat_partner_name String @map("chatPartnerName")
 }

@@ -43,3 +43,5 @@ Thumbs.db
 
 # custom
 .env
+*/node_modules
+*/.angular/cache
