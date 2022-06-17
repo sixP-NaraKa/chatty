@@ -1,0 +1,8 @@
+<ul class="tab-close flex justify-center md:flex-row flex-wrap list-none border-b-0 pl-0 mb-4">
+    <li *ngFor="let tab of tabs" (click)="selectTab(tab)" [class.active]="tab.active" class="nav-item">
+        <a id={{tab.tabId}} href="javascript:;" [class.tab-active]="tab.active">
+        {{tab.tabTitle}}
+        </a>
+    </li>
+</ul>
+<ng-content></ng-content>
