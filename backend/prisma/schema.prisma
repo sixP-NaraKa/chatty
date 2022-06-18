@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model chats {
+  chat_id       Int             @id(map: "chatty_pkey")
+  user_id       Int
+  users         users           @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+  user_messages user_messages[]
+}
+
+model messages {
+  msg_id        Int             @id
+  posted_at     DateTime        @db.Timestamp(6)
+  content       String
+  user_messages user_messages[]
+}
+
+model user_messages {
+  msg_id   Int
+  user_id  Int
+  chat_id  Int
+  um_id    Int      @id(map: "user_messages_pk")
+  chats    chats    @relation(fields: [chat_id], references: [chat_id], onDelete: NoAction, onUpdate: NoAction, map: "chat_id_fk")
+  messages messages @relation(fields: [msg_id], references: [msg_id], onDelete: NoAction, onUpdate: NoAction, map: "msg_id_fk")
+  users    users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+}
+
+model users {
+  user_id       Int             @id @default(autoincrement())
+  display_name  String
+  creation_date DateTime        @db.Timestamp(6)
+  chats         chats[]
+  user_messages user_messages[]
+}

@@ -45,3 +45,4 @@ Thumbs.db
 .env
 */node_modules
 */.angular/cache
+*/dist

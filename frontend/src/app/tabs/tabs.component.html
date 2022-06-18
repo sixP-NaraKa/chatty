@@ -1,8 +1,6 @@
-<ul class="tab-close flex justify-center md:flex-row flex-wrap list-none border-b-0 pl-0 mb-4">
-    <li *ngFor="let tab of tabs" (click)="selectTab(tab)" [class.active]="tab.active" class="nav-item">
-        <a id={{tab.tabId}} href="javascript:;" [class.tab-active]="tab.active">
-        {{tab.tabTitle}}
-        </a>
-    </li>
+<ul class="flex justify-center flex-col flex-wrap list-none border-b-0">
+    <div *ngFor="let chat of availableChats" id={{chat.chat_id}} (click)="notifyLoadChat(chat)" class="mb-0.5 chat-tab" [class.chat-tab-selected]="chat.chat_id === selectedChatId">
+        <p class="whitespace-nowrap text-ellipsis overflow-hidden">{{chat.user_id}}</p>
+    </div>
 </ul>
-<ng-content></ng-content>
+<!-- <ng-content></ng-content> -->

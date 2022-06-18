@@ -1,13 +1,13 @@
 import { AfterContentInit, Component, ContentChildren, EventEmitter, Input, Output, QueryList } from '@angular/core';
+import { HttpClient } from "@angular/common/http";
 import { TabComponent } from '../tab/tab.component';
-import { chatty, PrismaClient, PrismaPromise } from "@prisma/client";
+import { chats } from '../../../../shared/types/db-dtos';
 
-// const prisma = new PrismaClient();
 
 type Chat = {
-  chatId: number,
-  chatPartnerId: number,
-  chatPartnerName: string
+  chat_id: number,
+  chat_partner_id: number,
+  chat_partner_name: string
 }
 
 @Component({
@@ -20,38 +20,43 @@ export class TabsComponent implements AfterContentInit {
   @ContentChildren(TabComponent)
   tabs!: QueryList<TabComponent>;
 
+  // @Output()
+  // loadAvailableChats = new EventEmitter();
+
   @Output()
   loadChat = new EventEmitter();
 
-  // availableChats!: Promise<{ chat_id: number; }[]>;
-  // availableChats!: PrismaPromise<chatty[]>;
-  availableChats!: PrismaPromise<chatty[]>;
+  availableChats!: chats[];
 
-  constructor() {
-      // load chats (tabs to click on) from the db
-      // this.availableChats = prisma.chatty.findMany({
-      //   // select: {
-      //   //   chat_id: true
-      //   // },
-      //   where: {
-      //     chat_id: 1
-      //   }
-      // });
-      // console.dir(this.availableChats, { depth: null });
-  }
+  selectedChatId: number = -1;
 
-
+  constructor(private http: HttpClient) { }
+  
   async ngAfterContentInit() {
-    let activeTabs = this.tabs.filter((tab) => tab.active);
-    if (activeTabs.length === 0) {
-      this.selectTab(this.tabs.first);
-    }
+    // let activeTabs = this.tabs.filter((tab) => tab.active);
+    // if (activeTabs.length === 0) {
+    //   this.selectTab(this.tabs.first);
+    // }
+
+    this.http.get<chats[]>("http://localhost:3100/api/user/chats").subscribe(chats => {
+      this.availableChats = chats;
+      console.log("chats", this.availableChats);
+      // this.loadAvailableChats.emit(this.availableChats);
+    });
   }
 
-  selectTab(tab: TabComponent) {
-    this.tabs.toArray().forEach(tab => tab.active = false);
-    tab.active = true;
-    this.loadChat.emit(tab.metaData);
+  // TODO: if a chat has been clicked on, notfiy the parent component (done) and pass it the needed chat metadata (chat id, partner id, partner name) (done)
+  //       the parent component should then notify the display chat component that it should display the messages of the given chat (not yet) => fetch messages from db (via prisma)
+  // TODO: configure new db tables "user_messages" (verknüpfungstabelle) und "messages" und "user" correctly (foreign keys, etc. pp.)
+
+  notifyLoadChat(chat: chats) {
+    this.selectedChatId = chat.chat_id;
+    this.loadChat.emit(chat);
   }
+
+  // selectTab(tab: TabComponent) {
+  //   this.tabs.toArray().forEach(tab => tab.active = false);
+  //   tab.active = true;
+  // }
 
 }
