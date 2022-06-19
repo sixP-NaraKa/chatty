@@ -32,14 +32,16 @@ export class AppController {
     return users;
   }
 
-  @Get("/api/user/chats")
+  @UseGuards(LocalAuthGuard)
+  @Post("/api/user/chats")
   async getChatsForUser(@Query("user_id", ParseIntPipe) userId: number): Promise<UserChats[]> {
     const chats = await this.appService.getAllAvailableChatsForUser(userId);
     console.log("chats => controller", chats);
     return chats;
   }
 
-  @Get("/api/chat/messages")
+  @UseGuards(LocalAuthGuard)
+  @Post("/api/chat/messages")
   async getChatMessages(@Query("chat_id", ParseIntPipe) chatId: number): Promise<ChatMessage[]> {
     const messages = await this.appService.getChatMessages(chatId);
     console.log("messages for chat with id: ", chatId, messages);

@@ -6,12 +6,16 @@ import { AppComponent } from './app.component';
 import { TabsComponent } from './tabs/tabs.component';
 import { TabComponent } from './tab/tab.component';
 import { HttpClientModule } from '@angular/common/http';
+import { LoginFormComponent } from './login-form/login-form.component';
+import { ChatComponent } from './chat/chat.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TabsComponent,
-    TabComponent
+    TabComponent,
+    LoginFormComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,
