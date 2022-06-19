@@ -1,12 +1,30 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import { Body, Controller, Get, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { users, chats, messages, user_messages, chat_messages } from '@prisma/client';
 import { AppService } from './app.service';
-import { UserChats, ChatMessage } from '../../shared/types/db-dtos';
+import { UserChats, ChatMessage, User } from '../../shared/types/db-dtos';
+import { LocalAuthGuard } from './auth/local-auth.guard';
+import { AuthService } from './auth/auth.service';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService, private authService: AuthService) {}
 
+  @UseGuards(LocalAuthGuard)
+  @Post("/auth/login")
+  async login(@Request() req) {
+    console.log("login => req", req.user);
+    return this.authService.login(req.user as users);
+  }
+
+  // @UseGuards(LocalAuthGuard)
+  @Post("/auth/create")
+  async createUser(@Body() body: { username: string, password: string }) {
+    console.log("createUser with data", body);
+    return this.authService.createUser(body)
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get("/api/user/users")
   async getAllUsers() {
     const users = await this.appService.getAllUsers();

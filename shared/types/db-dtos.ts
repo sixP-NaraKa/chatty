@@ -9,7 +9,16 @@ type UserChats = {
 }
 
 type ChatMessage = chat_messages & {
-    users: users;
+    users: {
+        user_id: number,
+        display_name: string
+    };
 }
 
-export { users, chats, messages, user_messages, chat_messages, UserChats, ChatMessage };
+type User = {
+    user_id: number,
+    display_name: string,
+    creation_date: Date
+}
+
+export { users, chats, messages, user_messages, chat_messages, UserChats, ChatMessage, User };

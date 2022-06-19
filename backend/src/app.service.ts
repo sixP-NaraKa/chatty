@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { chats, chat_messages, messages, users } from '@prisma/client';
 import { PrismaService } from './prisma/prisma.service';
-import { UserChats, ChatMessage } from '../../shared/types/db-dtos';
+import { UserChats, ChatMessage, User } from '../../shared/types/db-dtos';
 
 @Injectable()
 export class AppService {
   
   constructor(private prismaService: PrismaService) { }
 
-  async getAllUsers(): Promise<users[]> {
-    return await this.prismaService.users.findMany();
+  async getAllUsers(): Promise<User[]> {
+    return await this.prismaService.users.findMany({
+      select: {
+        user_id: true,
+        display_name: true,
+        creation_date: true,
+        password: false
+      }
+    });
   }
 
   async getAllAvailableChatsForUser(userId: number): Promise<UserChats[]> {
@@ -35,7 +42,12 @@ export class AppService {
         chat_id: chatId
       },
       include: {
-        users: true
+        users: { // or simply "users: true"
+          select: {
+            user_id: true,
+            display_name: true
+          }
+        }
       }
     });
   }

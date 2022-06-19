@@ -5,6 +5,8 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma/prisma.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { PrismaService } from './prisma/prisma.service';
       rootPath: join(__dirname, "../../frontend", "dist/chatty")
   }),
     ConfigModule.forRoot(),
+    AuthModule,
+    UsersModule,
 ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

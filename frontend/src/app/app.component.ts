@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
-import { UserChats, ChatMessage } from '../../../shared/types/db-dtos';
+import { UserChats, ChatMessage, User } from '../../../shared/types/db-dtos';
 
 
 @Component({
@@ -13,6 +13,9 @@ export class AppComponent {
 
   // TODO: global user authenticated against the backend db
   currentUserId: number = 1;
+  // TODO: take user from localstorage or something, maybe the login component/view will pass data to here
+  // @Input()
+  currentlyLoggedInUser!: User;
 
   constructor(private http: HttpClient) {
     // this.http.get<users[]>("http://localhost:3100/api/user/users").subscribe(users => console.log(users));
@@ -32,6 +35,8 @@ export class AppComponent {
       this.chatMessages = msgs;
       this.chatMessages.forEach(message => console.log(message))
     });
+
+    this.http.post("http://localhost:3100/auth/login", { username: chat.users_chats_with_userTousers.display_name, password: null }).subscribe(resp => console.log(resp));
   }
 
 }
