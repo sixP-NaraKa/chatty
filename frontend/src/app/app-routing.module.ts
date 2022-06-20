@@ -7,15 +7,21 @@ import { LoginFormComponent } from './login-form/login-form.component';
 
 const routes: Routes = [
     {
-        path: "", component: LoginFormComponent,
+        path: "login", component: LoginFormComponent,
         canActivate: [LoginGuard]
     },
     {
-        path: "chat", component: ChatComponent,
-        canActivate: [AuthGuard]
+        path: "", component: ChatComponent,
+        canActivate: [AuthGuard],
+        children: [
+            ...["chat", "chats"].map(path => ({
+                path,
+                component: ChatComponent
+            }))
+        ]
     },
     {
-        path: "**", redirectTo: "chat", // either redirect to login (and then check if not logged in via cookies) or display notification on the chat component itself,
+        path: "**", redirectTo: "chat",
     }
 ];
 

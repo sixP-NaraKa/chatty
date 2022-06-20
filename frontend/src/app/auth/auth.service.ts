@@ -45,7 +45,7 @@ export class AuthService {
     logout() {
         localStorage.removeItem("chatty-current-user");
         this.currentUserSubject.next(null as any);
-        this.router.navigate(["/"]);
+        this.router.navigate(["/login"]);
     }
 
     isLoggedIn(): boolean {
