@@ -1,1 +1,19 @@
-<p>login-form works!</p>
+<div class="px-4 h-full">
+    <fieldset class="login-fieldset text-left text-xl max-w-3xl min-w-max h-[420px] mx-auto mt-12 px-2 rounded-2xl"> <!-- flex flex-col items-center -->
+        <legend [align]="'center'" class="text-2xl px-4">Login to chatty</legend>
+
+        <form ngNativeValidate [formGroup]="loginFormGroup" (ngSubmit)="onLoginSubmit()" class="flex flex-col items-center w-full">
+            <label for="username" class="w-64 sm:w-1/2 pt-8 pb-1 text-lg">Username</label>
+            <input #username formControlName="usernameInput" required type="text" id="username" placeholder="Enter username..." name="username"
+                class="login-input from-control w-64 sm:w-1/2 h-8 sm:h-12 px-2 rounded bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"/>
+
+            <p class="py-8"></p>
+            
+            <label for="password" class="w-64 sm:w-1/2 pt-2 pb-1 text-lg">Password</label>
+            <input #password formControlName="passwordInput" required type="password" id="password" placeholder="Enter password..." name="password"
+                class="login-input form-control w-64 sm:w-1/2 h-8 sm:h-12 px-2 rounded bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"/>
+            <button type="submit" class="form-control h-10 w-1/5 my-8 px-2 bg-violet-200 text-black rounded">Login</button>
+            <p *ngIf="loginErrorMessage" class="text-red-500">{{loginErrorMessage}}</p>
+        </form>
+    </fieldset>
+</div>

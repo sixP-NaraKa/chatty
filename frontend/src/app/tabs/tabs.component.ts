@@ -24,7 +24,7 @@ export class TabsComponent implements AfterContentInit {
   constructor(private http: HttpClient) { }
   
   async ngAfterContentInit() {
-    this.http.post<UserChats[]>("http://localhost:3100/api/user/chats?user_id=" + 1, { username: "Test", password: "12345" }).subscribe(chats => {
+    this.http.get<UserChats[]>("http://localhost:3100/api/user/chats?user_id=" + 1).subscribe(chats => {
       this.availableChats = chats;
       console.log("chats", this.availableChats);
     });

@@ -10,13 +10,17 @@ import { LocalStrategy } from './local.strategy';
 @Module({
   imports: [
     UsersModule,
-    PassportModule,
+    PassportModule.register({
+      defaultStrategy: "jwt",
+      property: "user",
+      session: false
+    }),
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: "300s" },
+      signOptions: { expiresIn: "7d" },
     }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  exports: [AuthService]
+  exports: [AuthService, PassportModule, LocalStrategy]
 })
 export class AuthModule {}

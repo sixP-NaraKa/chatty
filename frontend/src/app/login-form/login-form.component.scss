@@ -1,0 +1,23 @@
+.login-input {
+    border: 1px solid rgb(44, 53, 71);
+    background-color: rgb(44, 53, 71);
+
+    &:hover {
+        border: 1px solid rgb(81, 95, 119);
+        // transition-timing-function: linear;
+        transition: border 200ms;
+    }
+
+    &:focus {
+        border: 1px solid rgb(53, 108, 219);
+        // transition-timing-function: linear;
+        transition: border 200ms;
+        // transition-property: border;
+        // transition-duration: 1s;
+    }
+}
+
+.login-fieldset {
+    border: 1px solid rgb(53, 108, 219);
+    border-bottom: 0;
+}
