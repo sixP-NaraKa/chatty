@@ -9,15 +9,15 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, "../../frontend", "dist/chatty")
-  }),
-    ConfigModule.forRoot(),
-    AuthModule,
-    UsersModule,
-],
-  controllers: [AppController],
-  providers: [AppService, PrismaService],
+    imports: [
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, "../../frontend", "dist/chatty")
+        }),
+        ConfigModule.forRoot(),
+        AuthModule,
+        UsersModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService, PrismaService],
 })
-export class AppModule {}
+export class AppModule { }

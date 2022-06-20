@@ -5,37 +5,37 @@ import { UserChats } from '../../../../shared/types/db-dtos';
 
 
 @Component({
-  selector: 'app-tabs',
-  templateUrl: './tabs.component.html',
-  styleUrls: ['./tabs.component.scss']
+    selector: 'app-tabs',
+    templateUrl: './tabs.component.html',
+    styleUrls: ['./tabs.component.scss']
 })
 export class TabsComponent implements AfterContentInit {
 
-  @ContentChildren(TabComponent)
-  tabs!: QueryList<TabComponent>;
+    @ContentChildren(TabComponent)
+    tabs!: QueryList<TabComponent>;
 
-  @Output()
-  loadChat = new EventEmitter<UserChats>();
+    @Output()
+    loadChat = new EventEmitter<UserChats>();
 
-  availableChats!: UserChats[];
+    availableChats!: UserChats[];
 
-  selectedChatId: number = -1;
+    selectedChatId: number = -1;
 
-  constructor(private http: HttpClient) { }
-  
-  async ngAfterContentInit() {
-    this.http.get<UserChats[]>("http://localhost:3100/api/user/chats?user_id=" + 1).subscribe(chats => {
-      this.availableChats = chats;
-      console.log("chats", this.availableChats);
-    });
-  }
+    constructor(private http: HttpClient) { }
 
-  notifyLoadChat(chat: UserChats) {
-    if (this.selectedChatId === chat.chat_id) { // no need to load the chat again
-      return;
+    async ngAfterContentInit() {
+        this.http.get<UserChats[]>("http://localhost:3100/api/user/chats?user_id=" + 1).subscribe(chats => {
+            this.availableChats = chats;
+            console.log("chats", this.availableChats);
+        });
     }
-    this.selectedChatId = chat.chat_id;
-    this.loadChat.emit(chat);
-  }
+
+    notifyLoadChat(chat: UserChats) {
+        if (this.selectedChatId === chat.chat_id) { // no need to load the chat again
+            return;
+        }
+        this.selectedChatId = chat.chat_id;
+        this.loadChat.emit(chat);
+    }
 
 }

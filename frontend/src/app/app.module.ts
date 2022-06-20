@@ -12,20 +12,20 @@ import { ChatComponent } from './chat/chat.component';
 import { jwtInterceptorProvider } from './auth/interceptor/jwt.interceptor';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    TabsComponent,
-    TabComponent,
-    LoginFormComponent,
-    ChatComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    ReactiveFormsModule
-  ],
-  providers: [jwtInterceptorProvider],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        TabsComponent,
+        TabComponent,
+        LoginFormComponent,
+        ChatComponent
+    ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        ReactiveFormsModule
+    ],
+    providers: [jwtInterceptorProvider],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }
