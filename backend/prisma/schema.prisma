@@ -38,7 +38,7 @@ model users {
   user_id                      Int             @id @default(autoincrement())
   display_name                 String          @unique(map: "display_name_unique")
   creation_date                DateTime        @default(now()) @db.Timestamp(6)
-  password                     String?
+  password                     String
   chat_messages                chat_messages[]
   chats                        chats[]
   chats_chats_with_userTousers chats[]         @relation("chats_with_userTousers")

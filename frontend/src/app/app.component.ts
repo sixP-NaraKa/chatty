@@ -11,11 +11,11 @@ export class AppComponent {
 
     constructor(private authService: AuthService) { }
 
-    logout() {
-        this.authService.logout();
-    }
+    // logout() {
+    //     this.authService.logout();
+    // }
 
-    isLoggedIn(): boolean {
-        return this.authService.isLoggedIn();
-    }
+    // isLoggedIn(): boolean {
+    //     return this.authService.isLoggedIn();
+    // }
 }

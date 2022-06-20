@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http'
-import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { UserChats, ChatMessage } from '../../../../shared/types/db-dtos';
 import { ApplicationUser, AuthService } from '../auth/auth.service';
 
@@ -35,6 +34,10 @@ export class ChatComponent implements OnInit {
             this.chatMessages = msgs;
             this.chatMessages.forEach(message => console.log(message));
         });
+    }
+
+    logout() {
+        this.authService.logout();
     }
 
 }

@@ -29,14 +29,6 @@ export class LoginFormComponent implements OnInit {
         console.log("onLoginSubmit()...");
         const username = this.loginFormGroup.value.usernameInput as string;
         const password = this.loginFormGroup.value.passwordInput as string;
-        // const resp = this.http.post<{ access_token: string }>("http://localhost:3100/auth/login", { username: username, password: password }, { withCredentials: true }).toPromise();
-        // resp.then(r => {
-        //   console.log("access_token => authenticated", r!.access_token);
-        // })
-        // .catch(err => {
-        //   console.log("this is error", err);
-        //   this.loginErrorMessage = "Wrong username/password.";
-        // });
 
         this.authService.login(username, password).pipe(first()).subscribe(
             data => {

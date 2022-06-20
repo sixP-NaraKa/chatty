@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { userInfo } from 'os';
 import { Router } from '@angular/router';
 
 export interface ApplicationUser {
@@ -50,7 +49,8 @@ export class AuthService {
     }
 
     isLoggedIn(): boolean {
-        return this.currentUserValue && this.currentUserValue.access_token ? true : false;
+        const value = this.currentUserValue;
+        return value && value.access_token ? true : false;
     }
 
 }
