@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
+import { userInfo } from 'os';
+import { Router } from '@angular/router';
 
 export interface ApplicationUser {
     access_token: string,
@@ -17,7 +19,7 @@ export class AuthService {
     private currentUserSubject: BehaviorSubject<ApplicationUser>;
     public currentUserToken: Observable<ApplicationUser>;
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private router: Router) {
         this.currentUserSubject = new BehaviorSubject<ApplicationUser>(
             JSON.parse(localStorage.getItem("chatty-current-user") as string)
         );
@@ -44,6 +46,11 @@ export class AuthService {
     logout() {
         localStorage.removeItem("chatty-current-user");
         this.currentUserSubject.next(null as any);
+        this.router.navigate(["/"]);
+    }
+
+    isLoggedIn(): boolean {
+        return this.currentUserValue && this.currentUserValue.access_token ? true : false;
     }
 
 }

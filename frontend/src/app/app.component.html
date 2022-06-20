@@ -1,1 +1,4 @@
+<div *ngIf="isLoggedIn()" class="absolute right-0 z-10 pr-4 pt-2 text-lg">
+    <button (click)="logout()" class="h-[25px] bg-violet-200 text-black rounded-t-lg px-2 hover:bg-violet-400">Logout</button>
+</div>
 <router-outlet></router-outlet>

@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
 import { ChatComponent } from './chat/chat.component';
+import { LoginGuard } from './guard/login.guard';
 import { LoginFormComponent } from './login-form/login-form.component';
 
 const routes: Routes = [
     {
         path: "", component: LoginFormComponent,
+        canActivate: [LoginGuard]
     },
     {
         path: "chat", component: ChatComponent,
