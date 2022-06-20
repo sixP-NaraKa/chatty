@@ -2,6 +2,7 @@ import { AfterContentInit, Component, ContentChildren, EventEmitter, Input, Outp
 import { HttpClient } from "@angular/common/http";
 import { TabComponent } from '../tab/tab.component';
 import { UserChats } from '../../../../shared/types/db-dtos';
+import { ApplicationUser, AuthService } from '../auth/auth.service';
 
 
 @Component({
@@ -21,10 +22,15 @@ export class TabsComponent implements AfterContentInit {
 
     selectedChatId: number = -1;
 
-    constructor(private http: HttpClient) { }
+    currentUser: ApplicationUser;
+
+    constructor(private http: HttpClient, private authService: AuthService) {
+        this.currentUser = this.authService.currentUserValue;
+        console.log("currentUser", this.currentUser);
+    }
 
     async ngAfterContentInit() {
-        this.http.get<UserChats[]>("http://localhost:3100/api/user/chats?user_id=" + 1).subscribe(chats => {
+        this.http.get<UserChats[]>("http://localhost:3100/api/user/chats?user_id=" + this.currentUser.userId).subscribe(chats => {
             this.availableChats = chats;
             console.log("chats", this.availableChats);
         });

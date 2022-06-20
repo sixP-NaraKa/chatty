@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
 import { Router } from '@angular/router';
-import { UserChats, ChatMessage, User } from '../../../../shared/types/db-dtos';
+import { UserChats, ChatMessage } from '../../../../shared/types/db-dtos';
+import { ApplicationUser, AuthService } from '../auth/auth.service';
 
 @Component({
     selector: 'app-chat',
@@ -11,24 +12,13 @@ import { UserChats, ChatMessage, User } from '../../../../shared/types/db-dtos';
 export class ChatComponent implements OnInit {
 
     title = 'chatty';
+    currentUser: ApplicationUser;
 
-    // TODO: take user from localstorage or something, maybe the login component/view will pass data to here
-    // Note: user JWT token is stored in localStorage, maybe also add some more data there, like username and id to fetch specific information, etc.
-    // (or simply pass this data to the chat component, after successful login)
-    // for example during the validation of the provided key during login, we can also do a db fetch and get the user that way, seems easier
-    // @Input()
-    currentlyLoggedInUser: User & { password: string } = {
-        display_name: "Test",
-        password: "12345",
-        creation_date: new Date(),
-        user_id: 1,
-    };
-
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private authService: AuthService) {
+        this.currentUser = this.authService.currentUserValue;
     }
 
     ngOnInit(): void {
-
     }
 
     chat!: UserChats;

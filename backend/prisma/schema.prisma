@@ -36,7 +36,7 @@ model user_messages {
 
 model users {
   user_id                      Int             @id @default(autoincrement())
-  display_name                 String
+  display_name                 String          @unique(map: "display_name_unique")
   creation_date                DateTime        @default(now()) @db.Timestamp(6)
   password                     String?
   chat_messages                chat_messages[]
