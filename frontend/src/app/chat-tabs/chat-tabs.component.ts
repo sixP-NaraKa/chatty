@@ -1,20 +1,16 @@
-import { AfterContentInit, Component, ContentChildren, EventEmitter, Input, Output, QueryList } from '@angular/core';
+import { AfterContentInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { TabComponent } from '../tab/tab.component';
 import { UserChats } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 
 
 @Component({
-    selector: 'app-tabs',
-    templateUrl: './tabs.component.html',
-    styleUrls: ['./tabs.component.scss']
+    selector: 'app-chat-tabs',
+    templateUrl: './chat-tabs.component.html',
+    styleUrls: ['./chat-tabs.component.scss']
 })
-export class TabsComponent implements AfterContentInit {
-
-    @ContentChildren(TabComponent)
-    tabs!: QueryList<TabComponent>;
+export class ChatTabsComponent implements AfterContentInit {
 
     @Output()
     loadChat = new EventEmitter<UserChats>();
