@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { AuthService } from './auth/auth.service';
 
 @Component({
     selector: 'app-root',
@@ -9,13 +8,6 @@ import { AuthService } from './auth/auth.service';
 export class AppComponent {
     title = 'chatty';
 
-    constructor(private authService: AuthService) { }
+    constructor() { }
 
-    // logout() {
-    //     this.authService.logout();
-    // }
-
-    // isLoggedIn(): boolean {
-    //     return this.authService.isLoggedIn();
-    // }
 }

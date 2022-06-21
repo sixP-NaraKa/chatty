@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first } from 'rxjs';
-import { AuthService } from '../auth/auth.service';
+import { UserService } from '../services/user.services';
 
 @Component({
     selector: 'app-login-form',
@@ -12,7 +11,7 @@ import { AuthService } from '../auth/auth.service';
 })
 export class LoginFormComponent implements OnInit {
 
-    constructor(private router: Router, private authService: AuthService) { }
+    constructor(private router: Router, private userService: UserService) { }
 
     ngOnInit(): void {
     }
@@ -26,13 +25,12 @@ export class LoginFormComponent implements OnInit {
 
     async onLoginSubmit() {
         this.loginErrorMessage = "";
-        console.log("onLoginSubmit()...");
         const username = this.loginFormGroup.value.usernameInput as string;
         const password = this.loginFormGroup.value.passwordInput as string;
 
-        this.authService.login(username, password).pipe(first()).subscribe(
+        this.userService.login(username, password).pipe(first()).subscribe(
             data => {
-                console.log("authService.login(...) =>", data);
+                console.log("userService.login(...) =>", data);
                 this.router.navigate(["/chat"]);
             },
             error => {

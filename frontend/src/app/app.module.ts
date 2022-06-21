@@ -10,6 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { ChatComponent } from './chat/chat.component';
 import { jwtInterceptorProvider } from './auth/interceptor/jwt.interceptor';
+import { RegistrationFormComponent } from './registration-form/registration-form.component';
 
 @NgModule({
     declarations: [
@@ -17,7 +18,8 @@ import { jwtInterceptorProvider } from './auth/interceptor/jwt.interceptor';
         TabsComponent,
         TabComponent,
         LoginFormComponent,
-        ChatComponent
+        ChatComponent,
+        RegistrationFormComponent
     ],
     imports: [
         BrowserModule,

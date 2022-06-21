@@ -29,7 +29,7 @@ export class AuthService {
         return this.currentUserSubject.value;
     }
 
-    login(username: string, password: string) {
+    login(username: string, password: string): Observable<ApplicationUser> {
         return this.http.post<ApplicationUser>("http://localhost:3100/auth/login", { username: username, password: password }, { withCredentials: true }).pipe(
             map(user => {
                 console.log("user obj =>", user);
@@ -42,7 +42,7 @@ export class AuthService {
         );
     }
 
-    logout() {
+    logout(): void {
         localStorage.removeItem("chatty-current-user");
         this.currentUserSubject.next(null as any);
         this.router.navigate(["/login"]);

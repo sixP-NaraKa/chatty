@@ -4,10 +4,15 @@ import { AuthGuard } from './auth/auth.guard';
 import { ChatComponent } from './chat/chat.component';
 import { LoginGuard } from './guard/login.guard';
 import { LoginFormComponent } from './login-form/login-form.component';
+import { RegistrationFormComponent } from './registration-form/registration-form.component';
 
 const routes: Routes = [
     {
         path: "login", component: LoginFormComponent,
+        canActivate: [LoginGuard]
+    },
+    {
+        path: "register", component: RegistrationFormComponent,
         canActivate: [LoginGuard]
     },
     {

@@ -2,7 +2,8 @@ import { AfterContentInit, Component, ContentChildren, EventEmitter, Input, Outp
 import { HttpClient } from "@angular/common/http";
 import { TabComponent } from '../tab/tab.component';
 import { UserChats } from '../../../../shared/types/db-dtos';
-import { ApplicationUser, AuthService } from '../auth/auth.service';
+import { ApplicationUser } from '../auth/auth.service';
+import { UserService } from '../services/user.services';
 
 
 @Component({
@@ -24,8 +25,8 @@ export class TabsComponent implements AfterContentInit {
 
     currentUser: ApplicationUser;
 
-    constructor(private http: HttpClient, private authService: AuthService) {
-        this.currentUser = this.authService.currentUserValue;
+    constructor(private http: HttpClient, private userService: UserService) {
+        this.currentUser = this.userService.currentUser;
         console.log("currentUser", this.currentUser);
     }
 

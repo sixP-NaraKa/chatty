@@ -4,7 +4,7 @@
         <legend [align]="'center'" class="text-2xl px-4">Login to chatty</legend>
 
         <form ngNativeValidate [formGroup]="loginFormGroup" (ngSubmit)="onLoginSubmit()"
-            class="flex flex-col items-center w-full">
+            class="relative flex flex-col items-center w-full">
             <label for="username" class="w-64 sm:w-1/2 pt-8 pb-1 text-lg">Username</label>
             <input #username formControlName="usernameInput" required type="text" id="username"
                 placeholder="Enter username..." name="username"
@@ -19,6 +19,12 @@
             <button type="submit"
                 class="form-control h-10 w-1/5 my-8 px-2 bg-violet-200 text-black rounded">Login</button>
             <p *ngIf="loginErrorMessage" class="text-red-500">{{loginErrorMessage}}</p>
+
+            <br/>
+            <div class="absolute bottom-0 right-0 pb-4 text-sm">
+                Need an account?
+                <button type="button" routerLink="/register" class="text-blue-300"><b>Register!</b></button>
+            </div>
         </form>
     </fieldset>
 </div>

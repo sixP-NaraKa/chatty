@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UserChats, ChatMessage } from '../../../../shared/types/db-dtos';
-import { ApplicationUser, AuthService } from '../auth/auth.service';
+import { ApplicationUser } from '../auth/auth.service';
+import { UserService } from '../services/user.services';
 
 @Component({
     selector: 'app-chat',
@@ -13,8 +14,8 @@ export class ChatComponent implements OnInit {
     title = 'chatty';
     currentUser: ApplicationUser;
 
-    constructor(private http: HttpClient, private authService: AuthService) {
-        this.currentUser = this.authService.currentUserValue;
+    constructor(private http: HttpClient, private userService: UserService) {
+        this.currentUser = this.userService.currentUser;
     }
 
     ngOnInit(): void {
@@ -37,7 +38,7 @@ export class ChatComponent implements OnInit {
     }
 
     logout() {
-        this.authService.logout();
+        this.userService.logout();
     }
 
 }
