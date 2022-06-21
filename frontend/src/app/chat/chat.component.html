@@ -1,6 +1,9 @@
 <div class="absolute right-0 z-10 pr-4 pt-2 text-lg">
-    <button (click)="logout()"
-        class="h-[25px] bg-violet-200 text-black rounded-t-lg px-2 hover:bg-violet-400">Logout</button>
+    <div class="flex flex-auto">
+        <p class="pr-4 text-base">Logged in as: <b class="text-violet-200">{{currentUser.username}}</b></p>
+        <button (click)="logout()"
+            class="h-[25px] bg-violet-200 text-black rounded-t-lg px-2 hover:bg-violet-400">Logout</button>
+    </div>
 </div>
 
 <div class="px-4 pb-4 pt-8 h-[85vh] w-full flex relative">
@@ -25,5 +28,3 @@
         </div>
     </div>
 </div>
-
-<!-- <router-outlet></router-outlet> -->
