@@ -7,50 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model chats {
-  chat_id                      Int             @id(map: "chatty_pkey") @default(autoincrement())
-  user_id                      Int
-  with_user                    Int
-  users                        users           @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
-  users_chats_with_userTousers users           @relation("chats_with_userTousers", fields: [with_user], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "with_user_id_fk")
-  chat_messages                chat_messages[]
-  user_messages                user_messages[]
-}
-
-model messages {
-  msg_id        Int             @id @default(autoincrement())
-  posted_at     DateTime        @default(now()) @db.Timestamp(6)
-  content       String?
-  user_messages user_messages[]
-}
-
-model user_messages {
-  msg_id   Int
-  user_id  Int
-  chat_id  Int
-  um_id    Int      @id(map: "user_messages_pk") @default(autoincrement())
-  chats    chats    @relation(fields: [chat_id], references: [chat_id], onDelete: NoAction, onUpdate: NoAction, map: "chat_id_fk")
-  messages messages @relation(fields: [msg_id], references: [msg_id], onDelete: NoAction, onUpdate: NoAction, map: "msg_id_fk")
-  users    users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
-}
-
 model users {
-  user_id                      Int             @id @default(autoincrement())
-  display_name                 String          @unique(map: "display_name_unique")
-  creation_date                DateTime        @default(now()) @db.Timestamp(6)
-  password                     String
-  chat_messages                chat_messages[]
-  chats                        chats[]
-  chats_chats_with_userTousers chats[]         @relation("chats_with_userTousers")
-  user_messages                user_messages[]
+  user_id       Int             @id @default(autoincrement())
+  display_name  String          @unique(map: "display_name_unique")
+  creation_date DateTime        @default(now()) @db.Timestamp(6)
+  password      String
+  chat_messages chat_messages[]
+  participants  participants[]
 }
 
 model chat_messages {
-  msg_id      Int      @id @default(autoincrement())
-  posted_at   DateTime @default(now()) @db.Timestamp(6)
+  msg_id      Int       @id @default(autoincrement())
+  posted_at   DateTime  @default(now()) @db.Timestamp(6)
   msg_content String
-  chat_id     Int
   user_id     Int
-  chats       chats    @relation(fields: [chat_id], references: [chat_id], onDelete: NoAction, onUpdate: NoAction, map: "chat_id_fk")
-  users       users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+  chatroom_id Int
+  chatrooms   chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
+  users       users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+}
+
+model chatrooms {
+  chatroom_id   Int             @id @default(autoincrement())
+  name          String?
+  isgroup       Boolean
+  chat_messages chat_messages[]
+  participants  participants[]
+}
+
+model participants {
+  p_id        Int       @id @default(autoincrement())
+  user_id     Int
+  chatroom_id Int
+  chatrooms   chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
+  users       users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }

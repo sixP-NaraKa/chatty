@@ -1,7 +1,7 @@
 <ul class="flex justify-center flex-col flex-wrap list-none border-b-0">
-    <div *ngFor="let chat of availableChats" id={{chat.chat_id}} (click)="notifyLoadChat(chat)" class="mb-0.5 chat-tab"
-        [class.chat-tab-selected]="chat.chat_id === selectedChatId">
-        <p class="whitespace-nowrap text-ellipsis overflow-hidden">{{chat.users_chats_with_userTousers.display_name}}
+    <div *ngFor="let chat of chatrooms" id={{chat.chatroom_id}} (click)="notifyLoadChat(chat)" class="mb-0.5 chat-tab"
+        [class.chat-tab-selected]="chat.chatroom_id === selectedChatId">
+        <p class="whitespace-nowrap text-ellipsis overflow-hidden">{{chat.chatrooms.isgroup ? chat.chatrooms.name : chat.chatrooms.participants[0].users.display_name}}
         </p>
     </div>
 </ul>

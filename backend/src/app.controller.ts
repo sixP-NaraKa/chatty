@@ -1,10 +1,9 @@
 import { Body, Controller, Get, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
-import { users, chats, messages, user_messages, chat_messages } from '@prisma/client';
+import { users } from '@prisma/client';
 import { AppService } from './app.service';
-import { UserChats, ChatMessage, User } from '../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages } from '../../shared/types/db-dtos';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
@@ -18,7 +17,6 @@ export class AppController {
         return this.authService.login(req.user as users);
     }
 
-    // @UseGuards(LocalAuthGuard)
     @Post("/auth/create")
     async createUser(@Body() body: { username: string, password: string }) {
         console.log("createUser with data", body);
@@ -34,18 +32,19 @@ export class AppController {
     }
 
     @UseGuards(AuthGuard())
-    @Get("/api/user/chats")
-    async getChatsForUser(@Query("user_id", ParseIntPipe) userId: number): Promise<UserChats[]> {
-        const chats = await this.appService.getAllAvailableChatsForUser(userId);
-        console.log("chats => controller", chats);
-        return chats;
+    @Get("/api/user/chatrooms")
+    async getChatroomsForUserWithParticipantsExceptSelf(@Query("user_id", ParseIntPipe) userId: number): Promise<ChatRoomWithParticipantsExceptSelf[]> {
+        const chatrooms = await this.appService.getChatroomsForUserWithParticipantsExceptSelf(userId);
+        console.log("chatrooms => ", chatrooms);
+        return chatrooms;
     }
 
     @UseGuards(AuthGuard())
-    @Get("api/chat/messages")
-    async getChatMessages(@Query("chat_id", ParseIntPipe) chatId: number): Promise<ChatMessage[]> {
-        const messages = await this.appService.getChatMessages(chatId);
-        console.log("messages for chat with id: ", chatId, messages);
+    @Get("/api/chat/chatmessages")
+    async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<ChatroomWithMessages> {
+        const messages = await this.appService.getAllMessagesForChatroom(chatroomId);
+        console.log("chatroom messages => ", messages);
         return messages;
     }
+
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { chats, chat_messages, messages, users } from '@prisma/client';
 import { PrismaService } from './prisma/prisma.service';
-import { UserChats, ChatMessage, User } from '../../shared/types/db-dtos';
+import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages } from '../../shared/types/db-dtos';
 
 @Injectable()
 export class AppService {
@@ -19,36 +18,55 @@ export class AppService {
         });
     }
 
-    async getAllAvailableChatsForUser(userId: number): Promise<UserChats[]> {
-        return await this.prismaService.chats.findMany({
-            select: {
-                users_chats_with_userTousers: {
-                    select: {
-                        user_id: true,
-                        display_name: true
-                    }
-                },
-                chat_id: true,
-            },
+    async getChatroomsForUserWithParticipantsExceptSelf(userId: number): Promise<ChatRoomWithParticipantsExceptSelf[]> {
+        return await this.prismaService.participants.findMany({
             where: {
                 user_id: userId
             },
-        });
-    }
-
-    async getChatMessages(chatId: number): Promise<ChatMessage[]> {
-        return await this.prismaService.chat_messages.findMany({
-            where: {
-                chat_id: chatId
-            },
             include: {
-                users: { // or simply "users: true"
-                    select: {
-                        user_id: true,
-                        display_name: true
+                users: false,
+                chatrooms: {
+                    include: {
+                        participants: {
+                            select: {
+                                users: {
+                                    select: {
+                                        user_id: true,
+                                        display_name: true,
+                                    },
+                                }
+                            },
+                            where: {
+                                NOT: {
+                                    user_id: userId
+                                }
+                            }
+                        }
                     }
                 }
             }
+        });
+    }
+
+    async getAllMessagesForChatroom(chatroomId: number): Promise<ChatroomWithMessages> {
+        return await this.prismaService.chatrooms.findUnique({
+            where: {
+                chatroom_id: chatroomId
+            },
+            include: {
+                participants: true,
+                chat_messages: {
+                    include: {
+                        users: {
+                            select: {
+                                user_id: true,
+                                display_name: true,
+                                creation_date: true
+                            }
+                        }
+                    }
+                }
+            },
         });
     }
 

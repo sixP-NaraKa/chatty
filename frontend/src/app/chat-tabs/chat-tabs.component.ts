@@ -1,6 +1,5 @@
 import { AfterContentInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
-import { UserChats } from '../../../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 
@@ -13,31 +12,31 @@ import { UserService } from '../services/user.services';
 export class ChatTabsComponent implements AfterContentInit {
 
     @Output()
-    loadChat = new EventEmitter<UserChats>();
+    loadChat = new EventEmitter<ChatRoomWithParticipantsExceptSelf>();
 
-    availableChats!: UserChats[];
+    chatrooms!: ChatRoomWithParticipantsExceptSelf[];
 
     selectedChatId: number = -1;
 
     currentUser: ApplicationUser;
 
-    constructor(private http: HttpClient, private userService: UserService) {
+    constructor(private userService: UserService) {
         this.currentUser = this.userService.currentUser;
         console.log("currentUser", this.currentUser);
     }
 
     async ngAfterContentInit() {
-        this.http.get<UserChats[]>("http://localhost:3100/api/user/chats?user_id=" + this.currentUser.userId).subscribe(chats => {
-            this.availableChats = chats;
-            console.log("chats", this.availableChats);
+        this.userService.getChatroomsForUserWithParticipantsExceptSelf(this.currentUser.userId).subscribe(chats => {
+            this.chatrooms = chats;
+            console.log("chatrooms =>", this.chatrooms);
         });
     }
 
-    notifyLoadChat(chat: UserChats) {
-        if (this.selectedChatId === chat.chat_id) { // no need to load the chat again
+    notifyLoadChat(chat: ChatRoomWithParticipantsExceptSelf) {
+        if (this.selectedChatId === chat.chatroom_id) { // no need to load the chat again
             return;
         }
-        this.selectedChatId = chat.chat_id;
+        this.selectedChatId = chat.chatroom_id;
         this.loadChat.emit(chat);
     }
 

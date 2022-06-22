@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { User } from "../../../../shared/types/db-dtos";
+import { ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User } from "../../../../shared/types/db-dtos";
 import { ApplicationUser, AuthService } from "../auth/auth.service";
 
 @Injectable({
@@ -36,6 +36,14 @@ export class UserService {
     }
 
     /* FETCHING OF DATA */
+
+    getChatroomsForUserWithParticipantsExceptSelf(userId: number): Observable<ChatRoomWithParticipantsExceptSelf[]> {
+        return this.http.get<ChatRoomWithParticipantsExceptSelf[]>("http://localhost:3100/api/user/chatrooms?user_id=" + userId);
+    }
+
+    getChatroomMessages(chatroomId: number): Observable<ChatroomWithMessages> {
+        return this.http.get<ChatroomWithMessages>("http://localhost:3100/api/chat/chatmessages?chatroom_id=" + chatroomId);
+    }
 
 
 }
