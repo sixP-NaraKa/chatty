@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ChatMessageWithUser, chatrooms, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, participants } from '../../../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ChatData } from './chat.dto';
 
 @Component({
     selector: 'app-chat',
@@ -12,6 +13,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 export class ChatComponent implements OnInit {
 
     currentUser: ApplicationUser;
+    chatDataDTO: ChatData = new ChatData();
 
     constructor(private userService: UserService) {
         this.currentUser = this.userService.currentUser;
@@ -20,26 +22,24 @@ export class ChatComponent implements OnInit {
     ngOnInit(): void {
     }
 
-    chat!: ChatRoomWithParticipantsExceptSelf;
     displayChat(chat: ChatRoomWithParticipantsExceptSelf) {
-        this.chat = chat;
-        this.displayChatMessages(chat);
+        // create new instance here, in case any errors might happen during chatroom navigation or whatnot
+        this.chatDataDTO = new ChatData();
+        this.chatDataDTO.chat = chat;
+        this.displayChatMessages();
     }
 
-    chatroomData!: ChatroomWithMessages;
-    chatroomOnly!: chatrooms;
-    participantsList!: participants[];
-    chatroomMessages!: ChatMessageWithUser[];
-    displayChatMessages(chat: ChatRoomWithParticipantsExceptSelf) {
-        this.userService.getChatroomMessages(chat.chatroom_id).subscribe(chatroomData => {
-            this.chatroomData = chatroomData;
-            console.dir("chatroom messages => ", chatroomData);
+    displayChatMessages() {
+        this.userService.getChatroomMessages(this.chatDataDTO.chat.chatroom_id).subscribe(chatroomData => {
+            this.chatDataDTO.chatroomData = chatroomData;
 
-            const { participants, chat_messages, ...chatroom } = this.chatroomData;
-            this.participantsList = participants;
-            this.chatroomMessages = chat_messages;
-            this.chatroomOnly = chatroom;
-        })
+            const { participants, chat_messages, ...chatroom } = this.chatDataDTO.chatroomData;
+            this.chatDataDTO.participantsList = participants;
+            this.chatDataDTO.chatroomMessages = chat_messages;
+            this.chatDataDTO.chatroomOnly = chatroom;
+
+            this.scrollToLatestMessage();
+        });
     }
 
     logout() {
@@ -53,10 +53,19 @@ export class ChatComponent implements OnInit {
         this.userService.sendMessage(
             this.formGroup.value.messageInput,
             this.currentUser.userId,
-            this.chatroomOnly.chatroom_id).subscribe(msg => {
+            this.chatDataDTO.chatroomOnly.chatroom_id).subscribe(msg => {
                 this.formGroup.reset();
-                this.chatroomMessages.push(msg);
+                this.chatDataDTO.chatroomMessages.push(msg);
+                
+                this.scrollToLatestMessage();
             });
+    }
+
+    scrollToLatestMessage() {
+        setTimeout(function() {
+            const lastMessageDiv = Array.from(document.getElementsByClassName("chat-message-div")).pop();
+            lastMessageDiv?.scrollIntoView({ behavior: 'smooth' });
+        }, 1);
     }
 
 }

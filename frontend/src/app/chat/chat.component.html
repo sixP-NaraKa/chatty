@@ -12,14 +12,14 @@
     </div>
     <div class="relative flex-auto mr-auto w-96 max-w-full h-3/3 border border-emerald-200 text-xs sm:text-base">
         <div class="chat-scrollbar text-left h-[90%] overflow-y-auto">
-            <div *ngFor="let message of chatroomMessages" [class.text-right]="message.user_id === currentUser.userId">
+            <div *ngFor="let message of chatDataDTO.chatroomMessages" class="chat-message-div" [class.text-right]="message.user_id === currentUser.userId">
                 <p class="max-w-md break-words text-ellipsis overflow-hidden pb-8 px-2"
                     [class.mr-auto]="message.user_id !== currentUser.userId"
                     [class.ml-auto]="message.user_id === currentUser.userId"><b>{{
                         message.users.display_name}}:</b> {{ message.msg_content }}</p>
             </div>
         </div>
-        <div *ngIf="chat" class="absolute bottom-0 w-full h-7 border-t rounded-lg border-violet-200 px-2 text-lg">
+        <div *ngIf="chatDataDTO.chat" class="absolute bottom-0 w-full h-7 border-t rounded-lg border-violet-200 px-2 text-lg">
             <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate>
             <input required formControlName="messageInput"
                 class="absolute bottom-0 left-0 w-10/12 h-7 px-2 bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
