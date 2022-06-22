@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User } from "../../../../shared/types/db-dtos";
+import { ChatMessageWithUser, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User } from "../../../../shared/types/db-dtos";
 import { ApplicationUser, AuthService } from "../auth/auth.service";
 
 @Injectable({
@@ -45,5 +45,10 @@ export class UserService {
         return this.http.get<ChatroomWithMessages>("http://localhost:3100/api/chat/chatmessages?chatroom_id=" + chatroomId);
     }
 
+    /* INSERTING OF DATA */
+    
+    sendMessage(message: string, userId: number, chatroomId: number): Observable<ChatMessageWithUser> {
+        return this.http.post<ChatMessageWithUser>("http://localhost:3100/api/chat/create/chatmessage", { message: message, userId: userId, chatroomId: chatroomId });
+    }
 
 }

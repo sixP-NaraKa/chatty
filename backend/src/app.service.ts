@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
-import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages } from '../../shared/types/db-dtos';
+import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser } from '../../shared/types/db-dtos';
 
 @Injectable()
 export class AppService {
@@ -67,6 +67,25 @@ export class AppService {
                     }
                 }
             },
+        });
+    }
+
+    async insertMessage(message: string, userId: number, chatroomId: number): Promise<ChatMessageWithUser> {
+        return this.prismaService.chat_messages.create({
+            data: {
+                msg_content: message,
+                user_id: userId,
+                chatroom_id: chatroomId
+            },
+            include: {
+                users: {
+                    select: {
+                        user_id: true,
+                        display_name: true,
+                        creation_date: true
+                    }
+                }
+            }
         });
     }
 

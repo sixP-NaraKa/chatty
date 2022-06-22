@@ -47,4 +47,12 @@ export class AppController {
         return messages;
     }
 
+    @UseGuards(AuthGuard())
+    @Post("/api/chat/create/chatmessage")
+    async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }) {
+        const newMessage = await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
+        console.log("new message inserted", newMessage);
+        return newMessage;
+    }
+
 }

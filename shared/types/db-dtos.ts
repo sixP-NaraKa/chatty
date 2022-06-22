@@ -6,7 +6,6 @@ type User = {
     creation_date: Date
 }
 
-
 type ChatRoomWithParticipantsExceptSelf = { //participants & { // doesn't work for some reason..., but manually does?
     p_id: number,
     user_id: number,
@@ -21,11 +20,13 @@ type ChatRoomWithParticipantsExceptSelf = { //participants & { // doesn't work f
     };
 }
 
+type ChatMessageWithUser = chat_messages & {
+    users: User
+};
+
 type ChatroomWithMessages = chatrooms & {
-    chat_messages: (chat_messages & {
-        users: User
-    })[];
+    chat_messages: ChatMessageWithUser[];
     participants: participants[];
 }
 
-export { users, chat_messages, participants, chatrooms, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages };
+export { users, chat_messages, participants, chatrooms, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser };

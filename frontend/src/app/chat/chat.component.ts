@@ -1,8 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { chatrooms, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, chat_messages, participants, User } from '../../../../shared/types/db-dtos';
+import { Component, OnInit } from '@angular/core';
+import { ChatMessageWithUser, chatrooms, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, participants } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-chat',
@@ -29,13 +29,13 @@ export class ChatComponent implements OnInit {
     chatroomData!: ChatroomWithMessages;
     chatroomOnly!: chatrooms;
     participantsList!: participants[];
-    chatroomMessages!: (chat_messages & { users: User })[];
+    chatroomMessages!: ChatMessageWithUser[];
     displayChatMessages(chat: ChatRoomWithParticipantsExceptSelf) {
         this.userService.getChatroomMessages(chat.chatroom_id).subscribe(chatroomData => {
             this.chatroomData = chatroomData;
             console.dir("chatroom messages => ", chatroomData);
 
-            const {participants, chat_messages, ...chatroom} = this.chatroomData;
+            const { participants, chat_messages, ...chatroom } = this.chatroomData;
             this.participantsList = participants;
             this.chatroomMessages = chat_messages;
             this.chatroomOnly = chatroom;
@@ -44,6 +44,19 @@ export class ChatComponent implements OnInit {
 
     logout() {
         this.userService.logout();
+    }
+
+    formGroup = new FormGroup({
+        messageInput: new FormControl("", Validators.required)
+    });
+    sendMessage() {
+        this.userService.sendMessage(
+            this.formGroup.value.messageInput,
+            this.currentUser.userId,
+            this.chatroomOnly.chatroom_id).subscribe(msg => {
+                this.formGroup.reset();
+                this.chatroomMessages.push(msg);
+            });
     }
 
 }

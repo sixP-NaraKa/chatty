@@ -19,12 +19,14 @@
                         message.users.display_name}}:</b> {{ message.msg_content }}</p>
             </div>
         </div>
-        <div class="absolute bottom-0 w-full h-7 border-t rounded-lg border-violet-200 px-2 text-lg">
-            <input
+        <div *ngIf="chat" class="absolute bottom-0 w-full h-7 border-t rounded-lg border-violet-200 px-2 text-lg">
+            <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate>
+            <input required formControlName="messageInput"
                 class="absolute bottom-0 left-0 w-10/12 h-7 px-2 bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
                 placeholder="Write your message..." />
-            <button
+            <button type="submit"
                 class="absolute bottom-0 right-0 w-1/6 h-7 border-l border-violet-200 rounded-lg text-violet-200 hover:bg-gray-600 whitespace-nowrap text-ellipsis overflow-hidden">Send</button>
+            </form>
         </div>
     </div>
 </div>
