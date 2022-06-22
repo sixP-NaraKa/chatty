@@ -1,0 +1,16 @@
+.chat-scrollbar {
+
+    &::-webkit-scrollbar {
+        width: 0.35rem;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgb(26, 32, 44);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgb(112, 125, 151);
+        border-radius: 0.5rem;
+    }
+
+}
