@@ -16,6 +16,19 @@ export class UsersService {
         })
     }
 
+    async findOneById(userId: number): Promise<User | undefined> {
+        return await this.prismaService.users.findUnique({
+            select: {
+                user_id: true,
+                display_name: true,
+                creation_date: true
+            },
+            where: {
+                user_id: userId
+            }
+        })
+    }
+
     async create(username: string, passw: string): Promise<User> {
         return await this.prismaService.users.create({
             data: {

@@ -30,7 +30,8 @@ export class ChatComponent implements OnInit {
     }
 
     displayChatMessages() {
-        this.userService.getChatroomMessages(this.chatDataDTO.chat.chatroom_id).subscribe(chatroomData => {
+        // or "this.chatDataDTO.chat.user_id"
+        this.userService.getChatroomMessages(this.chatDataDTO.chat.chatroom_id, this.currentUser.userId).subscribe(chatroomData => {
             this.chatDataDTO.chatroomData = chatroomData;
 
             const { participants, chat_messages, ...chatroom } = this.chatDataDTO.chatroomData;

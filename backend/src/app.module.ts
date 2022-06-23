@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
@@ -8,6 +8,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { WebsocketModule } from './websocket/websocket.module';
+import { VerifyUserMiddleware } from './verify-user.middleware';
 
 @Module({
     imports: [
@@ -22,4 +23,9 @@ import { WebsocketModule } from './websocket/websocket.module';
     controllers: [AppController],
     providers: [AppService, PrismaService],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(VerifyUserMiddleware).forRoutes("/api");
+    }
+}

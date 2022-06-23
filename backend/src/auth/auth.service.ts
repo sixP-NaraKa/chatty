@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { users } from '@prisma/client';
 import { User } from '../../../shared/types/db-dtos';
 import { UserAlreadyExistsError } from '../errors';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -39,5 +40,9 @@ export class AuthService {
             username: user.display_name,
             userId: user.user_id
         };
+    }
+
+    async verifyToken(token: string): Promise<{ username: string, sub: number, iat: number, exp: number }> {
+        return this.jwtService.verify(token, { secret: jwtConstants.secret });
     }
 }

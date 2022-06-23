@@ -14,9 +14,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    // this will get attached to the initial @Request object as the "user" property (?) if we use this class as a Guard
-    async validate(payload: any) {
+    // using now a Middleware before this gets called
+    // this will get attached to the initial @Request object as the "user" property (if used as Guard)
+    async validate(payload: any) { // can be modify this payload before it gets here? not sure
         console.log("jwt.strategy => validate", payload);
+        // return false;
         return { userId: payload.sub, username: payload.username };
     }
 }

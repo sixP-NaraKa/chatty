@@ -25,6 +25,9 @@ export class AuthService {
         this.currentUserToken = this.currentUserSubject.asObservable();
     }
 
+    /**
+     * Return the application-wide saved User.
+     */
     public get currentUserValue(): ApplicationUser {
         return this.currentUserSubject.value;
     }
