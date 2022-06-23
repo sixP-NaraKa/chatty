@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -10,6 +11,9 @@ import { LoginFormComponent } from './login-form/login-form.component';
 import { ChatComponent } from './chat/chat.component';
 import { jwtInterceptorProvider } from './auth/interceptor/jwt.interceptor';
 import { RegistrationFormComponent } from './registration-form/registration-form.component';
+import { WebsocketService } from './services/websocket.service';
+
+const socketconfig: SocketIoConfig = { url: "http://localhost:3100" }
 
 @NgModule({
     declarations: [
@@ -23,9 +27,10 @@ import { RegistrationFormComponent } from './registration-form/registration-form
         BrowserModule,
         AppRoutingModule,
         HttpClientModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        SocketIoModule.forRoot(socketconfig),
     ],
-    providers: [jwtInterceptorProvider],
+    providers: [jwtInterceptorProvider, WebsocketService],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

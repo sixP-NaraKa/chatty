@@ -4,6 +4,7 @@ import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ChatData } from './chat.dto';
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
     selector: 'app-chat',
@@ -15,18 +16,30 @@ export class ChatComponent implements OnInit {
     currentUser: ApplicationUser;
     chatDataDTO: ChatData = new ChatData();
 
-    constructor(private userService: UserService) {
+    constructor(private userService: UserService, private wsService: WebsocketService) {
         this.currentUser = this.userService.currentUser;
     }
 
     ngOnInit(): void {
+        // for now here, but this will be put then only as soon as we actually entered a chat (e.g. into the displayChat() method)
+        this.wsService.getChatMessage().subscribe(msg => {
+            console.log("message from websocket => ", msg);
+            this.chatDataDTO.chatroomMessages.push(msg);
+            this.scrollToLatestMessage();
+        })
     }
 
     displayChat(chat: ChatRoomWithParticipantsExceptSelf) {
+        // leave an existing chatroom first (only for now)
+        this.leaveChatroom();
+
         // create new instance here, in case any errors might happen during chatroom navigation or whatnot
         this.chatDataDTO = new ChatData();
         this.chatDataDTO.chat = chat;
         this.displayChatMessages();
+
+        // join websocket room
+        this.wsService.joinChatroom(this.chatDataDTO.chat.chatroom_id);
     }
 
     displayChatMessages() {
@@ -44,6 +57,7 @@ export class ChatComponent implements OnInit {
     }
 
     logout() {
+        this.leaveChatroom();
         this.userService.logout();
     }
 
@@ -57,6 +71,9 @@ export class ChatComponent implements OnInit {
             this.chatDataDTO.chatroomOnly.chatroom_id).subscribe(msg => {
                 this.formGroup.reset();
                 this.chatDataDTO.chatroomMessages.push(msg);
+
+                // emit msg via websocket
+                this.wsService.sendChatMessage(msg);
                 
                 this.scrollToLatestMessage();
             });
@@ -67,6 +84,12 @@ export class ChatComponent implements OnInit {
             const lastMessageDiv = Array.from(document.getElementsByClassName("chat-message-div")).pop();
             lastMessageDiv?.scrollIntoView({ behavior: 'smooth' });
         }, 1);
+    }
+
+    leaveChatroom() {
+        if (this.chatDataDTO && this.chatDataDTO.chat) {
+            this.wsService.leaveChatroom(this.chatDataDTO.chat.chatroom_id);
+        }
     }
 
 }
