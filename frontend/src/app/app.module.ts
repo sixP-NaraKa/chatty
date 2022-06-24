@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
@@ -12,6 +12,7 @@ import { ChatComponent } from './chat/chat.component';
 import { jwtInterceptorProvider } from './auth/interceptor/jwt.interceptor';
 import { RegistrationFormComponent } from './registration-form/registration-form.component';
 import { WebsocketService } from './services/websocket.service';
+import { UnauthorizedErroHandler } from './401-errorhandler';
 
 const socketconfig: SocketIoConfig = { url: "http://localhost:3100" }
 
@@ -30,7 +31,11 @@ const socketconfig: SocketIoConfig = { url: "http://localhost:3100" }
         ReactiveFormsModule,
         SocketIoModule.forRoot(socketconfig),
     ],
-    providers: [jwtInterceptorProvider, WebsocketService],
+    providers: [
+        jwtInterceptorProvider,
+        WebsocketService,
+        {provide: ErrorHandler, useClass: UnauthorizedErroHandler}
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
