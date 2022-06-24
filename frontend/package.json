@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "serve": "ng serve --port 4300",
+    "serveall": "ng serve --host 192.168.178.33 --port 4300",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

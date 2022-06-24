@@ -32,23 +32,23 @@ export class UserService {
     /* REGISTRATION */
 
     register(username: string, password: string): Observable<User> {
-        return this.http.post<User>("http://localhost:3100/auth/create", { username: username, password: password });
+        return this.http.post<User>("http://192.168.178.33:3100/auth/create", { username: username, password: password });
     }
 
     /* FETCHING OF DATA */
 
     getChatroomsForUserWithParticipantsExceptSelf(userId: number): Observable<ChatRoomWithParticipantsExceptSelf[]> {
-        return this.http.get<ChatRoomWithParticipantsExceptSelf[]>(`http://localhost:3100/api/user/chatrooms?user_id=${userId}`);
+        return this.http.get<ChatRoomWithParticipantsExceptSelf[]>(`http://192.168.178.33:3100/api/user/chatrooms?user_id=${userId}`);
     }
 
     getChatroomMessages(chatroomId: number, userId: number): Observable<ChatroomWithMessages> {
-        return this.http.get<ChatroomWithMessages>(`http://localhost:3100/api/chat/chatmessages?chatroom_id=${chatroomId}&user_id=${userId}`);
+        return this.http.get<ChatroomWithMessages>(`http://192.168.178.33:3100/api/chat/chatmessages?chatroom_id=${chatroomId}&user_id=${userId}`);
     }
 
     /* INSERTING OF DATA */
     
     sendMessage(message: string, userId: number, chatroomId: number): Observable<ChatMessageWithUser> {
-        return this.http.post<ChatMessageWithUser>(`http://localhost:3100/api/chat/create/chatmessage?user_id=${userId}`, { message: message, userId: userId, chatroomId: chatroomId });
+        return this.http.post<ChatMessageWithUser>(`http://192.168.178.33:3100/api/chat/create/chatmessage?user_id=${userId}`, { message: message, userId: userId, chatroomId: chatroomId });
     }
 
 }

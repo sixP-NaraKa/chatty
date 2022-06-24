@@ -14,7 +14,7 @@ import { RegistrationFormComponent } from './registration-form/registration-form
 import { WebsocketService } from './services/websocket.service';
 import { UnauthorizedErroHandler } from './401-errorhandler';
 
-const socketconfig: SocketIoConfig = { url: "http://localhost:3100" }
+const socketconfig: SocketIoConfig = { url: "http://192.168.178.33:3100" }
 
 @NgModule({
     declarations: [

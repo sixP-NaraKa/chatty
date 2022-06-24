@@ -33,7 +33,7 @@ export class AuthService {
     }
 
     login(username: string, password: string): Observable<ApplicationUser> {
-        return this.http.post<ApplicationUser>("http://localhost:3100/auth/login", { username: username, password: password }, { withCredentials: true }).pipe(
+        return this.http.post<ApplicationUser>("http://192.168.178.33:3100/auth/login", { username: username, password: password }, { withCredentials: true }).pipe(
             map(user => {
                 console.log("user obj =>", user);
                 if (user && user.access_token) {
