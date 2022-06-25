@@ -7,13 +7,14 @@
     </div>
 </div>
 
-<div class="px-4 pb-4 pt-8 h-[85vh] flex">
-    <div class="flex-auto ml-auto w-1/12 min-w-[80px] h-3/3 border border-yellow-200 px-2 mr-4 text-xs sm:text-base">
+<div class="chat px-4 pb-4 pt-8 h-[85vh] flex">
+    <div
+        class="chat-tabs chat-scrollbar flex-auto overflow-y-auto w-1/12 min-w-[80px] border border-yellow-200 px-2 mr-4 text-xs sm:text-base">
         <app-chat-tabs (loadChat)="displayChat($event)"></app-chat-tabs>
     </div>
     <div
-        class="chat-window-div relative flex-auto mr-auto w-3/4 min-w-[160px] md:w-2/3 h-3/3 border border-emerald-200 text-xs sm:text-base">
-        <div class="chat-scrollbar text-left h-[90%] overflow-y-auto">
+        class="chat-window-div relative flex-auto mr-auto w-3/4 min-w-[160px] md:w-2/3 border border-emerald-200 text-xs sm:text-base">
+        <div class="chat-scrollbar text-left h-full overflow-y-auto">
             <div *ngFor="let message of chatDataDTO.chatroomMessages" class="chat-message-div"
                 [class.text-right]="message.user_id === currentUser.userId">
                 <p class="max-w-md break-words text-ellipsis overflow-hidden pb-8 px-2"
@@ -26,10 +27,10 @@
             class="absolute bottom-0 w-full h-4 md:h-7 border-t-2 rounded-lg border-violet-200 px-2 text-xs md:text-base">
             <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate>
                 <input required formControlName="messageInput"
-                    class="form-element absolute bottom-0 left-0 w-3/4 sm:w-10/12 h-4 md:h-7 border-t-2 rounded-l-lg border-violet-200 px-2 mt-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
+                    class="form-element absolute bottom-0 left-0 w-3/4 sm:w-10/12 h-4 md:h-7 border-t-2 border-violet-200 px-2 mt-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
                     placeholder="Write your message..." />
                 <button type="submit"
-                    class="form-element absolute bottom-0 right-0 w-1/4 sm:w-1/6 h-4 md:h-7 border-l border-t-2 border-violet-200 rounded-lg text-violet-200 hover:bg-gray-600 whitespace-nowrap text-ellipsis overflow-hidden z-50">Send</button>
+                    class="form-element absolute bottom-0 right-0 w-1/4 sm:w-1/6 h-4 md:h-7 border-l-2 border-t-2 border-violet-200 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-50">Send</button>
             </form>
         </div>
     </div>
