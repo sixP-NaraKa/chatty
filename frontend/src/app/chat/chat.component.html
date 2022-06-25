@@ -7,13 +7,13 @@
     </div>
 </div>
 
-<div class="chat px-4 pb-4 pt-8 h-[85vh] flex">
+<div class="chat flex flex-auto flex-col sm:flex-row w-full h-[90vh] sm:space-x-6 p-4 pt-8">
     <div
-        class="chat-tabs chat-scrollbar flex-auto overflow-y-auto w-1/12 min-w-[80px] border border-yellow-200 px-2 mr-4 text-xs sm:text-base">
+        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] sm:w-1/4 h-1/4 sm:h-full px-4 border border-yellow-200 overflow-y-auto text-xs md:text-base">
         <app-chat-tabs (loadChat)="displayChat($event)"></app-chat-tabs>
     </div>
     <div
-        class="chat-window-div relative flex-auto mr-auto w-3/4 min-w-[160px] md:w-2/3 border border-emerald-200 text-xs sm:text-base">
+        class="chat-window-div relative sm:w-3/4 min-w-[240px] h-3/4 sm:h-full sm:mr-auto mt-2 sm:mt-0 border border-violet-200 text-xs md:text-base overflow-y-auto">
         <div class="chat-scrollbar text-left h-full overflow-y-auto">
             <div *ngFor="let message of chatDataDTO.chatroomMessages" class="chat-message-div"
                 [class.text-right]="message.user_id === currentUser.userId">
