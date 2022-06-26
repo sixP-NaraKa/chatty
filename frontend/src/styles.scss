@@ -7,6 +7,26 @@ html {
     height: 100%;
 }
 
+html, .chat-scrollbar {
+    &::-webkit-scrollbar {
+        width: 0.35rem;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgb(26, 32, 44);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgb(112, 125, 151);
+        border-radius: 0.5rem;
+    }
+
+    /* special firefox scrollbar styles */
+    scrollbar-width: thin;
+    scrollbar-color: rgb(112, 125, 151);
+    scrollbar-track-color: rgb(26, 32, 44);
+}
+
 .login-input, .register-input {
     border: 1px solid rgb(44, 53, 71);
     background-color: rgb(44, 53, 71);
