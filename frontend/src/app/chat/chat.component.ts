@@ -58,6 +58,7 @@ export class ChatComponent implements OnInit {
 
     logout() {
         this.leaveChatroom();
+        document.onclick = null; // otherwise "window" if used
         this.userService.logout();
     }
 
@@ -91,5 +92,5 @@ export class ChatComponent implements OnInit {
             this.wsService.leaveChatroom(this.chatDataDTO.chat.chatroom_id);
         }
     }
-
+    
 }

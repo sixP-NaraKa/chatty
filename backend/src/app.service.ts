@@ -2,6 +2,38 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser } from '../../shared/types/db-dtos';
 
+
+const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
+    return {
+        where: {
+            user_id: userId
+        },
+        include: {
+            users: false,
+            chatrooms: {
+                include: {
+                    participants: {
+                        select: {
+                            users: {
+                                select: {
+                                    user_id: true,
+                                    display_name: true,
+                                },
+                            }
+                        },
+                        where: {
+                            NOT: {
+                                user_id: userId
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 @Injectable()
 export class AppService {
 
@@ -23,28 +55,7 @@ export class AppService {
             where: {
                 user_id: userId
             },
-            include: {
-                users: false,
-                chatrooms: {
-                    include: {
-                        participants: {
-                            select: {
-                                users: {
-                                    select: {
-                                        user_id: true,
-                                        display_name: true,
-                                    },
-                                }
-                            },
-                            where: {
-                                NOT: {
-                                    user_id: userId
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            include: includeChatroomWithParticipantsExceptSelf(userId).include
         });
     }
 
@@ -67,6 +78,41 @@ export class AppService {
                     }
                 }
             },
+        });
+    }
+
+    async createChatroomWithParticipants(userId: number, participantUserId: number) {
+        const { chatroom_id } = await this.prismaService.chatrooms.create({
+            data: {
+                isgroup: false
+            },
+            select: {
+                chatroom_id: true
+            }
+        });//.then(() => chatroomId.chatroom_id);
+        await this.prismaService.participants.create({
+            data: {
+                user_id: userId,
+                chatroom_id: chatroom_id
+            }
+        });
+        await this.prismaService.participants.create({
+            data: {
+                user_id: participantUserId,
+                chatroom_id: chatroom_id
+            }
+        });
+
+        return await this.prismaService.participants.findFirst({
+            where: {
+                user_id: userId,
+                AND: {
+                    chatrooms: {
+                        chatroom_id: chatroom_id
+                    }
+                }
+            },
+            include: includeChatroomWithParticipantsExceptSelf(userId).include
         });
     }
 

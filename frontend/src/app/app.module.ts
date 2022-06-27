@@ -14,6 +14,7 @@ import { RegistrationFormComponent } from './registration-form/registration-form
 import { WebsocketService } from './services/websocket.service';
 import { UnauthorizedErroHandler } from './401-errorhandler';
 import { HeaderComponent } from './header/header.component';
+import { UserSearchComponent } from './user-search/user-search.component';
 
 const socketconfig: SocketIoConfig = { url: "http://192.168.178.33:3100" }
 
@@ -24,7 +25,8 @@ const socketconfig: SocketIoConfig = { url: "http://192.168.178.33:3100" }
         LoginFormComponent,
         ChatComponent,
         RegistrationFormComponent,
-        HeaderComponent
+        HeaderComponent,
+        UserSearchComponent
     ],
     imports: [
         BrowserModule,

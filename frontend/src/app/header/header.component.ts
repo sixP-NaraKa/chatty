@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 
@@ -9,12 +10,11 @@ import { UserService } from '../services/user.services';
 })
 export class HeaderComponent implements OnInit {
 
-    // would work, but the "leavingChatroom" function does not seem to be triggered correctly
-    // @Input()
-    // leaveChatRoomCallback!: Function;
+    @Output()
+    logOutEvent = new EventEmitter<boolean>();
 
     @Output()
-    logginOutEvent = new EventEmitter<boolean>();
+    userSelectionEvent = new EventEmitter<User>();
 
     currentUser: ApplicationUser;
     constructor(private userService: UserService) {
@@ -25,7 +25,7 @@ export class HeaderComponent implements OnInit {
     }
 
     logout() {
-        this.logginOutEvent.emit(true);
+        this.logOutEvent.emit(true);
     }
 
 }

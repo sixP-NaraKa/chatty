@@ -37,8 +37,16 @@ export class UserService {
 
     /* FETCHING OF DATA */
 
+    getRegisteredUsers(userId: number) {
+        return this.http.get<User[]>(`http://192.168.178.33:3100/api/user/users?user_id=${userId}`);
+    }
+
     getChatroomsForUserWithParticipantsExceptSelf(userId: number): Observable<ChatRoomWithParticipantsExceptSelf[]> {
         return this.http.get<ChatRoomWithParticipantsExceptSelf[]>(`http://192.168.178.33:3100/api/user/chatrooms?user_id=${userId}`);
+    }
+
+    create1on1Chatroom(userId: number, participantUserId: number) {
+        return this.http.get<ChatRoomWithParticipantsExceptSelf>(`http://192.168.178.33:3100/api/user/chatrooms/create?user_id=${userId}&participant_user_id=${participantUserId}`);
     }
 
     getChatroomMessages(chatroomId: number, userId: number): Observable<ChatroomWithMessages> {

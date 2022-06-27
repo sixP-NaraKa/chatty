@@ -1,5 +1,5 @@
-import { AfterContentInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
+import { AfterContentInit, Component, EventEmitter, Output } from '@angular/core';
+import { ChatRoomWithParticipantsExceptSelf, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 
@@ -22,10 +22,9 @@ export class ChatTabsComponent implements AfterContentInit {
 
     constructor(private userService: UserService) {
         this.currentUser = this.userService.currentUser;
-        console.log("currentUser", this.currentUser);
     }
 
-    async ngAfterContentInit() {
+    ngAfterContentInit() {
         this.userService.getChatroomsForUserWithParticipantsExceptSelf(this.currentUser.userId).subscribe(chats => {
             this.chatrooms = chats;
             console.log("chatrooms =>", this.chatrooms);
@@ -38,6 +37,27 @@ export class ChatTabsComponent implements AfterContentInit {
         }
         this.selectedChatId = chat.chatroom_id;
         this.loadChat.emit(chat);
+    }
+
+    userSelection(user: User) {
+        console.log("user emitted from user-search", user);
+        const existingChatroom = this.chatrooms.filter(room => !room.chatrooms.isgroup && room.chatrooms.participants.some(
+            participant => participant.users.user_id === user.user_id
+        ));
+        console.log("chatroom already exists? (frontend) => ", existingChatroom);
+        if (existingChatroom.length === 0) {
+            // make API call to create a new chatroom with the two participants
+            console.log("creating new chatroom (frontend)");
+            this.userService.create1on1Chatroom(this.currentUser.userId, user.user_id).subscribe(room => {
+                this.chatrooms.push(room);
+                this.notifyLoadChat(room);
+            })
+        }
+        else {
+            // load the existing chatroom
+            console.log("loading existing chatroom");
+            this.notifyLoadChat(existingChatroom[0]);
+        }
     }
 
 }

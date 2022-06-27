@@ -40,6 +40,15 @@ export class AppController {
     }
 
     @UseGuards(AuthGuard())
+    @Get("/api/user/chatrooms/create")
+    async create1on1ChatroomWithParticipants(@Query("user_id", ParseIntPipe) userId: number,
+        @Query("participant_user_id", ParseIntPipe) participantUserId: number): Promise<ChatRoomWithParticipantsExceptSelf> {
+        const chatroom = await this.appService.createChatroomWithParticipants(userId, participantUserId);
+        console.log("new chatroom created => ", chatroom)
+        return chatroom;
+    }
+
+    @UseGuards(AuthGuard())
     @Get("/api/chat/chatmessages")
     async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<ChatroomWithMessages> {
         const messages = await this.appService.getAllMessagesForChatroom(chatroomId);

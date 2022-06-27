@@ -1,8 +1,8 @@
-<app-header (logginOutEvent)="logout()"></app-header>
+<app-header (logOutEvent)="logout()"></app-header>
 
 <div class="chat flex flex-auto flex-col sm:flex-row w-full h-[85vh] sm:space-x-6 p-4 pt-4">
     <div
-        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] sm:w-1/4 h-1/4 sm:h-full px-4 border border-yellow-200 overflow-y-auto text-xs md:text-base">
+        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] sm:w-1/4 h-1/4 sm:h-full border border-yellow-200 overflow-y-auto text-xs md:text-base">
         <app-chat-tabs (loadChat)="displayChat($event)"></app-chat-tabs>
     </div>
     <div
