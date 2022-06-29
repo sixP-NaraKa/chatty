@@ -1,30 +1,19 @@
-<app-header (logOutEvent)="logout()"></app-header>
-
-<div class="chat flex flex-auto flex-col sm:flex-row w-full h-[85vh] sm:space-x-6 p-4 pt-4">
-    <div
-        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] sm:w-1/4 h-1/4 sm:h-full border border-yellow-200 overflow-y-auto text-xs md:text-base">
-        <app-chat-tabs (loadChat)="displayChat($event)"></app-chat-tabs>
+<div class="chat-scrollbar text-left h-full overflow-y-auto">
+    <div *ngFor="let message of chatroomMessages" class="chat-message-div"
+        [class.text-right]="message.user_id === currentUser.userId">
+        <p class="max-w-md break-words text-ellipsis overflow-hidden pb-8 px-2"
+            [class.mr-auto]="message.user_id !== currentUser.userId"
+            [class.ml-auto]="message.user_id === currentUser.userId"><b>{{
+                message.users.display_name}}:</b> {{ message.msg_content }}</p>
     </div>
-    <div
-        class="chat-window-div relative sm:w-3/4 min-w-[240px] h-3/4 sm:h-full sm:mr-auto mt-2 sm:mt-0 border border-violet-200 text-xs md:text-base overflow-y-auto">
-        <div class="chat-scrollbar text-left h-full overflow-y-auto">
-            <div *ngFor="let message of chatDataDTO.chatroomMessages" class="chat-message-div"
-                [class.text-right]="message.user_id === currentUser.userId">
-                <p class="max-w-md break-words text-ellipsis overflow-hidden pb-8 px-2"
-                    [class.mr-auto]="message.user_id !== currentUser.userId"
-                    [class.ml-auto]="message.user_id === currentUser.userId"><b>{{
-                        message.users.display_name}}:</b> {{ message.msg_content }}</p>
-            </div>
-        </div>
-        <div *ngIf="chatDataDTO.chat"
-            class="absolute bottom-0 w-full h-4 md:h-7 border-t-2 rounded-lg border-violet-200 px-2 text-xs md:text-base">
-            <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate>
-                <input required formControlName="messageInput"
-                    class="form-element absolute bottom-0 left-0 w-3/4 sm:w-10/12 h-4 md:h-7 border-t-2 border-violet-200 px-2 mt-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
-                    placeholder="Write your message..." />
-                <button type="submit"
-                    class="form-element absolute bottom-0 right-0 w-1/4 sm:w-1/6 h-4 md:h-7 border-l-2 border-t-2 border-violet-200 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-50">Send</button>
-            </form>
-        </div>
-    </div>
+</div>
+<div *ngIf="this.chatroomId !== 1"
+    class="absolute bottom-0 w-full h-4 md:h-7 border-t-2 rounded-lg border-violet-200 px-2 text-xs md:text-base">
+    <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate>
+        <input required formControlName="messageInput"
+            class="form-element absolute bottom-0 left-0 w-3/4 sm:w-10/12 h-4 md:h-7 border-t-2 border-violet-200 px-2 mt-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
+            placeholder="Write your message..." />
+        <button type="submit"
+            class="form-element absolute bottom-0 right-0 w-1/4 sm:w-1/6 h-4 md:h-7 border-l-2 border-t-2 border-violet-200 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-50">Send</button>
+    </form>
 </div>

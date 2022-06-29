@@ -51,6 +51,7 @@ export class UserSearchComponent implements OnInit {
     }
 
     userSelect(user: User) {
+        (document.getElementById("userSearch")! as HTMLInputElement).value = "";
         this.userSelectionEvent.emit(user);
     }
 

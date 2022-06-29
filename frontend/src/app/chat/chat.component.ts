@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
+import { Component, Input, OnInit } from '@angular/core';
+import { ChatMessageWithUser } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ChatData } from './chat.dto';
 import { WebsocketService } from '../services/websocket.service';
 
 @Component({
@@ -14,83 +13,98 @@ import { WebsocketService } from '../services/websocket.service';
 export class ChatComponent implements OnInit {
 
     currentUser: ApplicationUser;
-    chatDataDTO: ChatData = new ChatData();
+
+    chatroomId: number = -1;
+    @Input() set setChatroomId(id: number) {
+        this.chatroomId = id;
+        this.displayChat(id);
+    }
+    
+    chatroomMessages = new Array<ChatMessageWithUser>();
 
     constructor(private userService: UserService, private wsService: WebsocketService) {
         this.currentUser = this.userService.currentUser;
     }
 
     ngOnInit(): void {
-        // for now here, but this will be put then only as soon as we actually entered a chat (e.g. into the displayChat() method)
+        // get incoming messages from the joined chatrooms of the user
+        // since we are leaving / joining the current room, we will also only care about this specific rooms
+        // messages, other messages are handled by the parent app-chat-page component
         this.wsService.getChatMessage().subscribe(msg => {
-            console.log("message from websocket => ", msg);
-            this.chatDataDTO.chatroomMessages.push(msg);
-            this.scrollToLatestMessage();
-        })
+            if (msg.chatroom_id === this.chatroomId) {
+                console.log("message from websocket => ", msg);
+                this.chatroomMessages.push(msg);
+                this.scrollToLatestMessage();
+            }
+        });
     }
 
-    displayChat(chat: ChatRoomWithParticipantsExceptSelf) {
-        // leave an existing chatroom first (only for now)
-        this.leaveChatroom();
+    /**
+     * Displays the given chats messages and joins/leaves the appropriate room.
+     * 
+     * @param chatroomIdToLoad chat to load messages from
+     */
+    displayChat(chatroomIdToLoad: number) {
+        // leave the old chatroom first
+        // this app-chat component will only care about the current chat and its messages
+        // the parent component, the app-chat-page, will handle other incoming messages and act accordingly
+        // e.g. fire user notifications and such
+        // this.wsService.leaveChatroom(this.chatroomId); // don't leave chat rooms anymore, as this is not needed
 
-        // create new instance here, in case any errors might happen during chatroom navigation or whatnot
-        this.chatDataDTO = new ChatData();
-        this.chatDataDTO.chat = chat;
-        this.displayChatMessages();
-
-        // join websocket room
-        this.wsService.joinChatroom(this.chatDataDTO.chat.chatroom_id);
+        if (chatroomIdToLoad !== -1) {
+            console.log("loading chatId", chatroomIdToLoad);
+            // create new instance here, in case any errors might happen during chatroom navigation or whatnot
+            this.chatroomMessages = new Array<ChatMessageWithUser>();
+            this.fetchAndDisplayChatMessages();
+    
+            // join websocket room - no reason to join anymore, since we are already joining each chat at the beginning
+            // this.wsService.joinChatroom(this.chatroomId);
+        }
     }
 
-    displayChatMessages() {
-        // or "this.chatDataDTO.chat.user_id"
-        this.userService.getChatroomMessages(this.chatDataDTO.chat.chatroom_id, this.currentUser.userId).subscribe(chatroomData => {
-            this.chatDataDTO.chatroomData = chatroomData;
-
-            const { participants, chat_messages, ...chatroom } = this.chatDataDTO.chatroomData;
-            this.chatDataDTO.participantsList = participants;
-            this.chatDataDTO.chatroomMessages = chat_messages;
-            this.chatDataDTO.chatroomOnly = chatroom;
-
+    /**
+     * Fetches and displays the chat messages in the UI.
+     */
+    fetchAndDisplayChatMessages() {
+        this.userService.getChatroomMessages(this.chatroomId, this.currentUser.userId).subscribe(chatroomData => {
+            const { chat_messages, ..._ } = chatroomData;
+            this.chatroomMessages = chat_messages;
             this.scrollToLatestMessage();
         });
     }
 
-    logout() {
-        this.leaveChatroom();
-        document.onclick = null; // otherwise "window" if used
-        this.userService.logout();
-    }
-
+    /**
+     * Sends a message to the backend for inserting, as well as sending the chat message over the
+     * correct websocket room.
+     */
     formGroup = new FormGroup({
         messageInput: new FormControl("", Validators.required)
     });
     sendMessage() {
-        this.userService.sendMessage(
-            this.formGroup.value.messageInput,
-            this.currentUser.userId,
-            this.chatDataDTO.chatroomOnly.chatroom_id).subscribe(msg => {
-                this.formGroup.reset();
-                this.chatDataDTO.chatroomMessages.push(msg);
-
-                // emit msg via websocket
-                this.wsService.sendChatMessage(msg);
-                
-                this.scrollToLatestMessage();
+        if (this.chatroomId !== -1) {
+            this.userService.sendMessage(this.formGroup.value.messageInput, this.currentUser.userId, this.chatroomId)
+                .subscribe(msg => {
+                    this.formGroup.reset();
+                    this.chatroomMessages.push(msg);
+    
+                    // emit msg via websocket
+                    this.wsService.sendChatMessage(msg);
+                    
+                    this.scrollToLatestMessage();
             });
+        }
     }
 
+    /**
+     * Helper function to scroll to the latest message available in the UI.
+     * Is being used by initial load of the chat messages,
+     * and when writing, sending and receiving chat messages.
+     */
     scrollToLatestMessage() {
         setTimeout(function() {
             const lastMessageDiv = Array.from(document.getElementsByClassName("chat-message-div")).pop();
             lastMessageDiv?.scrollIntoView({ behavior: 'smooth' });
         }, 1);
-    }
-
-    leaveChatroom() {
-        if (this.chatDataDTO && this.chatDataDTO.chat) {
-            this.wsService.leaveChatroom(this.chatDataDTO.chat.chatroom_id);
-        }
     }
     
 }

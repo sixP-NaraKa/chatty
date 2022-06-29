@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
+import { ChatPageComponent } from './chat-page/chat-page.component';
 import { ChatComponent } from './chat/chat.component';
 import { LoginGuard } from './guard/login.guard';
 import { LoginFormComponent } from './login-form/login-form.component';
@@ -16,12 +17,12 @@ const routes: Routes = [
         canActivate: [LoginGuard]
     },
     {
-        path: "", component: ChatComponent,
+        path: "", component: ChatPageComponent,
         canActivate: [AuthGuard],
         children: [
             ...["chat", "chats"].map(path => ({
                 path,
-                component: ChatComponent
+                component: ChatPageComponent
             }))
         ]
     },

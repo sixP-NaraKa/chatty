@@ -40,6 +40,20 @@ export class AppController {
     }
 
     @UseGuards(AuthGuard())
+    @Get("/api/user/chatroom")
+    async getSingleChatroomForUserWithParticipantsExceptSelf(@Query("user_id", ParseIntPipe) userId: number,
+        @Query("chatroom_id", ParseIntPipe) chatroomId: number) {
+        return await this.appService.getSingleChatroomForUserWithParticipantsExceptSelf(userId, chatroomId);
+    }
+
+    @UseGuards(AuthGuard())
+    @Get("/api/user/chatroom/1on1")
+    async getSingleChatroomforUserByUserAndParticipantUserId(@Query("user_id", ParseIntPipe) userId: number,
+        @Query("participant_user_id", ParseIntPipe) participantUserId: number) {
+        return await this.appService.getSingleChatroomForUserWithParticipantUserId(userId, participantUserId);
+    }
+
+    @UseGuards(AuthGuard())
     @Get("/api/user/chatrooms/create")
     async create1on1ChatroomWithParticipants(@Query("user_id", ParseIntPipe) userId: number,
         @Query("participant_user_id", ParseIntPipe) participantUserId: number): Promise<ChatRoomWithParticipantsExceptSelf> {
@@ -62,6 +76,12 @@ export class AppController {
         const newMessage = await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
         console.log("new message inserted", newMessage);
         return newMessage;
+    }
+
+    @UseGuards(AuthGuard())
+    @Get("/api/chat/chatmessages/count")
+    async getChatroomMessageCount(@Query("chatroom_id", ParseIntPipe) chatroomId: number) {
+        return await this.appService.getChatroomMessagesCount(chatroomId);
     }
 
 }
