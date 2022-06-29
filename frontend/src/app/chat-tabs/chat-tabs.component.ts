@@ -15,8 +15,11 @@ export class ChatTabsComponent implements AfterContentInit {
     @Output()
     loadChat = new EventEmitter<ChatRoomWithParticipantsExceptSelf>();
 
+    // will be a user defineable setting
+    // if the user turns this off, empty chats which were created by the user will be shown
+    // if it is turned on, no empty 1on1 chats will be shown whatsoever
     @Input()
-    filterOutEmpty1on1Chats: boolean = true;
+    filterOutEmpty1on1Chats: boolean = true; // true per default
 
     @Input()
     incomingNewChatroom!: ChatRoomWithParticipantsExceptSelf;
@@ -33,25 +36,41 @@ export class ChatTabsComponent implements AfterContentInit {
 
     ngAfterContentInit() {
         this.userService.getChatroomsForUserWithParticipantsExceptSelf(this.currentUser.userId).subscribe(chats => {
+            console.log("initial chats", chats);
             // join all websocket chat rooms first
             chats.forEach(chat => {
                 this.wsService.joinChatroom(chat.chatroom_id);
-            })
+            });
 
-            if (this.filterOutEmpty1on1Chats) { // will be a user defineable setting
-                // group chats will always be added
-                const groupChats = chats.filter(chats => chats.chatrooms.isgroup);
-                chats.forEach(chat => { // TODO: I think because of this loop here, sometimes the order in the UI is moving around a little on page reload => seems to happen if chat messages are sent (but sometimes not...)
-                    // fetch the amount of messages
-                    this.userService.getChatroomMessagesCount(chat.chatroom_id, this.currentUser.userId).subscribe(amount => {
-                        if (amount >= 1 && !chat.chatrooms.isgroup) this.chatrooms.push(chat);
-                    });
-                })
-                this.chatrooms = this.chatrooms.concat(groupChats);
-            }
-            else {
-                this.chatrooms = chats;
-            }
+            // group chats will always be added
+            const groupChats = chats.filter(chat => chat.chatrooms.isgroup);
+            // create temporary array to not trigger angulars *ngFor directive during processing
+            let tempArray = new Array<ChatRoomWithParticipantsExceptSelf>();
+
+            // only go over 1on1 chats here
+            chats.filter(chat => !chat.chatrooms.isgroup).forEach((chat, index) => {
+                // fetch the amount of messages
+                this.userService.getChatroomMessagesCount(chat.chatroom_id, this.currentUser.userId).subscribe(amount => {
+                    console.log("filter?", this.filterOutEmpty1on1Chats, chat);
+                    if (amount >= 1) {
+                        tempArray.splice(index, 0, chat);
+                    }
+                    else if (chat.chatrooms.created_by === this.currentUser.userId) {
+                        console.log("empty chat created by me", chat);
+                        if (this.filterOutEmpty1on1Chats) {
+                            console.log("filtering the chat, because user settings");
+                            return;
+                        }
+                        console.log("not filtering the chat");
+                        tempArray.splice(index, 0, chat);
+                    }
+                });
+            });
+            tempArray = tempArray.concat(groupChats);
+            tempArray.sort((a, b) => a.chatrooms.chatroom_id - b.chatrooms.chatroom_id);
+            this.chatrooms = tempArray;
+            // remove elements from the tempArray, as this is not needed anymore
+            tempArray.length = 0;
             console.log("chatrooms =>", this.chatrooms);
         });
         this.listenForMessagesFromNotYetAddedChatrooms();
@@ -85,12 +104,6 @@ export class ChatTabsComponent implements AfterContentInit {
                     this.userService.create1on1Chatroom(this.currentUser.userId, user.user_id).subscribe(room => {
                         this.chatrooms.push(room);
                         this.notifyLoadChat(room);
-                        // purposefully not sending a notification via websockets (anymore),
-                        // as then the user will only see the chat if there are messages in it
-                        // Note: we will actually emit the new created chatroom, as this is now needed
-                        //       this websocket event will be listened to by the app-chat-page component,
-                        //       which in turn will notify this component here of the chat to add,
-                        //       once new messages of these types of chatrooms come in
                         this.wsService.createChatroom(room, user.user_id);
                     });
                 }
@@ -116,6 +129,7 @@ export class ChatTabsComponent implements AfterContentInit {
                         this.chatrooms.push(chatroom);
                 });
             }
+            // else: maybe something like a locally stored list, in which we store the IDs of the chats or something? but reload will empty that again...
         });
     }
 

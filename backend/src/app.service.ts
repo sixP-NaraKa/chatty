@@ -193,7 +193,8 @@ export class AppService {
     async createChatroomWithParticipants(userId: number, participantUserId: number) {
         const { chatroom_id } = await this.prismaService.chatrooms.create({
             data: {
-                isgroup: false
+                isgroup: false,
+                created_by: userId
             },
             select: {
                 chatroom_id: true

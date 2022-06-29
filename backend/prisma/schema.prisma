@@ -30,6 +30,8 @@ model chatrooms {
   chatroom_id   Int             @id @default(autoincrement())
   name          String?
   isgroup       Boolean
+  created_by    Int?
+  created_at    DateTime?       @default(now()) @db.Timestamp(6)
   chat_messages chat_messages[]
   participants  participants[]
 }
