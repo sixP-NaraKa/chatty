@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { WebsocketService } from '../services/websocket.service';
 
 export interface ApplicationUser {
     access_token: string,
@@ -18,7 +19,7 @@ export class AuthService {
     private currentUserSubject: BehaviorSubject<ApplicationUser>;
     public currentUserToken: Observable<ApplicationUser>;
 
-    constructor(private http: HttpClient, private router: Router) {
+    constructor(private http: HttpClient, private router: Router, private wsService: WebsocketService) {
         this.currentUserSubject = new BehaviorSubject<ApplicationUser>(
             JSON.parse(localStorage.getItem("chatty-current-user") as string)
         );
@@ -48,6 +49,7 @@ export class AuthService {
     logout(): void {
         localStorage.removeItem("chatty-current-user");
         this.currentUserSubject.next(null as any);
+        this.wsService.disconnect();
         this.router.navigate(["/login"]);
     }
 

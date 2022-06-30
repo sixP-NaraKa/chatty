@@ -9,6 +9,10 @@ export class WebsocketService {
 
     constructor(private socket: Socket) { }
 
+    disconnect() {
+        this.socket.disconnect();
+    }
+
     sendChatMessage(message: ChatMessageWithUser) {
         this.socket.emit("send:message", message);
     }

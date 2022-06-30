@@ -24,6 +24,7 @@ export class VerifyUserMiddleware implements NestMiddleware {
 
         // fetch user from db to completely verify
         const dbUser = await this.userService.findOneById(jwtUser.sub);
+        console.log("jwtUser", jwtUser, "dbUser", dbUser, "queryUserId", queryUserId);
 
         if (!dbUser || !jwtUser) {
             console.log("=> Middlware: No user found. <=");

@@ -37,6 +37,8 @@ export class ChatPageComponent implements OnInit {
      */
     displayChat(chat: ChatRoomWithParticipantsExceptSelf) {
         console.log("new chat to load", chat)
+        // join the chatroom websocket room
+        this.wsService.joinChatroom(chat.chatroom_id);
         this.chatroomIdToLoad = chat.chatroom_id;
         console.log("new chatId to load", this.chatroomIdToLoad);
     }

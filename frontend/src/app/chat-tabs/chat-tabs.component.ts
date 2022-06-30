@@ -30,8 +30,11 @@ export class ChatTabsComponent implements AfterContentInit {
 
     currentUser: ApplicationUser;
 
+    newUnreadMessagesChatroomIds = new Array<number>();
+
     constructor(private userService: UserService, private wsService: WebsocketService) {
         this.currentUser = this.userService.currentUser;
+        console.log("constructor currentUser", this.currentUser);
     }
 
     ngAfterContentInit() {
@@ -51,7 +54,6 @@ export class ChatTabsComponent implements AfterContentInit {
             chats.filter(chat => !chat.chatrooms.isgroup).forEach((chat, index) => {
                 // fetch the amount of messages
                 this.userService.getChatroomMessagesCount(chat.chatroom_id, this.currentUser.userId).subscribe(amount => {
-                    console.log("filter?", this.filterOutEmpty1on1Chats, chat);
                     if (amount >= 1) {
                         tempArray.splice(index, 0, chat);
                     }
@@ -77,7 +79,7 @@ export class ChatTabsComponent implements AfterContentInit {
     }
 
     /**
-     * Notifies the event subscribers and emits the chat.
+     * Notifies the event subscribers and emits the chat, if it is not the current opened one.
      * 
      * @param chat the chat to emit
      */
@@ -86,6 +88,12 @@ export class ChatTabsComponent implements AfterContentInit {
             return;
         }
         this.selectedChatId = chat.chatroom_id;
+        // remove the "unread messages" flag from the new chat, if it is present
+        let idxOf = this.newUnreadMessagesChatroomIds.indexOf(this.selectedChatId);
+        if (idxOf !== 1) {
+            this.newUnreadMessagesChatroomIds.splice(idxOf, 1);
+            console.log("new unread messages chatrooms", this.newUnreadMessagesChatroomIds);
+        }
         this.loadChat.emit(chat);
     }
 
@@ -120,16 +128,22 @@ export class ChatTabsComponent implements AfterContentInit {
     }
 
     listenForMessagesFromNotYetAddedChatrooms() {
+        // for websocket subscribers, be careful to use the userService.currentUser instead of the class-wide this.currentUser,
+        // as after a logout the websocket connection still exists, which leads to Unauthorized errors here,
+        // as we are fetching then once with the wrong userId => error,
+        // and then we would technically fetch again with the correct one, but we never get there due to the error
+        // Note: this (also) was easily fixed by just disconnecting the client from the websocket connection(s) when they log out
         this.wsService.getChatMessage().subscribe(msg => {
             const chatroomAlreadyShown = this.chatrooms.some(chatroom => chatroom.chatroom_id === msg.chatroom_id);
             if (!chatroomAlreadyShown) {
                 // fetch the chatroom from the API and add it to the list
-                this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.currentUser.userId, msg.chatroom_id)
+                this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroom_id)
                     .subscribe(chatroom => {
                         this.chatrooms.push(chatroom);
                 });
             }
-            // else: maybe something like a locally stored list, in which we store the IDs of the chats or something? but reload will empty that again...
+            // reload will empty this again, but for now it is fine
+            if (this.selectedChatId !== msg.chatroom_id) this.newUnreadMessagesChatroomIds.push(msg.chatroom_id);
         });
     }
 

@@ -40,25 +40,16 @@ export class ChatComponent implements OnInit {
     }
 
     /**
-     * Displays the given chats messages and joins/leaves the appropriate room.
+     * Displays the given chats messages.
      * 
      * @param chatroomIdToLoad chat to load messages from
      */
     displayChat(chatroomIdToLoad: number) {
-        // leave the old chatroom first
-        // this app-chat component will only care about the current chat and its messages
-        // the parent component, the app-chat-page, will handle other incoming messages and act accordingly
-        // e.g. fire user notifications and such
-        // this.wsService.leaveChatroom(this.chatroomId); // don't leave chat rooms anymore, as this is not needed
-
         if (chatroomIdToLoad !== -1) {
             console.log("loading chatId", chatroomIdToLoad);
             // create new instance here, in case any errors might happen during chatroom navigation or whatnot
             this.chatroomMessages = new Array<ChatMessageWithUser>();
             this.fetchAndDisplayChatMessages();
-    
-            // join websocket room - no reason to join anymore, since we are already joining each chat at the beginning
-            // this.wsService.joinChatroom(this.chatroomId);
         }
     }
 
