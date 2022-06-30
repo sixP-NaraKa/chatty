@@ -143,7 +143,10 @@ export class ChatTabsComponent implements AfterContentInit {
                 });
             }
             // reload will empty this again, but for now it is fine
-            if (this.selectedChatId !== msg.chatroom_id) this.newUnreadMessagesChatroomIds.push(msg.chatroom_id);
+            console.log("unread message chat ids", this.newUnreadMessagesChatroomIds, "this.selectedChatId", this.selectedChatId);
+            if (this.selectedChatId !== msg.chatroom_id && !this.newUnreadMessagesChatroomIds.includes(msg.chatroom_id)) {
+                this.newUnreadMessagesChatroomIds.push(msg.chatroom_id);
+            }
         });
     }
 

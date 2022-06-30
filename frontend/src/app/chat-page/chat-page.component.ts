@@ -15,7 +15,11 @@ export class ChatPageComponent implements OnInit {
      */
     chatroomIdToLoad: number = -1;
 
-    constructor(private userService: UserService, private wsService: WebsocketService) { }
+    constructor(private userService: UserService, private wsService: WebsocketService) {
+        // (re)connect the websocket on page reload
+        // why here? because if this app-chat-page component gets loaded, we are logged in and ready to go
+        this.wsService.connect();
+    }
 
     ngOnInit(): void {
         this.listenForNewChatroomsAndJoinThem();

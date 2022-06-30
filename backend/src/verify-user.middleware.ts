@@ -9,7 +9,7 @@ export class VerifyUserMiddleware implements NestMiddleware {
     constructor(private authService: AuthService, private userService: UsersService) { }
 
     async use(req: Request, res: Response, next: NextFunction) {
-        console.log("=> Middleware function started <=");
+        // console.log("=> Middleware function started <=");
         const queryUserId = Number(req.query.user_id);
         const bearerToken = req.headers.authorization.split(" ")[1];
         let jwtUser;
@@ -24,7 +24,7 @@ export class VerifyUserMiddleware implements NestMiddleware {
 
         // fetch user from db to completely verify
         const dbUser = await this.userService.findOneById(jwtUser.sub);
-        console.log("jwtUser", jwtUser, "dbUser", dbUser, "queryUserId", queryUserId);
+        // console.log("jwtUser", jwtUser, "dbUser", dbUser, "queryUserId", queryUserId);
 
         if (!dbUser || !jwtUser) {
             console.log("=> Middlware: No user found. <=");
@@ -38,7 +38,7 @@ export class VerifyUserMiddleware implements NestMiddleware {
             return;
         }
 
-        console.log("=> Middleware: User is the one they say they are - continuing with further (again) validating the token => calling next() <=");
+        // console.log("=> Middleware: User is the one they say they are - continuing with further (again) validating the token => calling next() <=");
         next();
     }
 

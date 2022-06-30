@@ -9,6 +9,10 @@ export class WebsocketService {
 
     constructor(private socket: Socket) { }
 
+    connect() {
+        this.socket.connect();
+    }
+
     disconnect() {
         this.socket.disconnect();
     }
@@ -36,4 +40,5 @@ export class WebsocketService {
     getNewChatroom() {
         return this.socket.fromEvent<[chatroom: ChatRoomWithParticipantsExceptSelf, participantUserId: number]>("new:chatroom");
     }
+    
 }

@@ -13,7 +13,7 @@ export class AuthService {
     constructor(private usersService: UsersService, private jwtService: JwtService) { }
 
     async validateUser(username: string, passw: string): Promise<User | undefined> {
-        console.log("provided username and password", username, passw);
+        // console.log("provided username and password", username, passw);
         const user = await this.usersService.findOne(username);
         if (user && await bcrypt.compare(passw, user.password)) {
             const { password, ...result } = user;
@@ -23,7 +23,7 @@ export class AuthService {
     }
 
     async createUser(user: { username: string, password: string }): Promise<User | undefined> {
-        console.log("creating new user", user);
+        // console.log("creating new user", user);
         const foundUser = await this.usersService.findOne(user.username);
         if (!foundUser) {
             const pwHash = await bcrypt.hash(user.password, 10);
