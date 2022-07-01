@@ -7,7 +7,7 @@
                 message.users.display_name}}:</b> {{ message.msg_content }}</p>
     </div>
 </div>
-<div *ngIf="this.chatroomId !== 1"
+<div *ngIf="this.chatroomId !== -1"
     class="absolute bottom-0 w-full h-4 md:h-7 border-t-2 rounded-lg border-violet-200 px-2 text-xs md:text-base">
     <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate>
         <input required formControlName="messageInput"

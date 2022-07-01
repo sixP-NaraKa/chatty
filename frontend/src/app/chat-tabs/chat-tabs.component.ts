@@ -90,9 +90,9 @@ export class ChatTabsComponent implements AfterContentInit {
         this.selectedChatId = chat.chatroom_id;
         // remove the "unread messages" flag from the new chat, if it is present
         let idxOf = this.newUnreadMessagesChatroomIds.indexOf(this.selectedChatId);
-        if (idxOf !== 1) {
+        if (idxOf !== -1) {
             this.newUnreadMessagesChatroomIds.splice(idxOf, 1);
-            console.log("new unread messages chatrooms", this.newUnreadMessagesChatroomIds);
+            console.log("new unread messages chatrooms", this.newUnreadMessagesChatroomIds, "idx", idxOf);
         }
         this.loadChat.emit(chat);
     }
