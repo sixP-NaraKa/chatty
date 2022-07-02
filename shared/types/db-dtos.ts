@@ -1,4 +1,4 @@
-import { users, chat_messages, chatrooms, participants } from '../../backend/node_modules/@prisma/client';
+import { users, chat_messages, chatrooms, participants, settings } from '../../backend/node_modules/@prisma/client';
 
 type User = {
     user_id: number,
@@ -29,4 +29,4 @@ type ChatroomWithMessages = chatrooms & {
     participants: participants[];
 }
 
-export { users, chat_messages, participants, chatrooms, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser };
+export { users, chat_messages, participants, chatrooms, settings, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser };

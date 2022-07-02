@@ -1,14 +1,15 @@
 import { Body, Controller, Get, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
-import { users } from '@prisma/client';
+import { settings, users } from '@prisma/client';
 import { AppService } from './app.service';
 import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages } from '../../shared/types/db-dtos';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { UsersService } from './users/users.service';
 
 @Controller()
 export class AppController {
-    constructor(private readonly appService: AppService, private authService: AuthService) { }
+    constructor(private readonly appService: AppService, private authService: AuthService, private userService: UsersService) { }
 
     @UseGuards(LocalAuthGuard)
     @Post("/auth/login")
@@ -29,6 +30,18 @@ export class AppController {
         const users = await this.appService.getAllUsers();
         // console.log("users", users);
         return users;
+    }
+
+    @UseGuards(AuthGuard())
+    @Get("/api/user/settings")
+    async getUserSettings(@Query("user_id", ParseIntPipe) userId: number) {
+        return await this.userService.getUserSettings(userId);
+    }
+
+    @UseGuards(AuthGuard())
+    @Post("/api/user/update/settings")
+    async updateUserSettings(@Body() body: settings) {
+        return await this.userService.updateUserSettings(body);
     }
 
     @UseGuards(AuthGuard())

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
-import { UserSettings } from '../../../../shared/types/user-settings';
+import { first } from 'rxjs';
+import { ChatRoomWithParticipantsExceptSelf, settings } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -16,19 +16,21 @@ export class ChatPageComponent implements OnInit {
      */
     chatroomIdToLoad: number = -1;
 
-    // locally stored UserSettings with default values
-    userSettings: UserSettings;
+    // locally stored user settings with default values
+    userSettings!: settings;
 
     constructor(private userService: UserService, private wsService: WebsocketService) {
         // (re)connect the websocket on page reload
         // why here? because if this app-chat-page component gets loaded, we are logged in and ready to go
         this.wsService.connect();
 
-        // TODO: fetch initial User Settings from db and apply them, or store them in the usersService if needed/wanted
-        this.userSettings =  {
-            filter: "filter",
-            fontSize: "default"
-        };
+        // fetch initial user settings
+        this.userService.getUserSettings(this.userService.currentUser.userId).subscribe(stts => {
+            // this will (re)trigger the [filterOutEmpty1on1Chats] directive (as it seems) before it gets loaded (?)
+            this.userSettings = stts;
+            console.log("fetched user settings", this.userSettings);
+            this.editChatWindowElementFontSize(stts); // both will have the same values, but this doesn't matter
+        });
     }
 
     ngOnInit(): void {
@@ -69,16 +71,39 @@ export class ChatPageComponent implements OnInit {
         });
     }
 
-    applySettings(userSettings: UserSettings) {
-        console.log(userSettings);
-        // check settings and act accordingly
-        this.userSettings = userSettings;
+    applySettings(usrSetts: settings) {
+        // TODO: no idea why after the first time here, both userSettings are ALWAYS the same... makes no sense
+        //       does not matter for the filter changes, but font-size changes need therefore a small,
+        //       rather insignificant workaround, but a workaround nonetheless
+        console.log("passed usersettings", usrSetts, "this.userSettings", this.userSettings);
+        let shouldReload: boolean = false;
+        this.editChatWindowElementFontSize(usrSetts);
 
-        // for font size, something like the following might work:
-        // check if default was selected, e.g. don't change anything here
-        // let element = (document.getElementById("DIV element which holds chat window contents") as HTMLDivElement);
-        // element.classList.remove("ELEMENTS TO REMOVE"); // e.g. md:text-base, and text-sm from this element
-        // element.classList.add("TAILWIND TEXT FONT SIZE => text-[12px], etc.");
+        if (this.userSettings.filter !== usrSetts.filter) {
+            shouldReload = true;
+        }
+        this.userSettings = usrSetts;
+
+        // page reload will, if it happened, repopulate the settings, etc.
+        // TODO: either reload the page, or pass an event to the chat-tabs component, to reload the chat-tabs?
+        if (shouldReload) {
+            window.alert("Filter changes will be applied after a page reload. Reloading page for the changes to take effect...");
+            document.location.reload();
+        }
+    }
+
+    editChatWindowElementFontSize(usrSetts: settings) {
+        let chatWindowElement = (document.getElementById("chatWindowDiv") as HTMLDivElement);
+        if (usrSetts.font_size === "default") {
+            chatWindowElement.classList.add("text-xs", "md:text-base");
+            // chatWindowElement.classList.remove(`${this.userSettings.font_size}`);
+            chatWindowElement.classList.remove("text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
+        }
+        else {
+            // chatWindowElement.classList.remove("text-xs", "md:text-base", `${this.userSettings.font_size}`);
+            chatWindowElement.classList.remove("text-xs", "md:text-base", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
+            chatWindowElement.classList.add(`${usrSetts.font_size}`);
+        }
     }
 
 }

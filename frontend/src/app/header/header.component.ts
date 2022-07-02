@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { User } from '../../../../shared/types/db-dtos';
-import { UserSettings } from '../../../../shared/types/user-settings';
+import { settings, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 
@@ -21,7 +20,7 @@ export class HeaderComponent implements OnInit {
      * EventEmitter to passthrough the catched "applySettingsEveent" event to the subscribed components.
      */
     @Output()
-    applySettingsPassthroughEvent = new EventEmitter<UserSettings>();
+    applySettingsPassthroughEvent = new EventEmitter<settings>();
 
     showMenu: boolean = false;
 
@@ -55,7 +54,7 @@ export class HeaderComponent implements OnInit {
         this.showMenu = false;
     }
 
-    applySettingsPassthrough(userSettings: UserSettings) {
+    applySettingsPassthrough(userSettings: settings) {
         this.applySettingsPassthroughEvent.emit(userSettings);
     }
 

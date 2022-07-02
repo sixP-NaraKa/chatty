@@ -14,6 +14,7 @@ model users {
   password      String
   chat_messages chat_messages[]
   participants  participants[]
+  settings      settings[]
 }
 
 model chat_messages {
@@ -42,4 +43,12 @@ model participants {
   chatroom_id Int
   chatrooms   chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
   users       users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+}
+
+model settings {
+  settings_id Int    @id @default(autoincrement())
+  user_id     Int
+  filter      String @default("filter")
+  font_size   String @default("default")
+  users       users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }

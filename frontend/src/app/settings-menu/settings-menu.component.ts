@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { UserSettings } from '../../../../shared/types/user-settings';
+import { settings } from '../../../../shared/types/db-dtos';
+import { UserService } from '../services/user.services';
 
 @Component({
     selector: 'app-settings-menu',
@@ -9,12 +10,7 @@ import { UserSettings } from '../../../../shared/types/user-settings';
 })
 export class SettingsMenuComponent implements OnInit {
 
-    // TODO: these settings will be fetched later from the db,
-    // and supplied to the respective FormControl
-    userSettings: UserSettings = {
-        filter: "nofilter",
-        fontSize: "12px",
-    }
+    userSettings!: settings;
 
     @Input()
     shouldShowMenu: boolean = false;
@@ -23,17 +19,39 @@ export class SettingsMenuComponent implements OnInit {
     settingsMenuClosedEvent = new EventEmitter<boolean>();
 
     @Output()
-    applySettingsEvent = new EventEmitter<UserSettings>();
+    applySettingsEvent = new EventEmitter<settings>();
 
-    settingsMenuFormGroup = new FormGroup({
-        filterRadio: new FormControl(this.userSettings.filter, Validators.required),
+    settingsMenuFormGroup: FormGroup = new FormGroup({
+        filterRadio: new FormControl(this.userSettings?.filter, Validators.required),
+        fontSize: new FormControl(this.userSettings?.font_size, Validators.required)
     });
 
-    constructor() { }
+    availableFontSizes = [
+        { value: "default", text: "default" },
+        { value: "text-sm", text: "text-sm (14px)" },
+        { value: "text-base", text: "text-base (16px)" },
+        { value: "text-lg", text: "text-lg (18px)" },
+        { value: "text-xl", text: "text-xl (20px)" },
+        { value: "text-2xl", text: "text-2xl (22px)" },
+    ];
+
+    constructor(private userService: UserService) {
+        this.userService.getUserSettings(this.userService.currentUser.userId).subscribe(stts => {
+            this.userSettings = stts;
+            // for now, as a workaround, simply overwrite the existing FormGroup to the correct one
+            this.settingsMenuFormGroup = new FormGroup({
+                filterRadio: new FormControl(this.userSettings.filter, Validators.required),
+                fontSize: new FormControl(this.userSettings.font_size, Validators.required)
+            });
+        });
+    }
 
     ngOnInit(): void {
     }
 
+    /**
+     * Close the settings menu window.
+     */
     closeMenu() {
         this.shouldShowMenu = false;
         this.settingsMenuClosedEvent.emit(false);
@@ -43,7 +61,12 @@ export class SettingsMenuComponent implements OnInit {
      * Submit form with (new) user settings to save.
      */
     onSubmit() {
-        console.log(this.settingsMenuFormGroup.value);
+        this.closeMenu();
+        this.userSettings.filter = this.settingsMenuFormGroup.value.filterRadio as string;
+        this.userSettings.font_size = this.settingsMenuFormGroup.value.fontSize as string;
+        // save the new settings in the db
+        this.userService.updateUserSettings(this.userSettings);
+        // emit the user settings
         this.applySettingsEvent.emit(this.userSettings);
     }
 

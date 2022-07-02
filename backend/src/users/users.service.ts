@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { users } from '@prisma/client';
+import { settings, users } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '../../../shared/types/db-dtos';
 
@@ -33,13 +33,37 @@ export class UsersService {
         return await this.prismaService.users.create({
             data: {
                 display_name: username,
-                password: passw
+                password: passw,
+                settings: {
+                    create: { // no explicit declarations, simply use default values
+                    }
+                }  
             },
             select: {
                 user_id: true,
                 display_name: true,
                 creation_date: true,
                 password: false
+            }
+        })
+    }
+
+    async getUserSettings(userId: number): Promise<settings> {
+        return await this.prismaService.settings.findFirst({
+            where: {
+                user_id: userId
+            }
+        })
+    }
+
+    async updateUserSettings(body: settings) {
+        await this.prismaService.settings.update({
+            where: {
+                settings_id: body.settings_id
+            },
+            data: {
+                filter: body.filter,
+                font_size: body.font_size
             }
         })
     }

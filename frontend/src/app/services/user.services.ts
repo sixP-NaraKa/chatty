@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { ChatMessageWithUser, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User } from "../../../../shared/types/db-dtos";
+import { settings, ChatMessageWithUser, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User } from "../../../../shared/types/db-dtos";
 import { ApplicationUser, AuthService } from "../auth/auth.service";
 
 @Injectable({
@@ -37,6 +37,10 @@ export class UserService {
 
     /* FETCHING OF DATA */
 
+    getUserSettings(userId: number): Observable<settings> {
+        return this.http.get<settings>(`http://192.168.178.33:3100/api/user/settings?user_id=${userId}`);
+    }
+
     getRegisteredUsers(userId: number) {
         return this.http.get<User[]>(`http://192.168.178.33:3100/api/user/users?user_id=${userId}`);
     }
@@ -67,6 +71,10 @@ export class UserService {
 
     /* INSERTING OF DATA */
     
+    updateUserSettings(userSettings: settings) {
+        this.http.post<any>(`http://192.168.178.33:3100/api/user/update/settings?user_id=${userSettings.user_id}`, userSettings).subscribe(); // no-op
+    }
+
     sendMessage(message: string, userId: number, chatroomId: number): Observable<ChatMessageWithUser> {
         return this.http.post<ChatMessageWithUser>(`http://192.168.178.33:3100/api/chat/create/chatmessage?user_id=${userId}`, { message: message, userId: userId, chatroomId: chatroomId });
     }
