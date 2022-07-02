@@ -1,0 +1,32 @@
+<div class="settings-menu-blur z-50 absolute top-0 left-0 flex items-center h-screen w-screen border border-amber-600"
+    [class.hidden]="shouldShowMenu === false" [class.flex]="shouldShowMenu === true">
+    <div class="settings-menu-window relative items-center w-[50%] min-w-fit h-64 px-4 mx-auto border border-green-600">
+        <button type="button" class="absolute top-0 right-0 p-2 fa-solid fa-xmark" (click)="closeMenu()"></button>
+        <p class="pt-8"></p>
+
+        <form [formGroup]="settingsMenuFormGroup" (ngSubmit)="onSubmit()" ngNativeValidate
+            class="flex flex-col items-center">
+            <div>
+                <label for="filter">
+                    <input formControlName="filterRadio" type="radio" name="filterRadio" value="filter" id="filter" />
+                    <span class="px-2">Filter empty chats</span>
+                </label>
+
+                <label for="nofilter" class="pl-4">
+                    <input formControlName="filterRadio" type="radio" name="filterRadio" value="nofilter"
+                        id="nofilter" />
+                    <span class="px-2">Do not filter empty chats</span>
+                </label>
+            </div>
+            <hr class="my-4 border-violet-200 w-full">
+            <div>
+                <p>Change chat window text font-size:</p>
+                <select>
+                    <option></option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-32 absolute bottom-0 mb-4 rounded bg-violet-200 text-black">Apply</button>
+        </form>
+    </div>
+</div>

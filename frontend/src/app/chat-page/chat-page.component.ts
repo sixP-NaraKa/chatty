@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
+import { UserSettings } from '../../../../shared/types/user-settings';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -15,10 +16,19 @@ export class ChatPageComponent implements OnInit {
      */
     chatroomIdToLoad: number = -1;
 
+    // locally stored UserSettings with default values
+    userSettings: UserSettings;
+
     constructor(private userService: UserService, private wsService: WebsocketService) {
         // (re)connect the websocket on page reload
         // why here? because if this app-chat-page component gets loaded, we are logged in and ready to go
         this.wsService.connect();
+
+        // TODO: fetch initial User Settings from db and apply them, or store them in the usersService if needed/wanted
+        this.userSettings =  {
+            filter: "filter",
+            fontSize: "default"
+        };
     }
 
     ngOnInit(): void {
@@ -57,6 +67,18 @@ export class ChatPageComponent implements OnInit {
                 this.wsService.joinChatroom(chatroom.chatroom_id);
             }
         });
+    }
+
+    applySettings(userSettings: UserSettings) {
+        console.log(userSettings);
+        // check settings and act accordingly
+        this.userSettings = userSettings;
+
+        // for font size, something like the following might work:
+        // check if default was selected, e.g. don't change anything here
+        // let element = (document.getElementById("DIV element which holds chat window contents") as HTMLDivElement);
+        // element.classList.remove("ELEMENTS TO REMOVE"); // e.g. md:text-base, and text-sm from this element
+        // element.classList.add("TAILWIND TEXT FONT SIZE => text-[12px], etc.");
     }
 
 }

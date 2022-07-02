@@ -16,6 +16,7 @@ import { UnauthorizedErroHandler } from './401-errorhandler';
 import { HeaderComponent } from './header/header.component';
 import { UserSearchComponent } from './user-search/user-search.component';
 import { ChatPageComponent } from './chat-page/chat-page.component';
+import { SettingsMenuComponent } from './settings-menu/settings-menu.component';
 
 const socketconfig: SocketIoConfig = { url: "http://192.168.178.33:3100", options: { autoConnect: false } }
 
@@ -28,7 +29,8 @@ const socketconfig: SocketIoConfig = { url: "http://192.168.178.33:3100", option
         RegistrationFormComponent,
         HeaderComponent,
         UserSearchComponent,
-        ChatPageComponent
+        ChatPageComponent,
+        SettingsMenuComponent
     ],
     imports: [
         BrowserModule,
