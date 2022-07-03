@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { User } from '../../../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf, User } from '../../../../shared/types/db-dtos';
+import { UserService } from '../services/user.services';
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
     selector: 'app-group-chat-window',
@@ -21,7 +23,10 @@ export class GroupChatWindowComponent implements OnInit {
         groupChatName: new FormControl("", Validators.required),
     });
 
-    constructor() { }
+    @Output()
+    groupChatCreatedEvent = new EventEmitter<ChatRoomWithParticipantsExceptSelf>();
+
+    constructor(private userService: UserService, private wsService: WebsocketService) { }
 
     ngOnInit(): void {
     }
@@ -53,7 +58,17 @@ export class GroupChatWindowComponent implements OnInit {
     }
 
     onSubmit() {
-
+        const groupChatName = this.formGroup.value.groupChatName as string;
+        const groupChatParticipantUserIds = new Array<number>();
+        for (let user of this.selectedUsers) {
+            groupChatParticipantUserIds.push(user.user_id);
+        }
+        this.userService.createChatroom(this.userService.currentUser.userId, groupChatParticipantUserIds, true, groupChatName).subscribe(chatroom => {
+            console.log("submit", chatroom);
+            this.closeMenu();
+            this.wsService.createChatroom(chatroom, groupChatParticipantUserIds);
+            this.groupChatCreatedEvent.emit(chatroom);
+        });
     }
 
 }

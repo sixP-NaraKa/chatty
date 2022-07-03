@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" [disabled]="selectedUsers.length === 0 || groupChatInput.value.trim() === '' || !formGroup.valid"
+            <button type="submit" [disabled]="selectedUsers.length === 0 || groupChatInput.value.trim() === '' || !formGroup.valid"
                 class="absolute bottom-0 right-0 text-center self-center text-black m-2 px-2 bg-violet-200 rounded disabled:bg-gray-500">
                 Create
             </button>

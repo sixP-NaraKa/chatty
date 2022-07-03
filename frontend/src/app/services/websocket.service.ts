@@ -33,12 +33,12 @@ export class WebsocketService {
         this.socket.emit("leave:chatroom", chatroomId);
     }
 
-    createChatroom(chatroom: ChatRoomWithParticipantsExceptSelf, participantUserId: number) {
-        this.socket.emit("create:chatroom", chatroom, participantUserId);
+    createChatroom(chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]) {
+        this.socket.emit("create:chatroom", chatroom, participantUserIds);
     }
 
     getNewChatroom() {
-        return this.socket.fromEvent<[chatroom: ChatRoomWithParticipantsExceptSelf, participantUserId: number]>("new:chatroom");
+        return this.socket.fromEvent<[chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]]>("new:chatroom");
     }
     
 }

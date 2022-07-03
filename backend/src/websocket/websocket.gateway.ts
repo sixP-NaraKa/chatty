@@ -60,8 +60,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     * @param participantUserId the userId to broadcast (only responsible people will process this further)
     */
     @SubscribeMessage("create:chatroom")
-    async onCreateChatroom(client: any, chatroom: ChatRoomWithParticipantsExceptSelf, participantUserId: number) {
-        client.broadcast.emit("new:chatroom", chatroom, participantUserId);
+    async onCreateChatroom(client: any, chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]) {
+        client.broadcast.emit("new:chatroom", chatroom, participantUserIds);
     }
 
 }

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { first } from 'rxjs';
 import { ChatRoomWithParticipantsExceptSelf, settings } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
@@ -34,7 +33,7 @@ export class ChatPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.listenForNewChatroomsAndJoinThem();
+        // this.listenForNewChatroomsAndJoinThem();
     }
 
     /**
@@ -58,18 +57,6 @@ export class ChatPageComponent implements OnInit {
         this.wsService.joinChatroom(chat.chatroom_id);
         this.chatroomIdToLoad = chat.chatroom_id;
         console.log("new chatId to load", this.chatroomIdToLoad);
-    }
-
-    listenForNewChatroomsAndJoinThem() {
-        // listen for new chatrooms which have been created and the user is a part of.
-        // join these chatrooms first, but do not show them in the UI unless there have been messages.
-        // listen in a second part (done in the app-chat-tabs component for the moment) to the websocket event "get:message"
-        // and if this chat is not yet part of our locally stored list, show them in the UI.
-        this.wsService.getNewChatroom().subscribe(([chatroom, participantUserId]) => {
-            if (participantUserId === this.userService.currentUser.userId) {
-                this.wsService.joinChatroom(chatroom.chatroom_id);
-            }
-        });
     }
 
     applySettings(usrSetts: settings) {
@@ -97,11 +84,9 @@ export class ChatPageComponent implements OnInit {
         let chatWindowElement = (document.getElementById("chatWindowDiv") as HTMLDivElement);
         if (usrSetts.font_size === "default") {
             chatWindowElement.classList.add("text-xs", "md:text-base");
-            // chatWindowElement.classList.remove(`${this.userSettings.font_size}`);
             chatWindowElement.classList.remove("text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
         }
         else {
-            // chatWindowElement.classList.remove("text-xs", "md:text-base", `${this.userSettings.font_size}`);
             chatWindowElement.classList.remove("text-xs", "md:text-base", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
             chatWindowElement.classList.add(`${usrSetts.font_size}`);
         }

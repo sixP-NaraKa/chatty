@@ -66,8 +66,8 @@ export class AppController {
     @Get("/api/user/chatrooms/create")
     async createChatroomWithParticipants(@Query("user_id", ParseIntPipe) userId: number,
         @Query("participant_user_id", new ParseArrayPipe({ items: Number, separator: "," })) participantUserIds: number[],
-        @Query("is_group", ParseBoolPipe) isGroup: boolean): Promise<ChatRoomWithParticipantsExceptSelf> {
-        const chatroom = await this.appService.createChatroomWithParticipants(userId, participantUserIds, isGroup);
+        @Query("is_group", ParseBoolPipe) isGroup: boolean, @Query("group_name") groupName?: string | null): Promise<ChatRoomWithParticipantsExceptSelf> {
+        const chatroom = await this.appService.createChatroomWithParticipants(userId, participantUserIds, isGroup, groupName);
         return chatroom;
     }
 

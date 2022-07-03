@@ -54,7 +54,6 @@ export class ChatTabsComponent implements AfterContentInit {
 
             // only go over 1on1 chats here
             chats.filter(chat => !chat.chatrooms.isgroup).forEach((chat, index) => {
-                // fetch the amount of messages
                 this.userService.getChatroomMessagesCount(chat.chatroom_id, this.currentUser.userId).subscribe(amount => {
                     if (amount >= 1) {
                         tempArray.splice(index, 0, chat);
@@ -74,9 +73,12 @@ export class ChatTabsComponent implements AfterContentInit {
             tempArray.sort((a, b) => a.chatrooms.chatroom_id - b.chatrooms.chatroom_id);
             this.chatrooms = tempArray;
             // remove elements from the tempArray, as this is not needed anymore
-            tempArray.length = 0;
+            // tempArray.length = 0; => this somehow causes issues for adding group chats / pushing things manually >
+            // because this part of the code is being executed before the .subscribe() is done,
+            // and that is why the tempArray gets nuked and previous data is not there
             console.log("chatrooms =>", this.chatrooms);
         });
+        this.listenForNewChatroomsAndJoinThem();
         this.listenForMessagesFromNotYetAddedChatrooms();
     }
 
@@ -100,7 +102,8 @@ export class ChatTabsComponent implements AfterContentInit {
     }
 
     /**
-     * Catches the "userSelectionEvent" event and is responsible for creating the chatroom if it does not yet exist.
+     * Catches the "userSelectionEvent" event from the user-search component,
+     * and is responsible for creating the chatroom if it does not yet exist.
      * 
      * @param user the user which has been selected to start a chat with
      */
@@ -114,7 +117,7 @@ export class ChatTabsComponent implements AfterContentInit {
                     this.userService.createChatroom(this.currentUser.userId, user.user_id, false).subscribe(room => {
                         this.chatrooms.push(room);
                         this.notifyLoadChat(room);
-                        this.wsService.createChatroom(room, user.user_id);
+                        this.wsService.createChatroom(room, [user.user_id]);
                     });
                 }
                 else {
@@ -129,12 +132,23 @@ export class ChatTabsComponent implements AfterContentInit {
             });
     }
 
+    listenForNewChatroomsAndJoinThem() {
+        // listen for new chatrooms which have been created and the user is a part of.
+        // join these chatrooms first, but do not show them in the UI unless there have been messages.
+        // listen in a second part (done in the app-chat-tabs component for the moment) to the websocket event "get:message"
+        // and if this chat is not yet part of our locally stored list, show them in the UI.
+        this.wsService.getNewChatroom().subscribe(([chatroom, participantUserIds]) => {
+            if (participantUserIds.includes(this.userService.currentUser.userId)) {
+                this.wsService.joinChatroom(chatroom.chatroom_id);
+                // if the chatroom from the websocket is a group chat, add it to our list of chats
+                if (chatroom.chatrooms.isgroup) {
+                    this.chatrooms.push(chatroom);
+                }
+            }
+        });
+    }
+
     listenForMessagesFromNotYetAddedChatrooms() {
-        // for websocket subscribers, be careful to use the userService.currentUser instead of the class-wide this.currentUser,
-        // as after a logout the websocket connection still exists, which leads to Unauthorized errors here,
-        // as we are fetching then once with the wrong userId => error,
-        // and then we would technically fetch again with the correct one, but we never get there due to the error
-        // Note: this (also) was easily fixed by just disconnecting the client from the websocket connection(s) when they log out
         this.wsService.getChatMessage().subscribe(msg => {
             const chatroomAlreadyShown = this.chatrooms.some(chatroom => chatroom.chatroom_id === msg.chatroom_id);
             if (!chatroomAlreadyShown) {
@@ -165,6 +179,16 @@ export class ChatTabsComponent implements AfterContentInit {
      */
     onCreateGroupChatClosed() {
         this.showGroupChatCreateWindow = false;
+    }
+
+    /**
+     * Catches the event emitted from the group-chat component,
+     * when a group chat has been created. Adds the group-chat to the list of chats for the user.
+     * 
+     * @param chatroom group chatroom to add to the chats list
+     */
+    onCreateGroupChatEvent(chatroom: ChatRoomWithParticipantsExceptSelf) {
+        this.chatrooms.push(chatroom);
     }
 
 }

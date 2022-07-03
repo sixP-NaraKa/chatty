@@ -190,7 +190,7 @@ export class AppService {
      * @param participantUserIds userIds of the participants
      * @returns 
      */
-    async createChatroomWithParticipants(userId: number, participantUserIds: number[], isgroup: boolean = false) {
+    async createChatroomWithParticipants(userId: number, participantUserIds: number[], isgroup: boolean = false, groupChatName?: string | null) {
         const data = [{ user_id: userId }]; // add user which created this chatroom
         for (let num of participantUserIds) {
             data.push({ user_id: num })
@@ -198,6 +198,7 @@ export class AppService {
         const { chatroom_id } = await this.prismaService.chatrooms.create({
             data: {
                 isgroup: isgroup,
+                name: groupChatName,
                 created_by: userId,
                 participants: {
                     createMany: {
