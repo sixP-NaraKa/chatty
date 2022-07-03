@@ -1,0 +1,9 @@
+<div class="settings-menu-blur z-50 absolute top-0 left-0 flex items-center h-screen w-screen"
+    [class.hidden]="shouldShowWindow === false" [class.flex]="shouldShowWindow === true">
+    <div class="settings-menu-window relative items-center w-[50%] min-w-fit h-64 px-4 mx-auto border border-green-600">
+        <p class="absolute top-0 left-0 p-2">Create Group Chat</p>
+        <button type="button" class="absolute top-0 right-0 p-2 fa-solid fa-xmark" (click)="closeMenu()"></button>
+        <p class="pt-8"></p>
+        <app-user-search (userSelectionEvent)="userSelection($event)"></app-user-search>
+    </div>
+</div>
