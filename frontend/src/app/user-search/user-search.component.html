@@ -1,7 +1,7 @@
-<div class="z-50 pb-2">
-    <input #userSearchInput type="text" id={{userSearchInputElementId}} placeholder="Search for users..." class="userSearch w-full h-fit px-2 border-b border-violet-200 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden text-xs md:text-base" />
+<div class="z-50">
+    <input #userSearchInput type="text" id={{userSearchInputElementId}} placeholder="Search for users..." class="bg-transparent w-full h-6 px-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden text-xs md:text-base" />
     <div #searchResultsetDiv id={{searchResultSetDivElementId}}>
-        <ul #searchResultsetUL *ngIf="filteredUsers.length !== 0" id={{searchResultSetULElementId}} class="search-box-resultset search-scrollbar flex flex-auto flex-col z-50 w-full max-h-32 px-4 border-b border-gray-200 rounded overflow-y-auto overflow-x-hidden">
+        <ul #searchResultsetUL *ngIf="filteredUsers.length !== 0" id={{searchResultSetULElementId}} class="bg-transparent search-scrollbar flex flex-auto flex-col z-50 w-full max-h-32 px-4 border-b border-gray-200 rounded overflow-y-auto overflow-x-hidden">
             <li *ngFor="let user of filteredUsers" (click)="userSelect(user)" title="User: {{user.display_name}}" class="w-fit border-b border-gray-200 hover:text-violet-200">
                 <a href="javascript:;">{{user.display_name}}</a>
             </li>

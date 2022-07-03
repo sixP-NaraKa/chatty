@@ -1,9 +1,30 @@
-<div class="settings-menu-blur z-50 absolute top-0 left-0 flex items-center h-screen w-screen"
+<div class="settings-menu-blur z-50 absolute top-0 left-0 flex items-center h-screen w-screen min-w-[256px]"
     [class.hidden]="shouldShowWindow === false" [class.flex]="shouldShowWindow === true">
-    <div class="settings-menu-window relative items-center w-[50%] min-w-fit h-64 px-4 mx-auto border border-green-600">
+    <div class="settings-menu-window relative items-center w-[50%] min-w-[256px] h-fit px-4 mx-auto border border-green-600">
         <p class="absolute top-0 left-0 p-2">Create Group Chat</p>
         <button type="button" class="absolute top-0 right-0 p-2 fa-solid fa-xmark" (click)="closeMenu()"></button>
-        <p class="pt-8"></p>
-        <app-user-search (userSelectionEvent)="userSelection($event)"></app-user-search>
+        <p class="pt-12"></p>
+        
+        <form [formGroup]="formGroup" ngNativeValidate (ngSubmit)="onSubmit()">
+            <input #groupChatInput required type="text" formControlName="groupChatName" placeholder="Enter group chat name..." class="w-full px-2 bg-gray-800 whitespace-nowrap text-ellipsis overflow-hidden focus:outline-none" />
+            <hr class="my-4 border border-gray-200 w-full">
+            <div class="bg-gray-800">
+                <app-user-search (userSelectionEvent)="userSelection($event)"></app-user-search>
+            </div>
+            <div id="selectedUsersDivContainer" class="mb-8">
+                <p class="p-2 mt-2"><b>Selected Users:</b></p>
+                <div id="selectedUsersDivListContainer" class="flex flex-row flex-wrap w-full p-2">
+                    <p *ngIf="selectedUsers.length === 0" class="mb-4">No Users selected. Select Users above!</p>
+                    <div *ngFor="let user of selectedUsers" class="flex space-x-1 px-2 mb-2 mr-2 border border-violet-200 rounded-xl">
+                        <p>{{user.display_name}}</p>
+                        <button type="button" class="px-1 fa-solid fa-xmark text-red-300" (click)="removeUser(user)"></button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" [disabled]="selectedUsers.length === 0 || groupChatInput.value.trim() === '' || !formGroup.valid"
+                class="absolute bottom-0 right-0 text-center self-center text-black m-2 px-2 bg-violet-200 rounded disabled:bg-gray-500">
+                Create
+            </button>
+        </form>
     </div>
 </div>
