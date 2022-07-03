@@ -50,3 +50,13 @@ html, .chat-scrollbar, .search-scrollbar {
     // border: 1px solid rgb(53, 108, 219);
     border-bottom: 0;
 }
+
+.settings-menu-blur {
+    background-color: rgba(0, 0, 0, 0.61);
+    // background-color: rgb(20, 24, 31);
+    backdrop-filter: blur(5px);
+}
+
+.settings-menu-window {
+    background-color: rgb(20, 24, 31);
+}

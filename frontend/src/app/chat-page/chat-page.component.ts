@@ -41,7 +41,8 @@ export class ChatPageComponent implements OnInit {
      * Log out the user. Catches the "logoutOutEvent(...)" event from the app-header component.
      */
     logout() {
-        document.onclick = null; // otherwise "window" if used
+        // document.onclick = null; // otherwise "window" if used
+        document.removeAllListeners!("click");
         this.userService.logout();
     }
 

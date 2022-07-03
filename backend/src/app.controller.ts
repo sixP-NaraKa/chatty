@@ -1,4 +1,4 @@
-import { Body, Controller, Get, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { settings, users } from '@prisma/client';
 import { AppService } from './app.service';
 import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages } from '../../shared/types/db-dtos';
@@ -14,13 +14,11 @@ export class AppController {
     @UseGuards(LocalAuthGuard)
     @Post("/auth/login")
     async login(@Request() req) {
-        // console.log("login => req", req.user);
         return this.authService.login(req.user as users);
     }
 
     @Post("/auth/create")
     async createUser(@Body() body: { username: string, password: string }) {
-        // console.log("createUser with data", body);
         return this.authService.createUser(body)
     }
 
@@ -28,7 +26,6 @@ export class AppController {
     @Get("/api/user/users")
     async getAllUsers() {
         const users = await this.appService.getAllUsers();
-        // console.log("users", users);
         return users;
     }
 
@@ -48,7 +45,6 @@ export class AppController {
     @Get("/api/user/chatrooms")
     async getChatroomsForUserWithParticipantsExceptSelf(@Query("user_id", ParseIntPipe) userId: number): Promise<ChatRoomWithParticipantsExceptSelf[]> {
         const chatrooms = await this.appService.getChatroomsForUserWithParticipantsExceptSelf(userId);
-        // console.log("chatrooms => ", chatrooms);
         return chatrooms;
     }
 
@@ -68,10 +64,10 @@ export class AppController {
 
     @UseGuards(AuthGuard())
     @Get("/api/user/chatrooms/create")
-    async create1on1ChatroomWithParticipants(@Query("user_id", ParseIntPipe) userId: number,
-        @Query("participant_user_id", ParseIntPipe) participantUserId: number): Promise<ChatRoomWithParticipantsExceptSelf> {
-        const chatroom = await this.appService.createChatroomWithParticipants(userId, participantUserId);
-        // console.log("new chatroom created => ", chatroom)
+    async createChatroomWithParticipants(@Query("user_id", ParseIntPipe) userId: number,
+        @Query("participant_user_id", new ParseArrayPipe({ items: Number, separator: "," })) participantUserIds: number[],
+        @Query("is_group", ParseBoolPipe) isGroup: boolean): Promise<ChatRoomWithParticipantsExceptSelf> {
+        const chatroom = await this.appService.createChatroomWithParticipants(userId, participantUserIds, isGroup);
         return chatroom;
     }
 
@@ -79,7 +75,6 @@ export class AppController {
     @Get("/api/chat/chatmessages")
     async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<ChatroomWithMessages> {
         const messages = await this.appService.getAllMessagesForChatroom(chatroomId);
-        // console.log("chatroom messages => ", messages);
         return messages;
     }
 
@@ -87,7 +82,6 @@ export class AppController {
     @Post("/api/chat/create/chatmessage")
     async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }) {
         const newMessage = await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
-        // console.log("new message inserted", newMessage);
         return newMessage;
     }
 

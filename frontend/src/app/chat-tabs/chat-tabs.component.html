@@ -1,4 +1,8 @@
-<app-user-search (userSelectionEvent)="userSelection($event)"></app-user-search>
+<div class="flex flex-row">
+    <app-user-search (userSelectionEvent)="userSelection($event)" class="w-full"></app-user-search>
+    <button type="menu" title="New Group Chat" class="h-6 fa-solid fa-user-group px-2" (click)="onCreateGroupChatButtonClick()">+</button>
+    <app-group-chat-window [shouldShowWindow]="showGroupChatCreateWindow" (groupChatClosedEvent)="onCreateGroupChatClosed()"></app-group-chat-window>
+</div>
 <ul class="flex justify-center flex-col flex-wrap list-none border-b-0 px-4">
     <div *ngFor="let chat of chatrooms" id={{chat.chatroom_id}} (click)="notifyLoadChat(chat)" class="mb-0.5 chat-tab"
         [class.chat-tab-selected]="chat.chatroom_id === selectedChatId"

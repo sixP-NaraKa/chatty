@@ -17,6 +17,7 @@ import { HeaderComponent } from './header/header.component';
 import { UserSearchComponent } from './user-search/user-search.component';
 import { ChatPageComponent } from './chat-page/chat-page.component';
 import { SettingsMenuComponent } from './settings-menu/settings-menu.component';
+import { GroupChatWindowComponent } from './group-chat-window/group-chat-window.component';
 
 const socketconfig: SocketIoConfig = { url: "http://192.168.178.33:3100", options: { autoConnect: false } }
 
@@ -30,7 +31,8 @@ const socketconfig: SocketIoConfig = { url: "http://192.168.178.33:3100", option
         HeaderComponent,
         UserSearchComponent,
         ChatPageComponent,
-        SettingsMenuComponent
+        SettingsMenuComponent,
+        GroupChatWindowComponent
     ],
     imports: [
         BrowserModule,

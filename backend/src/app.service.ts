@@ -184,35 +184,31 @@ export class AppService {
     }
 
     /**
-     * Create a new 1on1 chatroom with its both participants.
+     * Create a new chatroom (1on1 or group chat) with its participants.
      * 
      * @param userId userId of the requester
-     * @param participantUserId userId of the participant
+     * @param participantUserIds userIds of the participants
      * @returns 
      */
-    async createChatroomWithParticipants(userId: number, participantUserId: number) {
+    async createChatroomWithParticipants(userId: number, participantUserIds: number[], isgroup: boolean = false) {
+        const data = [{ user_id: userId }]; // add user which created this chatroom
+        for (let num of participantUserIds) {
+            data.push({ user_id: num })
+        }
         const { chatroom_id } = await this.prismaService.chatrooms.create({
             data: {
-                isgroup: false,
-                created_by: userId
+                isgroup: isgroup,
+                created_by: userId,
+                participants: {
+                    createMany: {
+                        data: data                      
+                    }
+                }
             },
             select: {
                 chatroom_id: true
             }
-        });//.then(() => chatroomId.chatroom_id);
-        await this.prismaService.participants.create({
-            data: {
-                user_id: userId,
-                chatroom_id: chatroom_id
-            }
         });
-        await this.prismaService.participants.create({
-            data: {
-                user_id: participantUserId,
-                chatroom_id: chatroom_id
-            }
-        });
-
         return await this.prismaService.participants.findFirst({
             where: {
                 user_id: userId,

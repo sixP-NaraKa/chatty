@@ -24,6 +24,8 @@ export class ChatTabsComponent implements AfterContentInit {
     @Input()
     incomingNewChatroom!: ChatRoomWithParticipantsExceptSelf;
 
+    showGroupChatCreateWindow: boolean = false;
+
     chatrooms = new Array<ChatRoomWithParticipantsExceptSelf>();
 
     selectedChatId: number = -1;
@@ -109,7 +111,7 @@ export class ChatTabsComponent implements AfterContentInit {
                 if (!room) {
                     // make API call to create a new chatroom with the two participants
                     console.log("creating new chatroom (frontend)");
-                    this.userService.create1on1Chatroom(this.currentUser.userId, user.user_id).subscribe(room => {
+                    this.userService.createChatroom(this.currentUser.userId, user.user_id, false).subscribe(room => {
                         this.chatrooms.push(room);
                         this.notifyLoadChat(room);
                         this.wsService.createChatroom(room, user.user_id);
@@ -140,7 +142,7 @@ export class ChatTabsComponent implements AfterContentInit {
                 this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroom_id)
                     .subscribe(chatroom => {
                         this.chatrooms.push(chatroom);
-                });
+                    });
             }
             // reload will empty this again, but for now it is fine
             console.log("unread message chat ids", this.newUnreadMessagesChatroomIds, "this.selectedChatId", this.selectedChatId);
@@ -148,6 +150,21 @@ export class ChatTabsComponent implements AfterContentInit {
                 this.newUnreadMessagesChatroomIds.push(msg.chatroom_id);
             }
         });
+    }
+
+    /**
+     * Notifies the group-chat-window component to show the window.
+     */
+    onCreateGroupChatButtonClick() {
+        this.showGroupChatCreateWindow = true;
+    }
+
+    /**
+     * Catches the event emitted from the group-chat-window component,
+     * when the group chat window has been closed.
+     */
+    onCreateGroupChatClosed() {
+        this.showGroupChatCreateWindow = false;
     }
 
 }
