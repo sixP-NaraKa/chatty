@@ -36,47 +36,44 @@ export class ChatTabsComponent implements AfterContentInit {
 
     constructor(private userService: UserService, private wsService: WebsocketService) {
         this.currentUser = this.userService.currentUser;
-        console.log("constructor currentUser", this.currentUser);
     }
 
     ngAfterContentInit() {
         this.userService.getChatroomsForUserWithParticipantsExceptSelf(this.currentUser.userId).subscribe(chats => {
-            console.log("initial chats", chats);
+
+            // create temporary array to not trigger angulars *ngFor directive during processing
+            let tempArray = new Array<ChatRoomWithParticipantsExceptSelf>();
+
             // join all websocket chat rooms first
             chats.forEach(chat => {
                 this.wsService.joinChatroom(chat.chatroom_id);
             });
 
-            // group chats will always be added
-            const groupChats = chats.filter(chat => chat.chatrooms.isgroup);
-            // create temporary array to not trigger angulars *ngFor directive during processing
-            let tempArray = new Array<ChatRoomWithParticipantsExceptSelf>();
+            // as a workaround to not being able to wait for the Observables/Promises correctly,
+            // we will simply sort the tempArray after each iteration, so that it always stays in the correct order
+            chats.forEach((chat, index) => {
 
-            // only go over 1on1 chats here
-            chats.filter(chat => !chat.chatrooms.isgroup).forEach((chat, index) => {
+                // if the chat is a group, we add it always
+                if (chat.chatrooms.isgroup) {
+                    tempArray.splice(index, 0, chat);
+                    tempArray.sort((a, b) => a.chatrooms.chatroom_id - b.chatrooms.chatroom_id);
+                    return;
+                }
+
                 this.userService.getChatroomMessagesCount(chat.chatroom_id, this.currentUser.userId).subscribe(amount => {
                     if (amount >= 1) {
                         tempArray.splice(index, 0, chat);
                     }
                     else if (chat.chatrooms.created_by === this.currentUser.userId) {
-                        console.log("empty chat created by me", chat);
                         if (this.filterOutEmpty1on1Chats) {
-                            console.log("filtering the chat, because user settings");
                             return;
                         }
-                        console.log("not filtering the chat");
                         tempArray.splice(index, 0, chat);
                     }
+                    tempArray.sort((a, b) => a.chatrooms.chatroom_id - b.chatrooms.chatroom_id);
                 });
             });
-            tempArray = tempArray.concat(groupChats);
-            tempArray.sort((a, b) => a.chatrooms.chatroom_id - b.chatrooms.chatroom_id);
             this.chatrooms = tempArray;
-            // remove elements from the tempArray, as this is not needed anymore
-            // tempArray.length = 0; => this somehow causes issues for adding group chats / pushing things manually >
-            // because this part of the code is being executed before the .subscribe() is done,
-            // and that is why the tempArray gets nuked and previous data is not there
-            console.log("chatrooms =>", this.chatrooms);
         });
         this.listenForNewChatroomsAndJoinThem();
         this.listenForMessagesFromNotYetAddedChatrooms();

@@ -4,12 +4,12 @@
     <button type="menu" title="New Group Chat" class="h-6 fa-solid fa-people-group px-2 border-l-2 border-violet-200" (click)="onCreateGroupChatButtonClick()">+</button>
     <app-group-chat-window [shouldShowWindow]="showGroupChatCreateWindow" (groupChatClosedEvent)="onCreateGroupChatClosed()" (groupChatCreatedEvent)="onCreateGroupChatEvent($event)"></app-group-chat-window>
 </div>
-<ul class="flex justify-center flex-col flex-wrap list-none border-b-0 px-4">
+<ul class="flex flex-col justify-center list-none border-b-0 px-4">
     <div *ngFor="let chat of chatrooms" id={{chat.chatroom_id}} (click)="notifyLoadChat(chat)" class="mb-0.5 chat-tab"
         [class.chat-tab-selected]="chat.chatroom_id === selectedChatId"
         [class.unread-messages]="newUnreadMessagesChatroomIds.includes(chat.chatroom_id)">
-        <p class="whitespace-nowrap text-ellipsis overflow-hidden flex justify-between">{{chat.chatrooms.isgroup ? chat.chatrooms.name : chat.chatrooms.participants[0].users.display_name}}
-            <b *ngIf="newUnreadMessagesChatroomIds.includes(chat.chatroom_id)" class="ml-auto text-red-500">+1</b>
+        <p class="relative whitespace-nowrap text-ellipsis overflow-hidden pr-6">{{chat.chatrooms.isgroup ? chat.chatrooms.name : chat.chatrooms.participants[0].users.display_name}}
+            <b *ngIf="newUnreadMessagesChatroomIds.includes(chat.chatroom_id)" class="absolute right-0 ml-4 text-red-500">+1</b>
         </p>
     </div>
 </ul>

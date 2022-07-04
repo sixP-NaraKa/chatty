@@ -1,7 +1,7 @@
 <div class="chat-scrollbar text-left h-full overflow-y-auto">
-    <div *ngFor="let message of chatroomMessages" class="chat-message-div"
+    <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-8 pt-2 px-2"
         [class.text-right]="message.user_id === currentUser.userId">
-        <p class="max-w-md break-words text-ellipsis overflow-hidden pb-8 px-2"
+        <p class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 border border-gray-200 rounded-xl"
             [class.mr-auto]="message.user_id !== currentUser.userId"
             [class.ml-auto]="message.user_id === currentUser.userId"><b>{{
                 message.users.display_name}}:</b> {{ message.msg_content }}</p>
