@@ -12,8 +12,15 @@ export class ChatPageComponent implements OnInit {
 
     /**
      * Chatroom ID will be used to notify the app-chat component which chat to load.
+     * @deprecated
      */
     chatroomIdToLoad: number = -1;
+    /**
+     * Chatroom will be used to notfiy the app-chat component which chat to load.
+     * The chatroom also is being used to carry additional metadata, like the participants,
+     * which are used to show the user with whom they are chatting, and more.
+     */
+    chatroom!: ChatRoomWithParticipantsExceptSelf;
 
     // locally stored user settings with default values
     userSettings!: settings;
@@ -56,7 +63,8 @@ export class ChatPageComponent implements OnInit {
         // join the chatroom websocket room
         this.wsService.joinChatroom(chat.chatroom_id);
         this.chatroomIdToLoad = chat.chatroom_id;
-        console.log("new chatId to load", this.chatroomIdToLoad);
+        this.chatroom = chat;
+        console.log("new chatId to load", this.chatroom.chatroom_id);
     }
 
     applySettings(usrSetts: settings) {
@@ -90,6 +98,14 @@ export class ChatPageComponent implements OnInit {
             chatWindowElement.classList.remove("text-xs", "md:text-base", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
             chatWindowElement.classList.add(`${usrSetts.font_size}`);
         }
+    }
+
+    /**
+     * On button click, shows the users which are part of the current opened group chat.
+     */
+    showUsersForGroupChat() {
+        // TODO
+        console.log("users in group chat =>");
     }
 
 }

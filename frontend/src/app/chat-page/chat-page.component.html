@@ -1,12 +1,32 @@
 <app-header (logOutEvent)="logout()" (applySettingsPassthroughEvent)="applySettings($event)"></app-header>
 
-<div class="chat flex flex-auto flex-col sm:flex-row w-full h-[85vh] sm:space-x-6 p-4 pt-4">
+<div class="chat flex flex-auto flex-col sm:flex-row w-full h-[85vh] min-h-[480px] sm:space-x-6 p-4 pt-4">
+    <!-- this container will have a min-height of 120px, as the parent container is 480px and the child component below 320px - (minus) paddings, etc. pp. -->
     <div
-        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] sm:w-1/4 h-1/4 sm:h-full border border-yellow-200 overflow-y-auto text-xs md:text-base">
-        <app-chat-tabs (loadChat)="displayChat($event)" [filterOutEmpty1on1Chats]="userSettings?.filter === 'filter'"></app-chat-tabs>
+        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] border border-yellow-200 overflow-y-auto text-xs md:text-base">
+        <app-chat-tabs (loadChat)="displayChat($event)" [filterOutEmpty1on1Chats]="userSettings?.filter === 'filter'">
+        </app-chat-tabs>
     </div>
-    <div id="chatWindowDiv"
-        class="chat-window-div relative sm:w-3/4 min-w-[240px] h-3/4 sm:h-full sm:mr-auto mt-2 sm:mt-0 border border-violet-200 text-xs md:text-base overflow-y-auto">
-        <app-chat [setChatroomId]="chatroomIdToLoad"></app-chat>
+    <div class="relative flex flex-col w-full min-w-[240px] min-h-[320px] mt-2 sm:mt-0 border border-violet-200">
+        <div class="chat-content-header border-b-2 border-violet-200">
+            <div id="chatHeader">
+                <div *ngIf="this.chatroom" class="flex flex-row justify-between h-full text-base">
+                    <p class="whitespace-nowrap text-ellipsis overflow-hidden px-2"
+                        title="{{chatroom.chatrooms.isgroup ? 'Chatting in: ' + chatroom.chatrooms.name : 'Chatting with: ' + chatroom.chatrooms.participants[0].users.display_name}}">
+                        {{chatroom.chatrooms.isgroup ? chatroom.chatrooms.name :
+                        chatroom.chatrooms.participants[0].users.display_name}}
+                    </p>
+                    <button type="button" *ngIf="chatroom.chatrooms.isgroup" (click)="showUsersForGroupChat()"
+                        class="px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden">
+                        Users
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="chat-content-main overflow-y-auto">
+            <app-chat id="chatWindowDiv" [setChatroom]="chatroom"></app-chat>
+        </div>
+        <!-- in case a footer component should be added, e.g. the chat-message form could be done here -->
+        <!-- <div class="border border-pink-400 chat-content-footer">footer content</div> -->
     </div>
 </div>

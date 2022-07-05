@@ -1,0 +1,15 @@
+.chat-content-header { // flex-initial
+    flex: 0 1 26px;
+    // flex: 0 1 auto;
+    background-color: rgb(20, 24, 31);
+}
+
+.chat-content-main {
+    flex: 1 1 240px;
+    // flex: 1 1 auto;
+}
+
+.chat-content-footer {
+    flex: 0 0 40px;
+    // flex: 0 0 auto;
+}

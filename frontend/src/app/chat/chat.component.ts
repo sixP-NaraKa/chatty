@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ChatMessageWithUser } from '../../../../shared/types/db-dtos';
+import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -14,10 +14,12 @@ export class ChatComponent implements OnInit {
 
     currentUser: ApplicationUser;
 
+    chatroom!: ChatRoomWithParticipantsExceptSelf;
     chatroomId: number = -1;
-    @Input() set setChatroomId(id: number) {
-        this.chatroomId = id;
-        this.displayChat(id);
+    @Input() set setChatroom(chatroom: ChatRoomWithParticipantsExceptSelf) {
+        this.chatroomId = chatroom ? chatroom.chatroom_id : -1;
+        this.chatroom = chatroom;
+        this.displayChat(this.chatroomId);
     }
     
     chatroomMessages = new Array<ChatMessageWithUser>();
@@ -49,15 +51,15 @@ export class ChatComponent implements OnInit {
             console.log("loading chatId", chatroomIdToLoad);
             // create new instance here, in case any errors might happen during chatroom navigation or whatnot
             this.chatroomMessages = new Array<ChatMessageWithUser>();
-            this.fetchAndDisplayChatMessages();
+            this.fetchAndDisplayChatMessages(chatroomIdToLoad);
         }
     }
 
     /**
      * Fetches and displays the chat messages in the UI.
      */
-    fetchAndDisplayChatMessages() {
-        this.userService.getChatroomMessages(this.chatroomId, this.currentUser.userId).subscribe(chatroomData => {
+    fetchAndDisplayChatMessages(chatroomIdToLoad: number) {
+        this.userService.getChatroomMessages(chatroomIdToLoad, this.currentUser.userId).subscribe(chatroomData => {
             const { chat_messages, ..._ } = chatroomData;
             this.chatroomMessages = chat_messages;
             this.scrollToLatestMessage();
