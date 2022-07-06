@@ -1,0 +1,11 @@
+<div class="absolute right-0 z-30">
+    <div>
+        <ul *ngIf="this.users.length !== 0"
+            class="group-chat-dropdown chat-scrollbar overflow-y-auto flex flex-auto flex-col w-full max-h-32 px-2 pb-2 border border-t-2 border-r-0 border-violet-200 rounded-b-lg rounded-r-none">
+            <li *ngFor="let username of users" title="User: {{username}}" class="w-full hover:text-violet-200">
+                {{username}}
+                <hr class="group-chat-hr w-full">
+            </li>
+        </ul>
+    </div>
+</div>

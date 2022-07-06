@@ -65,6 +65,9 @@ export class ChatPageComponent implements OnInit {
         this.chatroomIdToLoad = chat.chatroom_id;
         this.chatroom = chat;
         console.log("new chatId to load", this.chatroom.chatroom_id);
+
+        // set group chat participants/users to null
+        this.groupChatParticipants.length = 0;
     }
 
     applySettings(usrSetts: settings) {
@@ -100,12 +103,19 @@ export class ChatPageComponent implements OnInit {
         }
     }
 
+    groupChatParticipants = new Array<string>();
     /**
      * On button click, shows the users which are part of the current opened group chat.
      */
     showUsersForGroupChat() {
-        // TODO
-        console.log("users in group chat =>");
+        if (this.groupChatParticipants.length === 0) {
+            this.groupChatParticipants = new Array<string>();
+            this.groupChatParticipants.push(this.userService.currentUser.username + " (you)");
+            this.chatroom.chatrooms.participants.forEach(user => this.groupChatParticipants.push(user.users.display_name));
+        }
+        else {
+            this.groupChatParticipants.length = 0;
+        }
     }
 
 }

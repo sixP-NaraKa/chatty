@@ -16,10 +16,13 @@
                         {{chatroom.chatrooms.isgroup ? chatroom.chatrooms.name :
                         chatroom.chatrooms.participants[0].users.display_name}}
                     </p>
-                    <button type="button" *ngIf="chatroom.chatrooms.isgroup" (click)="showUsersForGroupChat()"
-                        class="px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden">
-                        Users
-                    </button>
+                    <div>
+                        <button type="button" *ngIf="chatroom.chatrooms.isgroup" (click)="showUsersForGroupChat()"
+                            class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden">
+                            {{this.groupChatParticipants.length === 0 ? "Show Users" : "Hide Users"}}
+                        </button>
+                        <app-group-chat-users [groupChatUsers]="groupChatParticipants"></app-group-chat-users>
+                    </div>
                 </div>
             </div>
         </div>
