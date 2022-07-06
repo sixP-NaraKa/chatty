@@ -6,6 +6,13 @@ type User = {
     creation_date: Date
 }
 
+type UserIdDisplayName = {
+    users: {
+        user_id: number,
+        display_name: string
+    }
+}
+
 type ChatRoomWithParticipantsExceptSelf = { //participants & { // doesn't work for some reason..., but manually does?
     p_id: number,
     user_id: number,
@@ -13,8 +20,9 @@ type ChatRoomWithParticipantsExceptSelf = { //participants & { // doesn't work f
     chatrooms: chatrooms & {
         participants: {
             users: {
-                user_id: number;
-                display_name: string;
+                user_id: number,
+                display_name: string,
+                creation_date: Date
             };
         }[];
     };
@@ -29,4 +37,4 @@ type ChatroomWithMessages = chatrooms & {
     participants: participants[];
 }
 
-export { users, chat_messages, participants, chatrooms, settings, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser };
+export { users, chat_messages, participants, chatrooms, settings, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, UserIdDisplayName };

@@ -18,6 +18,7 @@ const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
                                 select: {
                                     user_id: true,
                                     display_name: true,
+                                    creation_date: true
                                 },
                             }
                         },
@@ -78,6 +79,7 @@ export class AppService {
                                     select: {
                                         user_id: true,
                                         display_name: true,
+                                        creation_date: true
                                     },
                                 }
                             },
@@ -221,6 +223,10 @@ export class AppService {
             },
             include: includeChatroomWithParticipantsExceptSelf(userId).include
         });
+    }
+
+    async removeUserFromGroupChat(userId: number, chatroomId: number): Promise<number> {
+        return await this.prismaService.$executeRaw`DELETE FROM participants WHERE user_id=${userId} AND chatroom_id=${chatroomId};`
     }
 
     /**

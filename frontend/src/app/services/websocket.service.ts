@@ -37,6 +37,14 @@ export class WebsocketService {
         this.socket.emit("create:chatroom", chatroom, participantUserIds);
     }
 
+    removeUserFromChatroom(userIdToRemove: number, chatroomId: number) {
+        this.socket.emit("remove-user:chatroom", userIdToRemove, chatroomId);
+    }
+
+    listenForRemoveChatroom() {
+        return this.socket.fromEvent<[userId: number, chatroomId: number]>("removed-from:chatroom")
+    }
+
     getNewChatroom() {
         return this.socket.fromEvent<[chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]]>("new:chatroom");
     }

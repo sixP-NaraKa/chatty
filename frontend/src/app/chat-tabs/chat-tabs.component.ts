@@ -21,9 +21,6 @@ export class ChatTabsComponent implements AfterContentInit {
     @Input()
     filterOutEmpty1on1Chats: boolean = true; // true per default
 
-    @Input()
-    incomingNewChatroom!: ChatRoomWithParticipantsExceptSelf;
-
     showGroupChatCreateWindow: boolean = false;
 
     chatrooms = new Array<ChatRoomWithParticipantsExceptSelf>();
@@ -77,6 +74,7 @@ export class ChatTabsComponent implements AfterContentInit {
         });
         this.listenForNewChatroomsAndJoinThem();
         this.listenForMessagesFromNotYetAddedChatrooms();
+        this.listenForRemoveChatroomAndRemoveChatFromList();
     }
 
     /**
@@ -141,6 +139,24 @@ export class ChatTabsComponent implements AfterContentInit {
                 if (chatroom.chatrooms.isgroup) {
                     this.chatrooms.push(chatroom);
                 }
+            }
+        });
+    }
+
+    /**
+     * Listens for chatrooms (groups) to leave, if the user has been kicked by the creator.
+     * As of now, if the group chat from which the user was removed is currently open, they will still leave the chatroom
+     * and the websocket room, but in the UI the room is still there,
+     * but not otherwise interactable (e.g. sending/receicing messages will not work).
+     */
+    listenForRemoveChatroomAndRemoveChatFromList() {
+        this.wsService.listenForRemoveChatroom().subscribe(([userId, chatroomId]) => {
+            const filteredChatrooms = this.chatrooms.filter(chat => chat.chatroom_id === chatroomId);
+            // if (this.chatrooms.some(chat => chat.chatroom_id === chatroomId) && this.currentUser.userId === userId) {
+            if (filteredChatrooms.length !== 0 && userId === this.currentUser.userId) {
+                this.wsService.leaveChatroom(chatroomId);
+                const idxOf = this.chatrooms.indexOf(filteredChatrooms[0]);
+                this.chatrooms.splice(idxOf, 1);
             }
         });
     }

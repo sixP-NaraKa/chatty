@@ -1,7 +1,7 @@
 import { Body, Controller, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { settings, users } from '@prisma/client';
 import { AppService } from './app.service';
-import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages } from '../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser } from '../../shared/types/db-dtos';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -72,6 +72,12 @@ export class AppController {
     }
 
     @UseGuards(AuthGuard())
+    @Post("/api/user/chatrooms/groups/remove")
+    async removeUserFromGroupChat(@Body() body: { userId: number, chatroomId: number }): Promise<number> {
+        return await this.appService.removeUserFromGroupChat(body.userId, body.chatroomId);
+    }
+
+    @UseGuards(AuthGuard())
     @Get("/api/chat/chatmessages")
     async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<ChatroomWithMessages> {
         const messages = await this.appService.getAllMessagesForChatroom(chatroomId);
@@ -80,14 +86,14 @@ export class AppController {
 
     @UseGuards(AuthGuard())
     @Post("/api/chat/create/chatmessage")
-    async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }) {
+    async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }): Promise<ChatMessageWithUser> {
         const newMessage = await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
         return newMessage;
     }
 
     @UseGuards(AuthGuard())
     @Get("/api/chat/chatmessages/count")
-    async getChatroomMessageCount(@Query("chatroom_id", ParseIntPipe) chatroomId: number) {
+    async getChatroomMessageCount(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<number> {
         return await this.appService.getChatroomMessagesCount(chatroomId);
     }
 

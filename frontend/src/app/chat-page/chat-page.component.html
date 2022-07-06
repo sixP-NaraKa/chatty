@@ -18,10 +18,10 @@
                     </p>
                     <div>
                         <button type="button" *ngIf="chatroom.chatrooms.isgroup" (click)="showUsersForGroupChat()"
-                            class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden">
+                            class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden hover:bg-violet-400">
                             {{this.groupChatParticipants.length === 0 ? "Show Users" : "Hide Users"}}
                         </button>
-                        <app-group-chat-users [groupChatUsers]="groupChatParticipants"></app-group-chat-users>
+                        <app-group-chat-users [groupChatUsers]="groupChatParticipants" [groupChatCreatedBy]="chatroom.chatrooms.created_by" (removeUserFromGroupChat)="onRemoveParticipantFromGroupChat($event)"></app-group-chat-users>
                     </div>
                 </div>
             </div>

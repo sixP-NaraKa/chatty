@@ -69,7 +69,7 @@ export class UserService {
         return this.http.get<number>(`http://192.168.178.33:3100/api/chat/chatmessages/count?chatroom_id=${chatroomId}&user_id=${userId}`);
     }
 
-    /* INSERTING OF DATA */
+    /* INSERTING / EDITING OF DATA */
     
     updateUserSettings(userSettings: settings) {
         this.http.post<any>(`http://192.168.178.33:3100/api/user/update/settings?user_id=${userSettings.user_id}`, userSettings).subscribe(); // no-op
@@ -77,6 +77,10 @@ export class UserService {
 
     sendMessage(message: string, userId: number, chatroomId: number): Observable<ChatMessageWithUser> {
         return this.http.post<ChatMessageWithUser>(`http://192.168.178.33:3100/api/chat/create/chatmessage?user_id=${userId}`, { message: message, userId: userId, chatroomId: chatroomId });
+    }
+
+    removeUserFromGroupChat(userId: number, userIdToRemove: number, chatroomId: number): Observable<number> {
+        return this.http.post<number>(`http://192.168.178.33:3100/api/user/chatrooms/groups/remove?user_id=${userId}`, { userId: userIdToRemove, chatroomId: chatroomId });
     }
 
 }

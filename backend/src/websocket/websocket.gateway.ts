@@ -47,17 +47,20 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.leave(chatroomId);
     }
 
+    @SubscribeMessage("remove-user:chatroom")
+    async onRemoveUserFromChatroom(client: any, userIdAndChatroomId: number[]) {
+        const [ userId, chatroomId ] = userIdAndChatroomId;
+        client.broadcast.to(chatroomId).emit("removed-from:chatroom", [userId, chatroomId]);
+    }
+
     /**
     * Let the connected users, which subscribe to the event, know, that a chat has been created.
     * This chat, together with the userId of the participant,
     * will be broadcasted and only the responsible people will further process the event.
     * 
-    * TODO: for group chats simply make the participantUserId into an Array of Ids,
-    *       and modify a bit the resulting client side check.
-    * 
     * @param client the client which send the event
     * @param chatroom the chatroom to broadcast
-    * @param participantUserId the userId to broadcast (only responsible people will process this further)
+    * @param participantUserIds the userId to broadcast (only responsible people will process this further)
     */
     @SubscribeMessage("create:chatroom")
     async onCreateChatroom(client: any, chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]) {

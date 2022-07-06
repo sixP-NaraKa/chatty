@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ChatRoomWithParticipantsExceptSelf, settings } from '../../../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf, participants, settings, User, UserIdDisplayName, users } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -103,19 +103,39 @@ export class ChatPageComponent implements OnInit {
         }
     }
 
-    groupChatParticipants = new Array<string>();
+    groupChatParticipants = new Array<User>();
     /**
      * On button click, shows the users which are part of the current opened group chat.
      */
     showUsersForGroupChat() {
         if (this.groupChatParticipants.length === 0) {
-            this.groupChatParticipants = new Array<string>();
-            this.groupChatParticipants.push(this.userService.currentUser.username + " (you)");
-            this.chatroom.chatrooms.participants.forEach(user => this.groupChatParticipants.push(user.users.display_name));
+            this.groupChatParticipants = new Array<User>();
+            this.chatroom.chatrooms.participants.forEach(user => this.groupChatParticipants.push(user.users));
         }
         else {
             this.groupChatParticipants.length = 0;
         }
+    }
+
+    /**
+     * Catches the event from the group-chat-users component,
+     * indicating that a user should be removed from the group chat.
+     * 
+     * @param user the user to remove from the group chat
+     */
+    onRemoveParticipantFromGroupChat(user: User) {
+        const chatroomIdToRemoveParticipantFrom = this.chatroom.chatroom_id;
+        // leave websocket chatroom for the given user
+        // + remove the chat from the chats list (only important if the user is logged in)
+        this.wsService.removeUserFromChatroom(user.user_id, chatroomIdToRemoveParticipantFrom);
+
+        this.userService.removeUserFromGroupChat(this.userService.currentUser.userId, user.user_id, chatroomIdToRemoveParticipantFrom).subscribe(
+            amountDeleted => {
+                if (amountDeleted > 0) {
+                    console.log("user removed from the chatromo (deleted in db)");
+                }
+            }
+        )
     }
 
 }
