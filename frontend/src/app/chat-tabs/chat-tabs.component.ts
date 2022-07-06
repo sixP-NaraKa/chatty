@@ -15,11 +15,8 @@ export class ChatTabsComponent implements AfterContentInit {
     @Output()
     loadChat = new EventEmitter<ChatRoomWithParticipantsExceptSelf>();
 
-    // will be a user defineable setting
-    // if the user turns this off, empty chats which were created by the user will be shown
-    // if it is turned on, no empty 1on1 chats will be shown whatsoever
     @Input()
-    filterOutEmpty1on1Chats: boolean = true; // true per default
+    filterOutEmpty1on1Chats: boolean = true;
 
     showGroupChatCreateWindow: boolean = false;
 
@@ -148,11 +145,13 @@ export class ChatTabsComponent implements AfterContentInit {
      * As of now, if the group chat from which the user was removed is currently open, they will still leave the chatroom
      * and the websocket room, but in the UI the room is still there,
      * but not otherwise interactable (e.g. sending/receicing messages will not work).
+     * 
+     * Additionally, we do not care as a user if someone else has been removed,
+     * as in this component we do not use the user information whatsoever.
      */
     listenForRemoveChatroomAndRemoveChatFromList() {
         this.wsService.listenForRemoveChatroom().subscribe(([userId, chatroomId]) => {
             const filteredChatrooms = this.chatrooms.filter(chat => chat.chatroom_id === chatroomId);
-            // if (this.chatrooms.some(chat => chat.chatroom_id === chatroomId) && this.currentUser.userId === userId) {
             if (filteredChatrooms.length !== 0 && userId === this.currentUser.userId) {
                 this.wsService.leaveChatroom(chatroomId);
                 const idxOf = this.chatrooms.indexOf(filteredChatrooms[0]);

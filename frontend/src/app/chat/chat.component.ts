@@ -14,11 +14,9 @@ export class ChatComponent implements OnInit {
 
     currentUser: ApplicationUser;
 
-    chatroom!: ChatRoomWithParticipantsExceptSelf;
     chatroomId: number = -1;
     @Input() set setChatroom(chatroom: ChatRoomWithParticipantsExceptSelf) {
         this.chatroomId = chatroom ? chatroom.chatroom_id : -1;
-        this.chatroom = chatroom;
         this.displayChat(this.chatroomId);
     }
     

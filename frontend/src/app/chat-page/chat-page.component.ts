@@ -17,8 +17,7 @@ export class ChatPageComponent implements OnInit {
     chatroomIdToLoad: number = -1;
     /**
      * Chatroom will be used to notfiy the app-chat component which chat to load.
-     * The chatroom also is being used to carry additional metadata, like the participants,
-     * which are used to show the user with whom they are chatting, and more.
+     * Only the ID is of importance here, as the chat contens (e.g. messages) will be fetched in the component.
      */
     chatroom!: ChatRoomWithParticipantsExceptSelf;
 
@@ -125,14 +124,21 @@ export class ChatPageComponent implements OnInit {
      */
     onRemoveParticipantFromGroupChat(user: User) {
         const chatroomIdToRemoveParticipantFrom = this.chatroom.chatroom_id;
+
         // leave websocket chatroom for the given user
         // + remove the chat from the chats list (only important if the user is logged in)
         this.wsService.removeUserFromChatroom(user.user_id, chatroomIdToRemoveParticipantFrom);
-
+        
         this.userService.removeUserFromGroupChat(this.userService.currentUser.userId, user.user_id, chatroomIdToRemoveParticipantFrom).subscribe(
             amountDeleted => {
                 if (amountDeleted > 0) {
-                    console.log("user removed from the chatromo (deleted in db)");
+                    console.log("user removed from the chatroom (deleted in db)");
+                    // remove user from the locally stored chatroom
+                    const userFromChatroom = this.chatroom.chatrooms.participants.filter(u => u.users.user_id === user.user_id);
+                    if (userFromChatroom.length > 0) {
+                        const idxOf = this.chatroom.chatrooms.participants.indexOf(userFromChatroom[0]);
+                        this.chatroom.chatrooms.participants.splice(idxOf, 1);
+                    }
                 }
             }
         )
