@@ -10,6 +10,7 @@
                 <li title="User: {{user.display_name}}" class="mr-2 hover:text-violet-200">
                     {{user.display_name}}
                 </li>
+                <i *ngIf="groupChatCreatedBy === user.user_id" class="fa-solid fa-star text-xs text-yellow-300 pt-0.5" title="Creator"></i>
                 <button *ngIf="groupChatCreatedBy === currentUserId" type="button" (click)="onRemoveParticipant(user)" title="Kick User: {{user.display_name}}"
                     class="px-2 fa-solid fa-xmark text-red-300 border border-red-300 rounded-full hover:bg-red-900"></button>
             </div>
