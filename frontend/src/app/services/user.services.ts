@@ -83,4 +83,8 @@ export class UserService {
         return this.http.post<number>(`http://192.168.178.33:3100/api/user/chatrooms/groups/remove?user_id=${userId}`, { userId: userIdToRemove, chatroomId: chatroomId });
     }
 
+    addUsersToGroupChat(userId: number, userIdsToAdd: number[], chatroomId: number) {
+        this.http.post<any>(`http://192.168.178.33:3100/api/user/chatrooms/groups/add?user_id=${userId}`, { userIds: userIdsToAdd, chatroomId: chatroomId });
+    }
+
 }

@@ -78,6 +78,12 @@ export class AppController {
     }
 
     @UseGuards(AuthGuard())
+    @Post("/api/user/chatrooms/groups/add")
+    async addUsersToGroupChat(@Body() body: { userIds: number[], chatroomId: number}) {
+        await this.appService.addUsersToGroupChat(body.userIds, body.chatroomId);
+    }
+
+    @UseGuards(AuthGuard())
     @Get("/api/chat/chatmessages")
     async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<ChatroomWithMessages> {
         const messages = await this.appService.getAllMessagesForChatroom(chatroomId);

@@ -129,12 +129,18 @@ export class ChatTabsComponent implements AfterContentInit {
         // join these chatrooms first, but do not show them in the UI unless there have been messages.
         // listen in a second part (done in the app-chat-tabs component for the moment) to the websocket event "get:message"
         // and if this chat is not yet part of our locally stored list, show them in the UI.
+        // Note for 1on1 chats: we do not need to fetch here the chat from the db or add it to the list,
+        // since we will get the latest info anyway upon receiving chat messages and then opening the chat
         this.wsService.getNewChatroom().subscribe(([chatroom, participantUserIds]) => {
             if (participantUserIds.includes(this.userService.currentUser.userId)) {
                 this.wsService.joinChatroom(chatroom.chatroom_id);
-                // if the chatroom from the websocket is a group chat, add it to our list of chats
+
+                // if the chatroom is a group chat,
+                // fetch the chatroom from the db, and add it to the list of chats
                 if (chatroom.chatrooms.isgroup) {
-                    this.chatrooms.push(chatroom);
+                    this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.currentUser.userId, chatroom.chatroom_id).subscribe(
+                        cr => this.chatrooms.push(cr)
+                    )
                 }
             }
         });

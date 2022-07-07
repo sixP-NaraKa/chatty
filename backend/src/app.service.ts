@@ -229,6 +229,16 @@ export class AppService {
         return await this.prismaService.$executeRaw`DELETE FROM participants WHERE user_id=${userId} AND chatroom_id=${chatroomId};`
     }
 
+    async addUsersToGroupChat(userIds: number[], chatroomId: number) {
+        const data = [];
+        for (let num of userIds) {
+            data.push({ user_id: num, chatroom_id: chatroomId })
+        }
+        await this.prismaService.participants.createMany({
+            data: data
+        });
+    }
+
     /**
      * Insert a new chat message record.
      * 
