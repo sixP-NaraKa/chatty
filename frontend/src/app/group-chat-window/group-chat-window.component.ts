@@ -45,7 +45,6 @@ export class GroupChatWindowComponent implements OnInit {
     }
 
     userSelection(user: User) {
-        console.log(user);
         if (!this.selectedUsers.some(u => user.user_id === u.user_id)) {
             this.selectedUsers.push(user);
         }
@@ -53,7 +52,6 @@ export class GroupChatWindowComponent implements OnInit {
 
     removeUser(user: User) {
         const idxOf = this.selectedUsers.indexOf(user);
-        console.log(idxOf);
         this.selectedUsers.splice(idxOf, 1);
     }
 
@@ -64,7 +62,6 @@ export class GroupChatWindowComponent implements OnInit {
             groupChatParticipantUserIds.push(user.user_id);
         }
         this.userService.createChatroom(this.userService.currentUser.userId, groupChatParticipantUserIds, true, groupChatName).subscribe(chatroom => {
-            console.log("submit", chatroom);
             this.closeMenu();
             this.wsService.createChatroom(chatroom, groupChatParticipantUserIds);
             this.groupChatCreatedEvent.emit(chatroom);

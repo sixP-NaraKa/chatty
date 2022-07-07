@@ -32,7 +32,6 @@ export class ChatComponent implements OnInit {
         // messages, other messages are handled by the parent app-chat-page component
         this.wsService.getChatMessage().subscribe(msg => {
             if (msg.chatroom_id === this.chatroomId) {
-                console.log("message from websocket => ", msg);
                 this.chatroomMessages.push(msg);
                 this.scrollToLatestMessage();
             }
@@ -46,7 +45,6 @@ export class ChatComponent implements OnInit {
      */
     displayChat(chatroomIdToLoad: number) {
         if (chatroomIdToLoad !== -1) {
-            console.log("loading chatId", chatroomIdToLoad);
             // create new instance here, in case any errors might happen during chatroom navigation or whatnot
             this.chatroomMessages = new Array<ChatMessageWithUser>();
             this.fetchAndDisplayChatMessages(chatroomIdToLoad);

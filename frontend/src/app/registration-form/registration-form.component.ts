@@ -35,7 +35,6 @@ export class RegistrationFormComponent implements OnInit {
 
         this.userService.register(username, password).pipe(first()).subscribe(
             data => {
-                console.log("userService.register(...) =>", data);
                 window.alert("User created. Redirecting to login page.");
                 this.router.navigate(["/login"]);
             },

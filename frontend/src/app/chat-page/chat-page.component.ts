@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatRoomWithParticipantsExceptSelf, participants, settings, User, UserIdDisplayName, users } from '../../../../shared/types/db-dtos';
+import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -24,7 +25,12 @@ export class ChatPageComponent implements OnInit {
     // locally stored user settings with default values
     userSettings!: settings;
 
+    // current user
+    currentUser: ApplicationUser;
+
     constructor(private userService: UserService, private wsService: WebsocketService) {
+        this.currentUser = this.userService.currentUser;
+
         // (re)connect the websocket on page reload
         // why here? because if this app-chat-page component gets loaded, we are logged in and ready to go
         this.wsService.connect();
@@ -33,7 +39,6 @@ export class ChatPageComponent implements OnInit {
         this.userService.getUserSettings(this.userService.currentUser.userId).subscribe(stts => {
             // this will (re)trigger the [filterOutEmpty1on1Chats] directive (as it seems) before it gets loaded (?)
             this.userSettings = stts;
-            console.log("fetched user settings", this.userSettings);
             this.editChatWindowElementFontSize(stts); // both will have the same values, but this doesn't matter
         });
     }
@@ -58,15 +63,14 @@ export class ChatPageComponent implements OnInit {
      * @param chat the chat to pass to the app-chat component (we only take the ID at the moment)
      */
     displayChat(chat: ChatRoomWithParticipantsExceptSelf) {
-        console.log("new chat to load", chat)
         // join the chatroom websocket room
         this.wsService.joinChatroom(chat.chatroom_id);
         this.chatroomIdToLoad = chat.chatroom_id;
         this.chatroom = chat;
-        console.log("new chatId to load", this.chatroom.chatroom_id);
 
         // set group chat participants/users to null
         this.groupChatParticipants.length = 0;
+        this.hideDropdown = true;
     }
 
     applySettings(usrSetts: settings) {
@@ -103,15 +107,18 @@ export class ChatPageComponent implements OnInit {
     }
 
     groupChatParticipants = new Array<User>();
+    hideDropdown: boolean = true;
     /**
      * On button click, shows the users which are part of the current opened group chat.
      */
     showUsersForGroupChat() {
         if (this.groupChatParticipants.length === 0) {
+            this.hideDropdown = false;
             this.groupChatParticipants = new Array<User>();
             this.chatroom.chatrooms.participants.forEach(user => this.groupChatParticipants.push(user.users));
         }
         else {
+            this.hideDropdown = true;
             this.groupChatParticipants.length = 0;
         }
     }
@@ -132,8 +139,7 @@ export class ChatPageComponent implements OnInit {
         this.userService.removeUserFromGroupChat(this.userService.currentUser.userId, user.user_id, chatroomIdToRemoveParticipantFrom).subscribe(
             amountDeleted => {
                 if (amountDeleted > 0) {
-                    console.log("user removed from the chatroom (deleted in db)");
-                    // remove user from the locally stored chatroom
+                    // remove user from the locally stored chatroom (only important until a page reload is done)
                     const userFromChatroom = this.chatroom.chatrooms.participants.filter(u => u.users.user_id === user.user_id);
                     if (userFromChatroom.length > 0) {
                         const idxOf = this.chatroom.chatrooms.participants.indexOf(userFromChatroom[0]);
@@ -142,6 +148,25 @@ export class ChatPageComponent implements OnInit {
                 }
             }
         )
+    }
+
+    /**
+     * Catches the event emitted from the group-chat-users component,
+     * indicating that a user should be added to the group chat.
+     * 
+     * @param user the user to add to the group chat
+     */
+    onAddParticipantToGroupChat(user: User) {
+        const chatroomIdToAddUsersTo = this.chatroom.chatroom_id;
+
+        // add the new user to the locally stored list(s)
+        this.groupChatParticipants.push(user);
+        this.chatroom.chatrooms.participants.push({ users: user });
+
+        // notify user via websocket(s), and store in db
+        this.userService.addUsersToGroupChat(this.currentUser.userId, user.user_id, chatroomIdToAddUsersTo).subscribe(_ => {
+            this.wsService.addUserToChatroom(this.chatroom, user.user_id);
+        });
     }
 
 }

@@ -78,9 +78,10 @@ export class AppController {
     }
 
     @UseGuards(AuthGuard())
-    @Post("/api/user/chatrooms/groups/add")
-    async addUsersToGroupChat(@Body() body: { userIds: number[], chatroomId: number}) {
-        await this.appService.addUsersToGroupChat(body.userIds, body.chatroomId);
+    @Get("/api/user/chatrooms/groups/add")
+    async addUsersToGroupChat(@Query("userIdsToAdd", new ParseArrayPipe({ items: Number, separator: "," })) userIds: number[],
+        @Query("chatroomId", ParseIntPipe) chatroomId: number) {
+        await this.appService.addUsersToGroupChat(userIds, chatroomId);
     }
 
     @UseGuards(AuthGuard())

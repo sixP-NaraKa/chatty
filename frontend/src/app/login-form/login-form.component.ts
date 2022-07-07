@@ -30,7 +30,6 @@ export class LoginFormComponent implements OnInit {
 
         this.userService.login(username, password).pipe(first()).subscribe(
             data => {
-                console.log("userService.login(...) =>", data);
                 this.router.navigate(["/chat"]);
             },
             error => {

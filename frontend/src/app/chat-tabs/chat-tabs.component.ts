@@ -100,12 +100,10 @@ export class ChatTabsComponent implements AfterContentInit {
      * @param user the user which has been selected to start a chat with
      */
     userSelection(user: User) {
-        console.log("user emitted from user-search", user);
         this.userService.getSingleChatroomForUserWithUserIdAndParticipantUserId(this.currentUser.userId, user.user_id)
             .subscribe(room => {
                 if (!room) {
                     // make API call to create a new chatroom with the two participants
-                    console.log("creating new chatroom (frontend)");
                     this.userService.createChatroom(this.currentUser.userId, user.user_id, false).subscribe(room => {
                         this.chatrooms.push(room);
                         this.notifyLoadChat(room);
@@ -114,7 +112,6 @@ export class ChatTabsComponent implements AfterContentInit {
                 }
                 else {
                     // load the existing chatroom
-                    console.log("loading existing chatroom");
                     // see if the chat needs to be added to the opened chat-tabs
                     if (!this.chatrooms.some(c => c.chatroom_id === room.chatroom_id)) {
                         this.chatrooms.push(room);
@@ -132,6 +129,7 @@ export class ChatTabsComponent implements AfterContentInit {
         // Note for 1on1 chats: we do not need to fetch here the chat from the db or add it to the list,
         // since we will get the latest info anyway upon receiving chat messages and then opening the chat
         this.wsService.getNewChatroom().subscribe(([chatroom, participantUserIds]) => {
+            console.log("new chatroom", chatroom, "user ids to join", participantUserIds);
             if (participantUserIds.includes(this.userService.currentUser.userId)) {
                 this.wsService.joinChatroom(chatroom.chatroom_id);
 

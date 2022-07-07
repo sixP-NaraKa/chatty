@@ -15,10 +15,16 @@ export class GroupChatUsersComponent implements AfterViewInit {
     }
 
     @Input()
+    hideDropdown: boolean = true;
+
+    @Input()
     groupChatCreatedBy: number | null = -1;
 
     @Output()
     removeUserFromGroupChat = new EventEmitter<User>();
+
+    @Output()
+    addUserToGroupChatEvent = new EventEmitter<User>();
 
     currentUserId: number;
     constructor(private userService: UserService) {
@@ -39,6 +45,12 @@ export class GroupChatUsersComponent implements AfterViewInit {
         this.removeUserFromGroupChat.emit(user);
     }
 
-    // TODO: think about removing for other users the participants as well, via the existing websocket method(s)
+    onUserSelection(user: User) {
+        if (this.users.some(u => u.user_id === user.user_id)) {
+            return;
+        }
+        // this.users.push(user); // no need to push here, as we do that already in the chat-page component (we would do it twice therefore)
+        this.addUserToGroupChatEvent.emit(user);
+    }
 
 }
