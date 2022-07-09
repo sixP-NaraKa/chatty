@@ -1,5 +1,5 @@
 import { Body, Controller, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
-import { settings, users } from '@prisma/client';
+import { emote, settings, users } from '@prisma/client';
 import { AppService } from './app.service';
 import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser } from '../../shared/types/db-dtos';
 import { LocalAuthGuard } from './auth/local-auth.guard';
@@ -39,6 +39,12 @@ export class AppController {
     @Post("/api/user/update/settings")
     async updateUserSettings(@Body() body: settings) {
         return await this.userService.updateUserSettings(body);
+    }
+
+    @UseGuards(AuthGuard())
+    @Get("/api/emotes")
+    async getAvailableEmotes(): Promise<emote[]> {
+        return await this.appService.getAllAvailableEmotes();
     }
 
     @UseGuards(AuthGuard())

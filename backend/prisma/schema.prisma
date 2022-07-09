@@ -52,3 +52,9 @@ model settings {
   font_size   String @default("default")
   users       users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }
+
+model emote {
+  emote_id Int     @id @default(autoincrement())
+  emote    String
+  name     String?
+}

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser } from '../../shared/types/db-dtos';
+import { emote } from '@prisma/client';
 
 
 const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
@@ -264,6 +265,11 @@ export class AppService {
                 }
             }
         });
+    }
+
+    /* EMOTE fetching */
+    async getAllAvailableEmotes(): Promise<emote[]> {
+        return this.prismaService.emote.findMany();
     }
 
 }

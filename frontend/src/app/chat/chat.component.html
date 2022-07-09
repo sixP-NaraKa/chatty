@@ -1,5 +1,5 @@
 <div class="chat-scrollbar text-left h-full overflow-y-auto">
-    <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-10 pt-2 px-2 mb-4">
+    <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-10 pt-2 px-2 sm:mb-4">
         <p class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 border border-gray-200 rounded-xl"
             [class.mr-auto]="message.user_id !== currentUser.userId"
             [class.ml-auto]="message.user_id === currentUser.userId">
@@ -7,13 +7,17 @@
         </p>
     </div>
 </div>
-<div *ngIf="this.chatroomId !== -1"
-    class="absolute bottom-0 w-full h-4 md:h-7 border-t-2 rounded-lg border-violet-200 px-2 text-xs md:text-base">
-    <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate>
-        <input required formControlName="messageInput"
-            class="form-element absolute bottom-0 left-0 w-3/4 sm:w-10/12 h-4 md:h-7 border-t-2 border-violet-200 px-2 mt-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
+<app-emote-select [showEmotesMenu]="showEmotesMenu" (closeEmotesMenuEvent)="onEmoteMenuClosed()" (emoteSelectedEvent)="onEmoteSelect($event)"
+    class="fixed top-16 right-0 w-full"></app-emote-select>
+<div *ngIf="this.chatroomId !== -1" class="absolute bottom-0 w-full h-fit text-xs md:text-base">
+    <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate
+        class="form-element mb-0 border-t-2 border-violet-200 h-full">
+        <input id="messageInput" required formControlName="messageInput"
+            class="bg-transparent w-[75%] h-full px-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden border-r-2"
             placeholder="Write your message..." />
+        <button type="button" id="emotesButton" class="fa-solid fa-face-grin w-[7.5%] h-full"
+            (click)="onEmoteMenu()"></button>
         <button type="submit"
-            class="form-element absolute bottom-0 right-0 w-1/4 sm:w-1/6 h-4 md:h-7 border-l-2 border-t-2 border-violet-200 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-40">Send</button>
+            class="w-[17.5%] h-full border-l-2 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-40">Send</button>
     </form>
 </div>

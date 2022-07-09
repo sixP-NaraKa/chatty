@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { settings, ChatMessageWithUser, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User } from "../../../../shared/types/db-dtos";
+import { settings, ChatMessageWithUser, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User, emote } from "../../../../shared/types/db-dtos";
 import { ApplicationUser, AuthService } from "../auth/auth.service";
 
 @Injectable({
@@ -67,6 +67,10 @@ export class UserService {
 
     getChatroomMessagesCount(chatroomId: number, userId: number): Observable<number> {
         return this.http.get<number>(`http://192.168.178.33:3100/api/chat/chatmessages/count?chatroom_id=${chatroomId}&user_id=${userId}`);
+    }
+
+    getAvailableEmotes(userId: number): Observable<emote[]> {
+        return this.http.get<emote[]>(`http://192.168.178.33:3100/api/emotes?user_id=${userId}`);
     }
 
     /* INSERTING / EDITING OF DATA */
