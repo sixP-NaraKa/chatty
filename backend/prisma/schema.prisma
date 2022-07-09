@@ -54,7 +54,7 @@ model settings {
 }
 
 model emote {
-  emote_id Int     @id @default(autoincrement())
+  emote_id Int    @id @default(autoincrement())
   emote    String
-  name     String?
+  name     String
 }

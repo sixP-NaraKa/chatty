@@ -8,7 +8,7 @@
     </div>
 </div>
 <app-emote-select [showEmotesMenu]="showEmotesMenu" (emoteSelectedEvent)="onEmoteSelect($event)"
-    class="fixed top-16 right-0 w-full"></app-emote-select>
+    class="absolute bottom-0 right-0 w-full"></app-emote-select>
 <div *ngIf="this.chatroomId !== -1" class="absolute bottom-0 w-full h-fit text-xs md:text-base">
     <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate
         class="form-element mb-0 border-t-2 border-violet-200 h-full">

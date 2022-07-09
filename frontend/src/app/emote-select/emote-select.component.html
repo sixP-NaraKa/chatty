@@ -1,10 +1,10 @@
 <div class="z-50">
-    <div id="emotesContainerId" [hidden]="!showEmotesMenu">
-        <!-- <input #userSearchInput type="text" placeholder="Search for users..." class="bg-transparent w-full h-6 px-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden text-xs md:text-base" /> -->
+    <div id="emotesContainerId" [hidden]="!showEmotesMenu" class="bg-black pb-5 md:pb-6 border-t-2 border-gray-200">
+        <input id="emoteSearchInput" #emoteSearchInput type="text" placeholder="Type to filter emotes..." class="bg-transparent w-full h-6 px-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden border-b border-gray-200 text-xs md:text-base" />
         <div #emoteDiv>
             <ul id="emotesULListId" #emoteUL
-                class="bg-black search-scrollbar grid grid-cols-6 z-50 w-fit max-h-32 px-2 overflow-y-auto overflow-x-hidden">
-                <li *ngFor="let emote of availableEmotes" (click)="emoteSelect(emote)" title="{{emote.name}} (soon)"
+                class="search-scrollbar grid grid-cols-6 z-50 w-full max-h-32 px-2 overflow-y-auto overflow-x-hidden">
+                <li *ngFor="let emote of filteredEmotes" (click)="emoteSelect(emote)" title="{{emote.name}}"
                     class="w-fit cursor-pointer px-2 hover:bg-gray-600">
                     {{emote.emote}}
                 </li>
