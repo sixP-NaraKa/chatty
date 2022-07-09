@@ -101,10 +101,6 @@ export class ChatComponent implements OnInit {
         }
     }
 
-    onEmoteMenuClosed() {
-        this.showEmotesMenu = false;
-    }
-
     onEmoteSelect(emote: emote) {
         this.formGroup.setValue({
             messageInput: this.formGroup.value.messageInput + emote.emote

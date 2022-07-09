@@ -1,11 +1,11 @@
 <!-- relative here might also be an option, to display the creation group chat window on top of the chat-tabs ... might be worth a consideration -->
 <div class="user-search-group-chat flex flex-row flex-auto justify-between mb-2 border-b-2 border-violet-200">
     <app-user-search (userSelectionEvent)="userSelection($event)" class="w-full"></app-user-search>
-    <button type="menu" title="New Group Chat" class="h-6 fa-solid fa-people-group px-2 border-l-2 border-violet-200" (click)="onCreateGroupChatButtonClick()">+</button>
+    <button type="menu" title="New Group Chat" class="h-6 fa-solid fa-people-group px-2 border-l-2 border-violet-200 hover:bg-gray-600 text-yellow-300" (click)="onCreateGroupChatButtonClick()">+</button>
     <app-group-chat-window [shouldShowWindow]="showGroupChatCreateWindow" (groupChatClosedEvent)="onCreateGroupChatClosed()" (groupChatCreatedEvent)="onCreateGroupChatEvent($event)"></app-group-chat-window>
 </div>
 <ul class="flex flex-col justify-center list-none border-b-0 px-4">
-    <div *ngFor="let chat of chatrooms" id={{chat.chatroom_id}} (click)="notifyLoadChat(chat)" class="mb-0.5 chat-tab"
+    <div *ngFor="let chat of chatrooms" id={{chat.chatroom_id}} (click)="notifyLoadChat(chat)" class="mb-0.5 chat-tab hover:text-violet-200"
         [class.chat-tab-selected]="chat.chatroom_id === selectedChatId"
         [class.unread-messages]="newUnreadMessagesChatroomIds.includes(chat.chatroom_id)">
         <p class="relative whitespace-nowrap text-ellipsis overflow-hidden pr-6">{{chat.chatrooms.isgroup ? chat.chatrooms.name : chat.chatrooms.participants[0].users.display_name}}

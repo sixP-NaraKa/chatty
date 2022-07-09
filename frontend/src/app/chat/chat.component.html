@@ -7,7 +7,7 @@
         </p>
     </div>
 </div>
-<app-emote-select [showEmotesMenu]="showEmotesMenu" (closeEmotesMenuEvent)="onEmoteMenuClosed()" (emoteSelectedEvent)="onEmoteSelect($event)"
+<app-emote-select [showEmotesMenu]="showEmotesMenu" (emoteSelectedEvent)="onEmoteSelect($event)"
     class="fixed top-16 right-0 w-full"></app-emote-select>
 <div *ngIf="this.chatroomId !== -1" class="absolute bottom-0 w-full h-fit text-xs md:text-base">
     <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate
@@ -15,9 +15,12 @@
         <input id="messageInput" required formControlName="messageInput"
             class="bg-transparent w-[75%] h-full px-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden border-r-2"
             placeholder="Write your message..." />
-        <button type="button" id="emotesButton" class="fa-solid fa-face-grin w-[7.5%] h-full"
-            (click)="onEmoteMenu()"></button>
+        <button type="button" id="emotesButton" class="w-[7.5%] h-full text-yellow-300"
+            (click)="onEmoteMenu()">
+            <i class="fa fa-solid fa-face-grin"></i>
+            <i class="fa fa-solid fa-face-kiss"></i>
+        </button>
         <button type="submit"
-            class="w-[17.5%] h-full border-l-2 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-40">Send</button>
+            class="w-[17.5%] h-full border-l-2 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-40 hover:bg-gray-600">Send</button>
     </form>
 </div>
