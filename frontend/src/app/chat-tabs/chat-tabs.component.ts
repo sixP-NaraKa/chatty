@@ -28,7 +28,11 @@ export class ChatTabsComponent implements AfterContentInit {
 
     newUnreadMessagesChatroomIds = new Array<number>();
 
+    // audio element to play sounds indicating a new unread message came in
+    audioElementUnreadMessage = new Audio("../../assets/VULULU.m4a");
+
     constructor(private userService: UserService, private wsService: WebsocketService) {
+        this.audioElementUnreadMessage.volume = 0.10; // 10%
         this.currentUser = this.userService.currentUser;
     }
 
@@ -176,8 +180,19 @@ export class ChatTabsComponent implements AfterContentInit {
             }
             // reload will empty this again, but for now it is fine
             console.log("unread message chat ids", this.newUnreadMessagesChatroomIds, "this.selectedChatId", this.selectedChatId);
-            if (this.selectedChatId !== msg.chatroom_id && !this.newUnreadMessagesChatroomIds.includes(msg.chatroom_id)) {
-                this.newUnreadMessagesChatroomIds.push(msg.chatroom_id);
+            if (this.selectedChatId !== msg.chatroom_id) {
+                if (!this.newUnreadMessagesChatroomIds.includes(msg.chatroom_id)) {
+                    this.newUnreadMessagesChatroomIds.push(msg.chatroom_id);
+                }
+                console.log("playing audio...")
+                // play sound indicating a new message
+                // Note - not needed anymore: reset time to 0, as sometimes the audio does not get played additional times otherwise
+                //                            also, this makes the audio play from the beginning
+                //                            if a new message during the duration of the audio came in, which is quite ok
+                this.audioElementUnreadMessage.currentTime = 0;
+                // Note - Firefox: audio cannot get played due to Firefox blocking it, but only if no chat has been loaded before...
+                //                 after any chat has been loaded (e.g. clicked on), the audio works fine...
+                this.audioElementUnreadMessage.play();
             }
         });
     }
