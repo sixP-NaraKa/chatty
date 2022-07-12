@@ -42,7 +42,7 @@ testem.log
 Thumbs.db
 
 # custom
-.env
+*.env
 */node_modules
 */.angular/cache
 */dist
