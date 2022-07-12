@@ -3,7 +3,8 @@
         <p class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 border border-gray-200 rounded-xl"
             [class.mr-auto]="message.user_id !== currentUser.userId"
             [class.ml-auto]="message.user_id === currentUser.userId">
-            <b>{{message.users.display_name}}:</b> {{ message.msg_content }}
+            <b>{{message.users.display_name}}: </b>
+            <span [innerHTML]="urlify(message.msg_content)"></span>
         </p>
     </div>
 </div>
