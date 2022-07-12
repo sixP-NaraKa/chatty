@@ -6,7 +6,7 @@ import { PrismaService } from './prisma/prisma.service';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     app.enableCors({
-        origin: ["http://localhost:4300", "http://192.168.178.33:4300"], // true,
+        origin: ["http://localhost:4300", process.env["HOST"]], // true,
         methods: "GET,POST",
         credentials: true
     });
