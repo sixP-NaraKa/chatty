@@ -20,8 +20,9 @@ import { SettingsMenuComponent } from './settings-menu/settings-menu.component';
 import { GroupChatWindowComponent } from './group-chat-window/group-chat-window.component';
 import { GroupChatUsersComponent } from './group-chat-users/group-chat-users.component';
 import { EmoteSelectComponent } from './emote-select/emote-select.component';
+import config from 'src/environments/config';
 
-const socketconfig: SocketIoConfig = { url: "http://192.168.178.33:3100", options: { autoConnect: false } }
+const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
 
 @NgModule({
     declarations: [
