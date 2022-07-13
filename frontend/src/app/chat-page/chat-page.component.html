@@ -3,12 +3,12 @@
 <div class="chat flex flex-auto flex-col sm:flex-row w-full h-[85vh] min-h-[480px] sm:space-x-6 p-4 pt-4">
     <!-- this container will have a min-height of 120px, as the parent container is 480px and the child component below 320px - (minus) paddings, etc. pp. -->
     <div
-        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] border border-yellow-200 overflow-y-auto text-xs md:text-base">
+        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] overflow-y-auto text-xs md:text-base border-2 border-gray-700">
         <app-chat-tabs (loadChat)="displayChat($event)" [filterOutEmpty1on1Chats]="userSettings?.filter === 'filter'">
         </app-chat-tabs>
     </div>
-    <div class="relative flex flex-col w-full min-w-[240px] min-h-[320px] mt-2 sm:mt-0 border border-violet-200">
-        <div class="chat-content-header border-b-2 border-violet-200">
+    <div class="relative flex flex-col w-full min-w-[240px] min-h-[320px] mt-2 sm:mt-0 border-2 border-gray-700">
+        <div class="chat-content-header border-b-2 border-gray-700">
             <div id="chatHeader">
                 <div *ngIf="this.chatroom" class="flex flex-row justify-between h-full text-base">
                     <p class="whitespace-nowrap text-ellipsis overflow-hidden px-2"

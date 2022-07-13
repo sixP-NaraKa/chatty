@@ -5,7 +5,7 @@
                 <b class="text-violet-200">{{currentUser.username}}</b>
             </p>
             <div class="flex space-x-4">
-                <button type="menu" title="Settings" class="h-6 fa-solid fa-gear" (click)="onMenuButtonClick()"></button>
+                <button type="menu" title="Settings" class="h-6 fa-solid fa-gear text-violet-200 hover:text-violet-400" (click)="onMenuButtonClick()"></button>
                 <!-- <app-settings-menu [shouldShowMenu]="showMenu"></app-settings-menu> -->
                 <button type="button" (click)="logout()" title="Logout"
                     class="h-6 w-fit bg-violet-200 text-black rounded px-2 hover:bg-violet-400 fa-solid fa-arrow-right-from-bracket"></button>

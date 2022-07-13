@@ -7,6 +7,21 @@ html {
     height: 100%;
 }
 
+body {
+    background-color: rgb(26, 32, 44);
+    // background-color: #0a0a0a;
+}
+
+.chat-tabs {
+    background-color: rgb(20, 24, 31);
+    // background-color: #141414;
+}
+
+.chat-content-main {
+    // background-color: #100d10;
+    // background-color: #1f1f1f;
+}
+
 html, .chat-scrollbar, .search-scrollbar {
     &::-webkit-scrollbar {
         width: 0.35rem;

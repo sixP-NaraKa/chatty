@@ -1,5 +1,6 @@
 .form-element {
-    background-color: rgb(26, 32, 44);
+    background-color: rgb(20, 24, 31);
+    // background-color: #141414;
 }
 
 #emotesButton > .fa + .fa,
@@ -9,4 +10,15 @@
 
 #emotesButton:hover > .fa + .fa {
     display: inherit;
+}
+
+.bg-owndigo {
+    background-color: #3a3c59;
+    // rgb(49, 46, 129)
+}
+
+.chat-participant-message {
+    // background-color: #4c4948;
+    background-color: #292929;
+    // bg-gray-800 was before
 }
