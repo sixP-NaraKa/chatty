@@ -19,7 +19,7 @@ export class ChatComponent implements OnInit {
         this.chatroomId = chatroom ? chatroom.chatroom_id : -1;
         this.displayChat(this.chatroomId);
     }
-    
+
     chatroomMessages = new Array<ChatMessageWithUser>();
 
     constructor(private userService: UserService, private wsService: WebsocketService) {
@@ -79,12 +79,12 @@ export class ChatComponent implements OnInit {
                 .subscribe(msg => {
                     this.formGroup.reset();
                     this.chatroomMessages.push(msg);
-    
+
                     // emit msg via websocket
                     this.wsService.sendChatMessage(msg);
-                    
+
                     this.scrollToLatestMessage();
-            });
+                });
         }
     }
 
@@ -110,6 +110,27 @@ export class ChatComponent implements OnInit {
         // and then this.element.nativeElement.focus()
     }
 
+    /**
+     * Helper method to populate some message specific metadata information, like when it was posted.
+     * This can be further used to fully populate the whole message itself, if wanted (e.g. the "div" which contains the message).
+     * 
+     * For now, only metadata information will be injected.
+     * 
+     * @param message the message
+     * @returns the HTML to inject into the calling component (e.g. "[innerHTML]='...'")
+     */
+    populateMessageHeader(message: ChatMessageWithUser) {
+        const isMessageFromCurrentUser = message.user_id === this.currentUser.userId;
+        console.log(isMessageFromCurrentUser);
+        const msgDate = new Date(message.posted_at); // ... just why is this needed? xD
+        // .substr(11, 5) => HH:MM format
+        // .substr(11, 8) => HH:MM:SS format
+        return `
+                ${!isMessageFromCurrentUser ? `<b class="text-xs text-gray-400">${message.users.display_name}</b>` : ""}
+                <b title="Posted at: ${msgDate}" class="text-xs text-gray-400">${msgDate.toISOString().substr(11, 5)}</b>
+                `
+    }
+
     // https://urlregex.com/
     urlRegex = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
     /**
@@ -131,10 +152,10 @@ export class ChatComponent implements OnInit {
      * and when writing, sending and receiving chat messages.
      */
     scrollToLatestMessage() {
-        setTimeout(function() {
+        setTimeout(function () {
             const lastMessageDiv = Array.from(document.getElementsByClassName("chat-message-div")).pop();
             lastMessageDiv?.scrollIntoView({ behavior: 'smooth' });
         }, 1);
     }
-    
+
 }

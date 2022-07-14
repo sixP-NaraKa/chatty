@@ -4,7 +4,7 @@
             [class.mr-auto]="message.user_id !== currentUser.userId"
             [class.chat-participant-message]="message.user_id !== currentUser.userId"
             [class.ml-auto]="message.user_id === currentUser.userId" [class.bg-owndigo]="message.user_id === currentUser.userId">
-            <b *ngIf="message.user_id !== currentUser.userId">{{message.users.display_name}}: </b>
+            <span class="flex gap-4" [innerHTML]="populateMessageHeader(message)"></span>
             <span [innerHTML]="urlify(message.msg_content)"></span>
         </p>
     </div>
