@@ -5,6 +5,8 @@ import {
     OnGatewayConnection,
     OnGatewayDisconnect,
 } from '@nestjs/websockets';
+import { UsersService } from 'src/users/users.service';
+import { AuthService } from '../auth/auth.service';
 import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf } from '../../../shared/types/db-dtos';
 
 const options = {
@@ -23,7 +25,31 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     numConnections = 0;
 
+    constructor(private authService: AuthService, private userService: UsersService) { }
+
     async handleConnection(client: any, ...args: any[]) {
+        // verify user before connecting them - similar to verfiy-user.middleware
+        console.log(client.handshake.auth.token);
+
+        let jwtUser;
+        try {
+            jwtUser = await this.authService.verifyToken(client.handshake.auth.token);
+        }
+        catch(e) {
+            console.log("=> Websocket: Token is invalid. <=");
+            client.disconnect(); // disconnecting just for good measure
+            return;
+        }
+        
+        // fetch user from db to completely verify
+        const dbUser = await this.userService.findOneById(jwtUser.sub);
+
+        if (!dbUser || !jwtUser) {
+            console.log("=> Websocket: No user found. <=");
+            client.disconnect(); // disconnecting just for good measure
+            return;
+        }
+        
         this.numConnections++;
         console.log("connected, num conn => ", this.numConnections);
     }

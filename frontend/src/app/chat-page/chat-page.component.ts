@@ -33,7 +33,8 @@ export class ChatPageComponent implements OnInit {
 
         // (re)connect the websocket on page reload
         // why here? because if this app-chat-page component gets loaded, we are logged in and ready to go
-        this.wsService.connect();
+        // give the current User token to authenticate connection
+        this.wsService.connect(this.currentUser);
 
         // fetch initial user settings
         this.userService.getUserSettings(this.userService.currentUser.userId).subscribe(stts => {

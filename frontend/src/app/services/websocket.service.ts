@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Socket } from "ngx-socket-io";
 import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf } from "../../../../shared/types/db-dtos";
+import { ApplicationUser } from "../auth/auth.service";
 
 @Injectable({
     providedIn: "root"
@@ -9,7 +10,8 @@ export class WebsocketService {
 
     constructor(private socket: Socket) { }
 
-    connect() {
+    connect(currentUser: ApplicationUser) {
+        this.socket.ioSocket["auth"] = { token: currentUser.access_token };
         this.socket.connect();
     }
 
