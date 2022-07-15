@@ -47,3 +47,4 @@ Thumbs.db
 */.angular/cache
 */dist
 */src/environments/config.ts
+*.pem

@@ -6,6 +6,7 @@
     "start": "ng serve",
     "serve": "ng serve --port 4300",
     "serveall": "ng serve --host 192.168.178.33 --port 4300",
+    "sas": "ng serve --host 192.168.178.33 --port 4300 --ssl true --ssl-key chatty-server-key.pem --ssl-cert chatty-server-cert.pem",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

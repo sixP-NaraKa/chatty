@@ -78,7 +78,10 @@
               "browserTarget": "chatty:build:development"
             },
             "options": {
-              "port": 4300
+              "port": 4300,
+              "ssl": true,
+              "sslKey": "chatty-server-key.pem",
+              "sslCert": "chatty-server-cert.pem"
             }
           },
           "defaultConfiguration": "development"
