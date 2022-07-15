@@ -29,8 +29,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     async handleConnection(client: any, ...args: any[]) {
         // verify user before connecting them - similar to verfiy-user.middleware
-        console.log(client.handshake.auth.token);
-
         let jwtUser;
         try {
             jwtUser = await this.authService.verifyToken(client.handshake.auth.token);

@@ -121,7 +121,6 @@ export class ChatComponent implements OnInit {
      */
     populateMessageHeader(message: ChatMessageWithUser) {
         const isMessageFromCurrentUser = message.user_id === this.currentUser.userId;
-        console.log(isMessageFromCurrentUser);
         const msgDate = new Date(message.posted_at); // ... just why is this needed? xD
         // .substr(11, 5) => HH:MM format
         // .substr(11, 8) => HH:MM:SS format
