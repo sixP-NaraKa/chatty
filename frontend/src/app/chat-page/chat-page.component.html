@@ -16,16 +16,31 @@
                         {{chatroom.chatrooms.isgroup ? chatroom.chatrooms.name :
                         chatroom.chatrooms.participants[0].users.display_name}}
                     </p>
-                    <div>
-                        <button type="button" *ngIf="chatroom.chatrooms.isgroup" (click)="showUsersForGroupChat()"
-                            class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden hover:bg-violet-400">
-                            {{this.groupChatParticipants.length === 0 ? "Show Users" : "Hide Users"}}
-                        </button>
-                        <app-group-chat-users [hideDropdown]="hideDropdown" [groupChatUsers]="groupChatParticipants"
-                            [groupChatCreatedBy]="chatroom.chatrooms.created_by"
-                            (removeUserFromGroupChat)="onRemoveParticipantFromGroupChat($event)"
-                            (addUserToGroupChatEvent)="onAddParticipantToGroupChat($event)">
-                        </app-group-chat-users>
+                    <div id="chatHeaderNavBarButtons">
+                        <div *ngIf="!chatroom.chatrooms.isgroup" class="flex gap-x-2 px-2 h-full">
+                            <button type="button" (click)="showAudioDeviceSelection()" title="Voice Chat" class="fa-solid fa-phone text-violet-200 hover:text-violet-400"></button>
+                            <div id="audioDeviceSelection" *ngIf="this.audioDevices.length !== 0">
+                                <select id="audioDeviceSelectElement" title="Selected Audio Input Device" class="h-full bg-transparent hover:bg-gray-600">
+                                    <option *ngFor="let device of this.audioDevices" value="{{device.deviceId}}" class="hover:bg-gray-400">{{device.label ? device.label : "Standard Microphone"}}</option>
+                                </select>
+                                <button type="button" (click)="initiateAudioCall()" class="h-full px-2 hover:bg-gray-600">
+                                    <i *ngIf="!this.isInCall" title="Start Call" class="fa-solid fa-check h-4 w-4 text-green-400"></i>
+                                    <i *ngIf="this.isInCall" title="End Call" class="fa-solid fa-xmark h-4 w-4 text-red-400"></i>
+                                </button>
+                                <audio *ngIf="this.isInCall" id="audioPlaybackElement" controls="false" class="bg-red-400"></audio>
+                            </div>
+                        </div>
+                        <div *ngIf="chatroom.chatrooms.isgroup">
+                            <button type="button" (click)="showUsersForGroupChat()"
+                                class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden hover:bg-violet-400">
+                                {{this.groupChatParticipants.length === 0 ? "Show Users" : "Hide Users"}}
+                            </button>
+                            <app-group-chat-users [hideDropdown]="hideDropdown" [groupChatUsers]="groupChatParticipants"
+                                [groupChatCreatedBy]="chatroom.chatrooms.created_by"
+                                (removeUserFromGroupChat)="onRemoveParticipantFromGroupChat($event)"
+                                (addUserToGroupChatEvent)="onAddParticipantToGroupChat($event)">
+                            </app-group-chat-users>
+                        </div>
                     </div>
                 </div>
             </div>

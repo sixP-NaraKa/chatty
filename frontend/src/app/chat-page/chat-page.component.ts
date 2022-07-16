@@ -170,4 +170,61 @@ export class ChatPageComponent implements OnInit {
         });
     }
 
+    audioDevices = new Array<MediaDeviceInfo>();
+    /**
+     * Initiates the voice call to the selected chat participant (user - 1on1 only at the moment).
+     */
+    showAudioDeviceSelection() {
+        if (this.audioDevices.length !== 0) {
+            this.audioDevices = new Array<MediaDeviceInfo>();
+            return;
+        }
+
+        // let the user select which microphone they want to use for the voice chat
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+            // filter only for audio devices
+            // if any where found, they will be shown as <option> tags inside of the <select> box
+            this.audioDevices = devices.filter(device => device.kind === "audioinput");
+            console.log(this.audioDevices);
+            if (this.audioDevices.length === 0) {
+                window.alert("No microphone found. Please plug in a microphone device.");
+                return;
+            }
+        });
+    }
+
+    isInCall: boolean = false;
+    initiateAudioCall() {
+        // leave call (e.g. remove src from audio element) if pressed again
+        if (this.isInCall) {
+            (document.getElementById("audioPlaybackElement") as HTMLAudioElement).srcObject = null;
+            this.isInCall = false;
+            return;
+        }
+
+        // get the selected audio device from the select element
+        const selectedDeviceId = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement).value;
+        // get audio element via constraints
+        const constraints = {
+            audio: { deviceId: selectedDeviceId },
+            video: false
+        }
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                this.isInCall = true;
+                alert("Selected device: " + stream);
+                // a quick timeout so the *ngIf directive is triggering
+                setTimeout(() => {
+                    (document.getElementById("audioPlaybackElement") as HTMLAudioElement).srcObject = stream;
+                }, 1);
+            })
+            .catch(error => {
+                alert("Could not access microphone: " + error);
+            });
+        
+        // TODO: PeerToPeer audio connection, not only local playback via audio element
+    }
+
+
+
 }
