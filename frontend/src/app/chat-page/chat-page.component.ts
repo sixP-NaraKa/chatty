@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatRoomWithParticipantsExceptSelf, participants, settings, User, UserIdDisplayName, users } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
+import { CallService } from '../services/call.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -28,7 +29,7 @@ export class ChatPageComponent implements OnInit {
     // current user
     currentUser: ApplicationUser;
 
-    constructor(private userService: UserService, private wsService: WebsocketService) {
+    constructor(private userService: UserService, private wsService: WebsocketService, private callService: CallService) {
         this.currentUser = this.userService.currentUser;
 
         // (re)connect the websocket on page reload
@@ -44,8 +45,8 @@ export class ChatPageComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {
-        // this.listenForNewChatroomsAndJoinThem();
+    async ngOnInit() {
+        await this.callService.addIncomingMessageHandler();
     }
 
     /**
@@ -136,7 +137,7 @@ export class ChatPageComponent implements OnInit {
         // leave websocket chatroom for the given user
         // + remove the chat from the chats list (only important if the user is logged in)
         this.wsService.removeUserFromChatroom(user.user_id, chatroomIdToRemoveParticipantFrom);
-        
+
         this.userService.removeUserFromGroupChat(this.userService.currentUser.userId, user.user_id, chatroomIdToRemoveParticipantFrom).subscribe(
             amountDeleted => {
                 if (amountDeleted > 0) {
@@ -194,35 +195,37 @@ export class ChatPageComponent implements OnInit {
     }
 
     isInCall: boolean = false;
-    initiateAudioCall() {
+    /**
+     * Starts the voice call with the chatroom user(s) - 1on1 only at the moment.
+     */
+    async startCall() {
         // leave call (e.g. remove src from audio element) if pressed again
         if (this.isInCall) {
             (document.getElementById("audioPlaybackElement") as HTMLAudioElement).srcObject = null;
+            this.callService.hangup(this.chatroom.chatroom_id);
             this.isInCall = false;
             return;
         }
 
-        // get the selected audio device from the select element
-        const selectedDeviceId = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement).value;
-        // get audio element via constraints
-        const constraints = {
-            audio: { deviceId: selectedDeviceId },
-            video: false
-        }
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(stream => {
-                this.isInCall = true;
-                alert("Selected device: " + stream);
-                // a quick timeout so the *ngIf directive is triggering
-                setTimeout(() => {
-                    (document.getElementById("audioPlaybackElement") as HTMLAudioElement).srcObject = stream;
-                }, 1);
-            })
-            .catch(error => {
-                alert("Could not access microphone: " + error);
-            });
+        // // get the selected audio device from the select element
+        // const selectedDeviceId = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement).value;
+        // // get audio element via constraints
+        // const constraints = {
+        //     audio: { deviceId: selectedDeviceId },
+        //     video: false
+        // }
+
+        // const err = await this.callService.getSelectedAudioMediaDevice(constraints);
+        // if (err) {
+        //     console.log("error in getting user media", err);
+        //     alert("could not get microphone " + selectedDeviceId);
+        //     return;
+        // }
+
+        this.isInCall = true;
+        await this.callService.call(this.chatroom.chatroom_id);
+
         
-        // TODO: PeerToPeer audio connection, not only local playback via audio element
     }
 
 

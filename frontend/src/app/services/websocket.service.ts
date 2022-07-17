@@ -3,6 +3,18 @@ import { Socket } from "ngx-socket-io";
 import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf } from "../../../../shared/types/db-dtos";
 import { ApplicationUser } from "../auth/auth.service";
 
+type SignallingDescription = {
+    desc: RTCSessionDescriptionInit,
+    chatroomId: number,
+}
+
+type VoiceChatMessage = {
+    type: "offer" | "answer" | "hangup" | "icecandidate",
+    chatroomId: number,
+    userId: number,
+    data: RTCSessionDescription | RTCSessionDescriptionInit | RTCIceCandidate | any,
+}
+
 @Injectable({
     providedIn: "root"
 })
@@ -44,7 +56,7 @@ export class WebsocketService {
     }
 
     addUserToChatroom(chatroom: ChatRoomWithParticipantsExceptSelf, participantUserId: number) {
-        this.createChatroom(chatroom, [ participantUserId ]);
+        this.createChatroom(chatroom, [participantUserId]);
     }
 
     listenForRemoveChatroom() {
@@ -54,5 +66,15 @@ export class WebsocketService {
     getNewChatroom() {
         return this.socket.fromEvent<[chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]]>("new:chatroom");
     }
-    
+
+    /* WebRTC but correctly (maybe :D) */
+
+    sendVoiceChatMessage(message: VoiceChatMessage) {
+        this.socket.emit("new:voice-chat-message", message);
+    }
+
+    getVoiceChatMessage() {
+        return this.socket.fromEvent<VoiceChatMessage>("new:voice-chat-message-received");
+    }
+
 }

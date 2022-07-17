@@ -91,4 +91,27 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.broadcast.emit("new:chatroom", chatroom, participantUserIds);
     }
 
+    /* WebRTC */
+
+    // @SubscribeMessage("new:voice-chat-offer-sent")
+    // async onVoiceChatOffer(client: any, offer: any) {
+    //     client.broadcast.to(offer.chatroomId).emit("new:voice-chat-offer-received", ["offer", offer]);
+    // }
+
+    // @SubscribeMessage("new:voice-chat-answer-sent")
+    // async onVoiceChatAnswer(client: any, answer: any) {
+    //     client.broadcast.to(answer.chatroomId).emit("new:voice-chat-answer-received", ["answer", answer]);
+    // }
+
+    // @SubscribeMessage("new:voice-chat-ice-candidate-sent")
+    // async onVoiceChatIceCandidate(client: any, candidateInfo: any) {
+    //     console.log("ws backend: ice candidate received", candidateInfo);
+    //     client.broadcast.to(candidateInfo.chatroomId).emit("new:voice-chat-ice-candidate-received", candidateInfo.candidate);
+    // }
+
+    @SubscribeMessage("new:voice-chat-message")
+    async onVoiceChatMessage(client: any, message: { type: "offer" | "answer" | "hangup" | "icecandidate", chatroomId: number, data: any }) {
+        client.broadcast.to(message.chatroomId).emit("new:voice-chat-message-received", message);
+    }
+
 }
