@@ -1,5 +1,8 @@
 <app-header (logOutEvent)="logout()" (applySettingsPassthroughEvent)="applySettings($event)"></app-header>
-<audio id="audioPlaybackElement" autoplay="true" controls="false" class="bg-red-400"></audio>
+
+<div id="voiceChatContainer" class="pt-2 pb-4">
+    <app-voice-chat [setChatroom]="this.chatroom"></app-voice-chat>
+</div>
 
 <div class="chat flex flex-auto flex-col sm:flex-row w-full h-[85vh] min-h-[480px] sm:space-x-6 p-4 pt-4">
     <!-- this container will have a min-height of 120px, as the parent container is 480px and the child component below 320px - (minus) paddings, etc. pp. -->
@@ -18,21 +21,6 @@
                         chatroom.chatrooms.participants[0].users.display_name}}
                     </p>
                     <div id="chatHeaderNavBarButtons">
-                        <div *ngIf="!chatroom.chatrooms.isgroup" class="flex gap-x-2 px-2 h-full">
-                            <button type="button" (click)="showAudioDeviceSelection()" title="Voice Chat" class="fa-solid fa-phone text-violet-200 hover:text-violet-400"></button>
-                            <div id="audioDeviceSelection" *ngIf="this.audioDevices.length !== 0">
-                                <select #audioDeviceSelectElement id="audioDeviceSelectElement" title="Selected Audio Input Device" class="h-full max-w-[240px] bg-transparent border-0 text-ellipsis whitespace-nowrap overflow-hidden">
-                                    <option *ngFor="let device of this.audioDevices" value="{{device.deviceId}}" class="bg-gray-800 border-0">{{device.label ? device.label : "Standard Audio Device"}}</option>
-                                </select>
-                                <!-- <button type="button" (click)="initiateAudioCall()" class="h-full px-2 hover:bg-gray-600"> -->
-                                <button type="button" (click)="startCall()" class="h-full px-2 hover:bg-gray-600">
-                                    <i *ngIf="!this.isInCall" title="Start Call" class="fa-solid fa-check h-4 w-4 text-green-400"></i>
-                                    <i *ngIf="this.isInCall" title="End Call" class="fa-solid fa-xmark h-4 w-4 text-red-400"></i>
-                                </button>
-                                <!-- <audio *ngIf="this.isInCall" id="audioPlaybackElement" autoplay="true" controls="false" class="bg-red-400"></audio> -->
-                                <!-- <audio id="audioPlaybackElement" autoplay="true" controls="false" class="bg-red-400"></audio> -->
-                            </div>
-                        </div>
                         <div *ngIf="chatroom.chatrooms.isgroup">
                             <button type="button" (click)="showUsersForGroupChat()"
                                 class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden hover:bg-violet-400">

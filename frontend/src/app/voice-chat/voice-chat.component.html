@@ -1,0 +1,31 @@
+<div class="overflow-x-hidden">
+    <button (click)="onVoiceChatSliderClick()"
+        class="absolute right-0 w-fit h-fit px-4 space-x-1 bg-white rounded-l-2xl text-gray-800 hover:text-gray-600">
+        <i class="fa-solid fa-arrow-left"></i>
+        <i class="fa-solid fa-phone"></i>
+    </button>
+    <div id="slideContent" class="voice-chat-content-container dismiss border-2 border-gray-700">
+        <!-- that is one way to do it I suppose :D -->
+        <button (click)="onVoiceChatSliderClick()"
+            class="w-fit h-fit px-4 space-x-1 bg-white rounded-r-2xl text-gray-800 hover:text-gray-600">
+            <i class="fa-solid fa-arrow-right"></i>
+            <i class="fa-solid fa-phone-flip"></i>
+        </button>
+
+        <audio id="audioPlaybackElement" autoplay="true" controls="false" class="w-full h-0 w-0 bg-red-400"></audio>
+
+        <div *ngIf="currentChatroom && !currentChatroom.chatrooms.isgroup" class="flex gap-x-2 px-2">
+            <p>{{"Call: " + currentChatroom.chatrooms.participants[0].users.display_name}}</p>
+            <button type="button" (click)="showAudioDeviceSelection()" title="Voice Chat" class="fa-solid fa-phone text-violet-200 hover:text-violet-400"></button>
+            <div id="audioDeviceSelection" *ngIf="this.audioDevices.length !== 0 && !this.isInCall">
+                <select #audioDeviceSelectElement id="audioDeviceSelectElement" title="Selected Audio Input Device" class="h-full max-w-[240px] bg-transparent border-0 text-ellipsis whitespace-nowrap overflow-hidden">
+                    <option *ngFor="let device of this.audioDevices" value="{{device.deviceId}}" class="bg-gray-800 border-0">{{device.label ? device.label : "Standard Audio Device"}}</option>
+                </select>
+                <button type="button" (click)="startCall()" class="h-full px-2 hover:bg-gray-600">
+                    <i *ngIf="!this.isInCall" title="Start Call" class="fa-solid fa-check h-4 w-4 text-green-400"></i>
+                    <i *ngIf="this.isInCall" title="End Call" class="fa-solid fa-xmark h-4 w-4 text-red-400"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

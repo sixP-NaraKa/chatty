@@ -1,0 +1,68 @@
+// .voice-chat-content-container, #slideContent {
+#slideContent {
+    position: fixed;
+    // top: 0;
+    right: 0;
+    width: 320px;
+    display: none;
+    height: 50%;
+    // overflow: hidden;
+    background-color: rgb(20, 24, 31);
+    z-index: 999;
+    transform: translateX(100%);
+    -webkit-transform: translateX(100%);
+}
+
+.selected {
+    animation: slide-in 0.5s forwards;
+    -webkit-animation: slide-in 0.5s forwards;
+}
+
+.dismiss {
+    animation: slide-out 0.5s forwards;
+    -webkit-animation: slide-out 0.5s forwards;
+}
+
+@keyframes slide-in {
+    0% {
+        -webkit-transform: translateX(100%);
+    }
+
+    100% {
+        -webkit-transform: translateX(0%);
+    }
+}
+
+@-webkit-keyframes slide-in {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+@keyframes slide-out {
+    0% {
+        transform: translateX(0%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@-webkit-keyframes slide-out {
+    0% {
+        -webkit-transform: translateX(0%);
+    }
+
+    100% {
+        -webkit-transform: translateX(100%);
+    }
+}
+
+#audioPlaybackElement {
+    visibility: hidden;
+}

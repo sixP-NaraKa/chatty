@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ChatRoomWithParticipantsExceptSelf, participants, settings, User, UserIdDisplayName, users } from '../../../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf, settings, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
-import { CallService } from '../services/call.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -29,7 +28,7 @@ export class ChatPageComponent implements OnInit {
     // current user
     currentUser: ApplicationUser;
 
-    constructor(private userService: UserService, private wsService: WebsocketService, private callService: CallService) {
+    constructor(private userService: UserService, private wsService: WebsocketService) {
         this.currentUser = this.userService.currentUser;
 
         // (re)connect the websocket on page reload
@@ -45,8 +44,7 @@ export class ChatPageComponent implements OnInit {
         });
     }
 
-    async ngOnInit() {
-        await this.callService.addIncomingMessageHandler();
+    ngOnInit() {
     }
 
     /**
@@ -170,64 +168,5 @@ export class ChatPageComponent implements OnInit {
             this.wsService.addUserToChatroom(this.chatroom, user.user_id);
         });
     }
-
-    audioDevices = new Array<MediaDeviceInfo>();
-    /**
-     * Initiates the voice call to the selected chat participant (user - 1on1 only at the moment).
-     */
-    showAudioDeviceSelection() {
-        if (this.audioDevices.length !== 0) {
-            this.audioDevices = new Array<MediaDeviceInfo>();
-            return;
-        }
-
-        // let the user select which microphone they want to use for the voice chat
-        navigator.mediaDevices.enumerateDevices().then(devices => {
-            // filter only for audio devices
-            // if any where found, they will be shown as <option> tags inside of the <select> box
-            this.audioDevices = devices.filter(device => device.kind === "audioinput");
-            console.log(this.audioDevices);
-            if (this.audioDevices.length === 0) {
-                window.alert("No microphone found. Please plug in a microphone device.");
-                return;
-            }
-        });
-    }
-
-    isInCall: boolean = false;
-    /**
-     * Starts the voice call with the chatroom user(s) - 1on1 only at the moment.
-     */
-    async startCall() {
-        // leave call (e.g. remove src from audio element) if pressed again
-        if (this.isInCall) {
-            (document.getElementById("audioPlaybackElement") as HTMLAudioElement).srcObject = null;
-            this.callService.hangup(this.chatroom.chatroom_id);
-            this.isInCall = false;
-            return;
-        }
-
-        // // get the selected audio device from the select element
-        // const selectedDeviceId = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement).value;
-        // // get audio element via constraints
-        // const constraints = {
-        //     audio: { deviceId: selectedDeviceId },
-        //     video: false
-        // }
-
-        // const err = await this.callService.getSelectedAudioMediaDevice(constraints);
-        // if (err) {
-        //     console.log("error in getting user media", err);
-        //     alert("could not get microphone " + selectedDeviceId);
-        //     return;
-        // }
-
-        this.isInCall = true;
-        await this.callService.call(this.chatroom.chatroom_id);
-
-        
-    }
-
-
 
 }
