@@ -193,15 +193,22 @@ export class CallService {
     public async getSelectedAudioMediaDevice() {
         console.log("fetching user media 2");
         // get the selected audio device from the select element
-        const selectedDeviceId = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement).value;
-        // get audio element via constraints
-        const constraints = {
-            audio: { deviceId: selectedDeviceId },
-            video: false
+        let constraints;
+        const element = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement);
+        if (element) {
+            const selectedDeviceId = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement).value;
+            // get audio element via constraints
+            constraints = {
+                audio: { deviceId: selectedDeviceId },
+                video: false
+            }
         }
 
         try {
-            this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            this.localStream =
+                element ?
+                    await navigator.mediaDevices.getUserMedia(constraints) :
+                    await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
         }
         catch (e) {
             return e;

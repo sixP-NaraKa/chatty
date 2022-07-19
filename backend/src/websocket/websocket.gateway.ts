@@ -110,8 +110,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // }
 
     @SubscribeMessage("new:voice-chat-message")
-    async onVoiceChatMessage(client: any, message: { type: "offer" | "answer" | "hangup" | "icecandidate", chatroomId: number, data: any }) {
+    async onVoiceChatMessage(client: any, message: { type: "offer" | "answer" | "hangup" | "icecandidate", chatroomId: number, userId: number, data: any }) {
         client.broadcast.to(message.chatroomId).emit("new:voice-chat-message-received", message);
+    }
+
+    @SubscribeMessage("new:voice-chat-request")
+    async onVoiceChatRequestMessage(client: any, message: { type: "request" | "accept" | "decline", chatroomId: number, userId: number }) {
+        client.broadcast.to(message.chatroomId).emit("new:voice-chat-request-received", message);
     }
 
 }

@@ -15,6 +15,12 @@ type VoiceChatMessage = {
     data: RTCSessionDescription | RTCSessionDescriptionInit | RTCIceCandidate | any,
 }
 
+type VoiceChatRequest = {
+    type: "request" | "accept" | "decline",
+    chatroomId: number,
+    userId: number,
+}
+
 @Injectable({
     providedIn: "root"
 })
@@ -67,7 +73,7 @@ export class WebsocketService {
         return this.socket.fromEvent<[chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]]>("new:chatroom");
     }
 
-    /* WebRTC but correctly (maybe :D) */
+    /* WebRTC WebSocket events (once call request accepted) */
 
     sendVoiceChatMessage(message: VoiceChatMessage) {
         this.socket.emit("new:voice-chat-message", message);
@@ -76,5 +82,36 @@ export class WebsocketService {
     getVoiceChatMessage() {
         return this.socket.fromEvent<VoiceChatMessage>("new:voice-chat-message-received");
     }
+
+    // sendVoiceChatRequest(chatroomId: number) {
+    //     this.socket.emit("new:voice-chat-request-sent", chatroomId);
+    // }
+
+    // getVoiceChatRequest() { // number = chatroomId needed only
+    //     return this.socket.fromEvent<number>("new:voice-chat-request-received");
+    // }
+
+    // acceptVoiceChatRequest(chatroomId: number) {
+    //     this.socket.emit("new:voice-chat-request-accept", chatroomId);
+    // }
+
+    // getAcceptedVoiceChatRequest() { // number = chatroomId needed only
+    //     return this.socket.fromEvent<number>("new:voice-chat-request-accepted");
+    // }
+
+    // declineVoiceChatRequest(chatroomId: number) {
+    //     this.socket.emit("new:voice-chat-request-decline", chatroomId);
+    // }
+
+    /** Voice Chat request creation */
+
+    sendVoiceChatRequest(message: VoiceChatRequest) {
+        this.socket.emit("new:voice-chat-request", message);
+    }
+
+    getVoiceChatRequest() {
+        return this.socket.fromEvent<VoiceChatRequest>("new:voice-chat-request-received");
+    }
+
 
 }

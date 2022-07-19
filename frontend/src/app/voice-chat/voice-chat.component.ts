@@ -1,6 +1,8 @@
-import { AfterViewInit, Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
 import { CallService } from '../services/call.service';
+import { UserService } from '../services/user.services';
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
     selector: 'app-voice-chat',
@@ -15,19 +17,96 @@ export class VoiceChatComponent implements AfterViewInit {
     currentChatroom!: ChatRoomWithParticipantsExceptSelf;
     @Input()
     set setChatroom(chatroom: ChatRoomWithParticipantsExceptSelf) {
-        // if (this.isInCall) {
-        //     console.log("currently in call, setting current chatroom");
-        //     this.currentChatroom = chatroom;
-        //     return;
-        // }
         if (!chatroom) return;
         this.currentChatroom = chatroom;
     }
 
-    constructor(private callService: CallService) { }
+    @ViewChild("notif")
+    notifDivElement!: any;
+
+    // current active notifications IDs (element IDs and their corresponding chatrooms)
+    notifsCurrentlyActiveMap = new Map<string, ChatRoomWithParticipantsExceptSelf>();
+
+    constructor(private callService: CallService, private wsService: WebsocketService, private userService: UserService) { }
 
     async ngAfterViewInit() {
         await this.callService.addIncomingMessageHandler();
+        this.listenForVoiceChatRequests();
+    }
+
+    listenForVoiceChatRequests() {
+        this.wsService.getVoiceChatRequest().subscribe(async msg => {
+            switch (msg.type) {
+                case "request":
+                    this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroomId).subscribe(room => {
+                        this.showNotificationOfVoiceChatRequest(room);
+                    });
+                    break;
+                case "accept":
+                    await this.callService.call(msg.chatroomId);
+                    this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroomId).subscribe(async room => {
+                        this.inCallWithChatroom = room;
+                        this.isInCall = true;
+                    });
+                    break;
+                case "decline":
+                    console.log("switch: call declined, noop (atm)");
+                    break;
+            }
+
+        });
+    }
+
+    /**
+     * Shows a notification to the user about a incoming voice chat request.
+     * The user has then the option to accept or decline the call.
+     * 
+     * @param room the chatroom to display information for
+     */
+    showNotificationOfVoiceChatRequest(room: ChatRoomWithParticipantsExceptSelf | any) {
+        const divId = Math.random().toString().substring(2, 8);
+        this.notifsCurrentlyActiveMap.set(divId, room);
+        (this.notifDivElement.nativeElement as HTMLDivElement).style.display = "block";
+        setTimeout(() => {
+            this.removeNotification(divId);
+        }, 10000);
+    }
+
+    /**
+     * Helper function to remove a <div> element.
+     * 
+     * @param divId the id of the div
+     */
+    removeNotification(divId: string) {
+        if (this.notifsCurrentlyActiveMap.has(divId)) {
+            this.notifsCurrentlyActiveMap.delete(divId);
+            const div = (document.getElementById(divId) as HTMLDivElement);
+            if (div) {
+                (this.notifDivElement.nativeElement as HTMLDivElement).removeChild(div);
+                div.remove();
+            }
+        }
+
+        if (this.notifsCurrentlyActiveMap.size === 0) {
+            (this.notifDivElement.nativeElement as HTMLDivElement).style.display = "none";
+        }
+    }
+
+    async onAcceptCall(divId: string, chatroomId: number | any) {
+        console.log("call accepted, notifying the user who send the request and creating peer connection and the like");
+        this.inCallWithChatroom = this.notifsCurrentlyActiveMap.get(divId) as any;
+        this.isInCall = true;
+
+        this.removeNotification(divId);
+
+        await this.callService.call(chatroomId);
+        this.wsService.sendVoiceChatRequest({ type: 'accept', chatroomId: chatroomId, userId: this.userService.currentUser.userId });
+    }
+
+    onDeclineCall(divId: string, chatroomId: number | any) {
+        console.log("call declined");
+        this.removeNotification(divId);
+        this.wsService.sendVoiceChatRequest({ type: 'decline', chatroomId: chatroomId, userId: this.userService.currentUser.userId });
     }
 
     /**
@@ -48,7 +127,7 @@ export class VoiceChatComponent implements AfterViewInit {
 
     audioDevices = new Array<MediaDeviceInfo>();
     /**
-     * Initiates the voice call to the selected chat participant (user - 1on1 only at the moment).
+     * Shows the avaikable audio media devices and lets the user select one of them to use.
      */
     showAudioDeviceSelection() {
         if (this.audioDevices.length !== 0) {
@@ -72,7 +151,7 @@ export class VoiceChatComponent implements AfterViewInit {
     /**
      * Starts the voice call with the chatroom user(s) - 1on1 only at the moment.
      */
-     async startCall() {
+    async startCall() {
         // leave call (e.g. remove src from audio element) if pressed again
         if (this.isInCall) {
             (document.getElementById("audioPlaybackElement") as HTMLAudioElement).srcObject = null;
@@ -80,24 +159,8 @@ export class VoiceChatComponent implements AfterViewInit {
             this.isInCall = false;
             return;
         }
-
-        // // get the selected audio device from the select element
-        // const selectedDeviceId = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement).value;
-        // // get audio element via constraints
-        // const constraints = {
-        //     audio: { deviceId: selectedDeviceId },
-        //     video: false
-        // }
-
-        // const err = await this.callService.getSelectedAudioMediaDevice(constraints);
-        // if (err) {
-        //     console.log("error in getting user media", err);
-        //     alert("could not get microphone " + selectedDeviceId);
-        //     return;
-        // }
-
-        this.isInCall = true;
-        await this.callService.call(this.inCallWithChatroom.chatroom_id);
+        // this.isInCall = true;
+        this.wsService.sendVoiceChatRequest({ type: 'request', chatroomId: this.currentChatroom.chatroom_id, userId: this.userService.currentUser.userId });
     }
 
 }

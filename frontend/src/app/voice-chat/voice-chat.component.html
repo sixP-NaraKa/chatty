@@ -1,10 +1,10 @@
 <div class="overflow-x-hidden">
-    <button (click)="onVoiceChatSliderClick()"
-        class="absolute right-0 w-fit h-fit px-4 space-x-1 bg-white rounded-l-2xl text-gray-800 hover:text-gray-600">
+    <button id="voiceChatSliderButton" (click)="onVoiceChatSliderClick()"
+        class="absolute right-0 w-fit h-fit px-4 space-x-1 bg-white rounded-l-2xl text-gray-800 hover:text-gray-200">
         <i class="fa-solid fa-arrow-left"></i>
         <i class="fa-solid fa-phone"></i>
     </button>
-    <div id="slideContent" class="voice-chat-content-container dismiss border-2 border-gray-700">
+    <div id="slideContent" class="voice-chat-content-container dismiss w-32 sm:w-80 border-2 border-r-0 border-gray-700">
         <!-- that is one way to do it I suppose :D -->
         <button (click)="onVoiceChatSliderClick()"
             class="w-fit h-fit px-4 space-x-1 bg-white rounded-r-2xl text-gray-800 hover:text-gray-600">
@@ -12,20 +12,50 @@
             <i class="fa-solid fa-phone-flip"></i>
         </button>
 
-        <audio id="audioPlaybackElement" autoplay="true" controls="false" class="w-full h-0 w-0 bg-red-400"></audio>
+        <audio id="audioPlaybackElement" autoplay="true" controls="false" class="h-0 w-0 bg-red-400"></audio>
 
-        <div *ngIf="currentChatroom && !currentChatroom.chatrooms.isgroup" class="flex gap-x-2 px-2">
-            <p>{{"Call: " + currentChatroom.chatrooms.participants[0].users.display_name}}</p>
-            <button type="button" (click)="showAudioDeviceSelection()" title="Voice Chat" class="fa-solid fa-phone text-violet-200 hover:text-violet-400"></button>
-            <div id="audioDeviceSelection" *ngIf="this.audioDevices.length !== 0 && !this.isInCall">
-                <select #audioDeviceSelectElement id="audioDeviceSelectElement" title="Selected Audio Input Device" class="h-full max-w-[240px] bg-transparent border-0 text-ellipsis whitespace-nowrap overflow-hidden">
-                    <option *ngFor="let device of this.audioDevices" value="{{device.deviceId}}" class="bg-gray-800 border-0">{{device.label ? device.label : "Standard Audio Device"}}</option>
-                </select>
-                <button type="button" (click)="startCall()" class="h-full px-2 hover:bg-gray-600">
-                    <i *ngIf="!this.isInCall" title="Start Call" class="fa-solid fa-check h-4 w-4 text-green-400"></i>
-                    <i *ngIf="this.isInCall" title="End Call" class="fa-solid fa-xmark h-4 w-4 text-red-400"></i>
-                </button>
+        <div *ngIf="currentChatroom && !currentChatroom.chatrooms.isgroup" class="pt-4">
+            <div *ngIf="!this.isInCall">
+                <p>{{"Call: " + currentChatroom.chatrooms.participants[0].users.display_name}}</p>
+                <div class="flex gap-x-2 px-2 h-6">
+                    <button type="button" (click)="showAudioDeviceSelection()" title="Voice Chat"
+                        class="fa-solid fa-phone text-violet-200 hover:text-violet-400"></button>
+                    <div id="audioDeviceSelection" *ngIf="this.audioDevices.length !== 0 && !this.isInCall">
+                        <select #audioDeviceSelectElement id="audioDeviceSelectElement" title="Selected Audio Input Device"
+                            class="max-w-[240px] bg-transparent border-0 text-ellipsis whitespace-nowrap overflow-hidden">
+                            <option *ngFor="let device of this.audioDevices" value="{{device.deviceId}}"
+                                class="bg-gray-800 border-0">{{device.label ? device.label : "Standard Audio Device"}}
+                            </option>
+                        </select>
+                        <button type="button" (click)="startCall()" class="px-2 hover:bg-gray-600">
+                            <i *ngIf="!this.isInCall" title="Start Call" class="fa-solid fa-check text-green-400"></i>
+                            <i *ngIf="this.isInCall" title="End Call" class="fa-solid fa-xmark text-red-400"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
+        </div>
+        
+        <div *ngIf="this.isInCall" class="pt-4">
+            <p>In call with: {{inCallWithChatroom.chatrooms.participants[0].users.display_name}}</p>
+            <button type="button" (click)="startCall()" class="px-2 hover:bg-gray-600">
+                <i *ngIf="!this.isInCall" title="Start Call" class="fa-solid fa-check text-green-400"></i>
+                <i *ngIf="this.isInCall" title="End Call" class="fa-solid fa-xmark text-red-400"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- user notification that they are being called, they can either deline the call, or accept it and end, if needed, the current call -->
+<div #notif id="voice-chat-call-notification" style="display: none;"
+    class="z-40 fixed bottom-0 right-0 w-64 h-32 mb-2 mr-2 border-2 border-gray-700 overflow-y-auto">
+    <div *ngFor="let item of notifsCurrentlyActiveMap | keyvalue" id="{{item.key}}" class="h-full py-4 text-center border-b-2 border-gray-700">
+        <p><b>{{item.value ? item.value.chatrooms.participants[0].users.display_name : "Unknown"}}</b> is calling you</p>
+        <div class="flex flex-row justify-center w-full gap-x-8 px-2 pt-6">
+            <button type="button" title="Accept" (click)="onAcceptCall(item.key, item.value?.chatroom_id)"
+                class="fa-solid fa-check px-2 h-8 w-8 bg-emerald-400 rounded-full hover:bg-emerald-600"></button>
+            <button type="button" title="Decline" (click)="onDeclineCall(item.key, item.value?.chatroom_id)"
+                class="fa-solid fa-xmark px-2 h-8 w-8 bg-red-400 rounded-full hover:bg-red-600"></button>
         </div>
     </div>
 </div>

@@ -3,7 +3,7 @@
     position: fixed;
     // top: 0;
     right: 0;
-    width: 320px;
+    // width: 320px;
     display: none;
     height: 50%;
     // overflow: hidden;
@@ -65,4 +65,14 @@
 
 #audioPlaybackElement {
     visibility: hidden;
+}
+
+#voice-chat-call-notification {
+    background-color: rgb(20, 24, 31);
+}
+
+#voiceChatSliderButton {
+    &:hover {
+        background-color: rgb(20, 24, 31);
+    }
 }
