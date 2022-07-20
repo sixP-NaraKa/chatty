@@ -43,7 +43,8 @@ export class VoiceChatComponent implements AfterViewInit {
                     });
                     break;
                 case "accept":
-                    await this.callService.call(msg.chatroomId);
+                    console.log("accept", this.isInCall);
+                    await this.callService.call(msg.chatroomId, true); // here we are the initiator/caller
                     this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroomId).subscribe(async room => {
                         this.inCallWithChatroom = room;
                         this.isInCall = true;
@@ -51,6 +52,13 @@ export class VoiceChatComponent implements AfterViewInit {
                     break;
                 case "decline":
                     console.log("switch: call declined, noop (atm)");
+                    break;
+                case "hangup": // just to get the hangup event here as well, to handle some UI stuff
+                    console.log(msg);
+                    if (this.isInCall) {
+                        this.isInCall = false;
+                        this.callService.hangup(msg.chatroomId);
+                    }
                     break;
             }
 
@@ -99,7 +107,7 @@ export class VoiceChatComponent implements AfterViewInit {
 
         this.removeNotification(divId);
 
-        await this.callService.call(chatroomId);
+        await this.callService.call(chatroomId, false); // here we are the receiver/accepter
         this.wsService.sendVoiceChatRequest({ type: 'accept', chatroomId: chatroomId, userId: this.userService.currentUser.userId });
     }
 

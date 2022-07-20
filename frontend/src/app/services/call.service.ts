@@ -21,20 +21,19 @@ export class CallService {
 
     constructor(private wsService: WebsocketService, private userService: UserService) { }
 
-    public async call(chatroomId: number) {
-        console.log("PEER CONNECTION in call()", this.peerConnection);
+    public async call(chatroomId: number, isCaller: boolean) {
+        console.log("PEER CONNECTION in call()", this.peerConnection, isCaller);
         this.chatroomId = chatroomId;
-        // if (!this.peerConnection) {
-        //     await this.createPeerConnection();
-        // }
         await this.createPeerConnection();
 
         // only audio offer option
-        console.log("creating offer");
-        const offer = await this.peerConnection.createOffer(offerOptions);
-        await this.peerConnection.setLocalDescription(offer);
+        if (isCaller) {
+            console.log("creating offer");
+            const offer = await this.peerConnection.createOffer(offerOptions);
+            await this.peerConnection.setLocalDescription(offer);
 
-        this.wsService.sendVoiceChatMessage({ type: "offer", chatroomId: chatroomId, userId: this.userService.currentUser.userId, data: offer });
+            this.wsService.sendVoiceChatMessage({ type: "offer", chatroomId: chatroomId, userId: this.userService.currentUser.userId, data: offer });
+        }
     }
 
     public hangup(chatroomId: number) {
@@ -44,19 +43,12 @@ export class CallService {
 
     private closeCall() {
         if (this.peerConnection) {
-            // this.peerConnection.ontrack = null;
-            // this.peerConnection.onicecandidate = null;
-            // this.peerConnection.oniceconnectionstatechange = null;
-            // this.peerConnection.onsignalingstatechange = null;
+            this.wsService.sendVoiceChatRequest({ type: "hangup", chatroomId: this.chatroomId, userId: this.userService.currentUser.userId });
 
             this.peerConnection.removeEventListener("track", this.handleTrackEvent);
             this.peerConnection.removeEventListener("icecandidate", this.handleIceCandidateEvent);
             this.peerConnection.removeEventListener("iceconnectionstatechange", this.handleIceConnectionStateChangeEvent);
             this.peerConnection.removeEventListener("signalingstatechange", this.handleSignallingStateChangeEvent);
-
-            // if (this.peerConnection.removeAllListeners !== undefined) {
-            //     this.peerConnection.removeAllListeners();
-            // }
 
             // Stop all transceivers on the connection
             this.peerConnection.getTransceivers().forEach(transceiver => {
@@ -64,10 +56,11 @@ export class CallService {
             });
             // Stop all tracks
             this.localStream.getTracks().forEach(track => track.stop());
+            this.localStream = null!;
 
             // Close the peer connection
             this.peerConnection.close();
-            this.peerConnection = null as unknown as RTCPeerConnection; // satisfying typescript :)
+            this.peerConnection = null!; // satisfying typescript :)
         }
     }
 
@@ -83,14 +76,11 @@ export class CallService {
         console.log("creating peer connection 1")
         this.peerConnection = new RTCPeerConnection();
 
-        // TODO: for some reason, upon the first connection we need to also use the call() method on the receiver to actually start the voice chat
-        // consecutive calls go through just fine (meaning, these methods here are being called twice for the receiver... not sure why)
-        // hence this simple check, this will then make it so once the call is done, we won't have lingering usage of media devices
         if (!this.localStream) {
+            console.log("getting user media");
             await this.getSelectedAudioMediaDevice();
         }
         this.localStream.getTracks().forEach(track => this.peerConnection.addTrack(track, this.localStream));
-
 
         console.log("adding event listeners 5")
         this.peerConnection.addEventListener("icecandidate", this.handleIceCandidateEvent);
@@ -135,7 +125,7 @@ export class CallService {
             console.log(msg);
             switch (msg.type) {
                 case 'offer':
-                    await this.handleOfferMessage(msg.data);
+                    await this.handleOfferMessage(msg);
                     break;
                 case 'answer':
                     await this.handleAnswerMessage(msg.data);
@@ -152,26 +142,19 @@ export class CallService {
         });
     }
 
-    private async handleOfferMessage(desc: RTCSessionDescriptionInit) {
+    private async handleOfferMessage(msg: any) {
         console.log("PEER CONNECTION in handleOfferMessage()", this.peerConnection);
         if (!this.peerConnection) {
             console.log("offer received, creating peer connection")
-            await this.createPeerConnection();
+            // await this.createPeerConnection();
+            await this.call(msg.chatroomId, false);
         }
 
-        // this.peerConnection.setRemoteDescription(new RTCSessionDescription(desc)).then(() => {
-        // }).then(() => {
-        //     return this.peerConnection.createAnswer();
-        // }).then((answer) => {
-        //     return this.peerConnection.setLocalDescription(answer);
-        // }).then(() => {
-        //     this.wsService.sendVoiceChatMessage({ type: "answer", chatroomId: this.chatroomId, userId: this.userService.currentUser.userId, data: this.peerConnection.localDescription });
-        // });
-
-        await this.peerConnection.setRemoteDescription(new RTCSessionDescription(desc));
+        await this.peerConnection.setRemoteDescription(new RTCSessionDescription(msg.data));
         const answer = await this.peerConnection.createAnswer();
+        answer.sdp = answer.sdp?.replace('useinbandfec=1', 'useinbandfec=1; stereo=1; maxaveragebitrate=510000');
         await this.peerConnection.setLocalDescription(answer);
-        this.wsService.sendVoiceChatMessage({ type: "answer", chatroomId: this.chatroomId, userId: this.userService.currentUser.userId, data: this.peerConnection.localDescription });
+        this.wsService.sendVoiceChatMessage({ type: "answer", chatroomId: msg.chatroomId, userId: this.userService.currentUser.userId, data: this.peerConnection.localDescription });
     }
 
     private async handleAnswerMessage(desc: RTCSessionDescriptionInit) {
@@ -196,10 +179,19 @@ export class CallService {
         let constraints;
         const element = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement);
         if (element) {
-            const selectedDeviceId = (document.getElementById("audioDeviceSelectElement") as HTMLSelectElement).value;
+            const selectedDeviceId = element.value;
             // get audio element via constraints
             constraints = {
-                audio: { deviceId: selectedDeviceId },
+                audio: {
+                    deviceId: selectedDeviceId,
+                    autoGainControl: false,
+                    channelCount: 2,
+                    echoCancellation: true,
+                    latency: 0,
+                    noiseSuppression: true,
+                    sampleRate: 48000,
+                    sampleSize: 16,
+                },
                 video: false
             }
         }
@@ -208,7 +200,18 @@ export class CallService {
             this.localStream =
                 element ?
                     await navigator.mediaDevices.getUserMedia(constraints) :
-                    await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                    await navigator.mediaDevices.getUserMedia({
+                        audio: {
+                            autoGainControl: false,
+                            channelCount: 2,
+                            echoCancellation: true,
+                            latency: 0,
+                            noiseSuppression: true,
+                            sampleRate: 48000,
+                            sampleSize: 16,
+                        },
+                        video: false
+                    });
         }
         catch (e) {
             return e;

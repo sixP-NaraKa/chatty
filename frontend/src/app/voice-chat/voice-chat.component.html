@@ -1,15 +1,18 @@
 <div class="overflow-x-hidden">
     <button id="voiceChatSliderButton" (click)="onVoiceChatSliderClick()"
-        class="absolute right-0 w-fit h-fit px-4 space-x-1 bg-white rounded-l-2xl text-gray-800 hover:text-gray-200">
+        class="absolute right-0 w-fit h-fit px-4 space-x-1 bg-red bg-white rounded-l-2xl text-gray-800 hover:text-gray-200"
+        [class.fade-color-during-call]="this.isInCall">
         <i class="fa-solid fa-arrow-left"></i>
-        <i class="fa-solid fa-phone"></i>
+        <i *ngIf="!this.isInCall" class="fa-solid fa-phone"></i>
+        <i *ngIf="this.isInCall" class="fa-solid fa-phone-volume"></i>
     </button>
     <div id="slideContent" class="voice-chat-content-container dismiss w-32 sm:w-80 border-2 border-r-0 border-gray-700">
         <!-- that is one way to do it I suppose :D -->
         <button (click)="onVoiceChatSliderClick()"
             class="w-fit h-fit px-4 space-x-1 bg-white rounded-r-2xl text-gray-800 hover:text-gray-600">
             <i class="fa-solid fa-arrow-right"></i>
-            <i class="fa-solid fa-phone-flip"></i>
+            <i *ngIf="!this.isInCall" class="fa-solid fa-phone-flip"></i>
+            <i *ngIf="this.isInCall" class="fa-solid fa-phone-volume"></i>
         </button>
 
         <audio id="audioPlaybackElement" autoplay="true" controls="false" class="h-0 w-0 bg-red-400"></audio>

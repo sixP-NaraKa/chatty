@@ -16,7 +16,7 @@ type VoiceChatMessage = {
 }
 
 type VoiceChatRequest = {
-    type: "request" | "accept" | "decline",
+    type: "request" | "accept" | "decline" | "hangup",
     chatroomId: number,
     userId: number,
 }
