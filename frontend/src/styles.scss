@@ -22,7 +22,7 @@ body {
     // background-color: #1f1f1f;
 }
 
-html, .chat-scrollbar, .search-scrollbar, #voice-chat-call-notification {
+html, .chat-scrollbar, .search-scrollbar, #voice-chat-call-notification, #slideContent {
     &::-webkit-scrollbar {
         width: 0.35rem;
     }
