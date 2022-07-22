@@ -115,8 +115,28 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage("new:voice-chat-request")
-    async onVoiceChatRequestMessage(client: any, message: { type: "request" | "accept" | "decline", chatroomId: number, userId: number }) {
+    async onVoiceChatRequestMessage(client: any, message: { type: "request" | "accept" | "decline" | "hangup", chatroomId: number, userId: number }) {
         client.broadcast.to(message.chatroomId).emit("new:voice-chat-request-received", message);
+
+        // TODO: do this differently, to cover all cases accruately, maybe?
+        
+        // if no one else is in this room after 10sec after we send the request,
+        // we send ourselves a "ignored" message with the original chatroom Id to compare against later on
+        // Note: there is actually no need to compare anything, as the button will be disabled anyway for the duration (until acceptance of the request, etc.),
+        // its only important that after the duration the user gets notified
+
+        // yes, there will be the edge case in which someone calls someone, they call, they hangup and then they will call someone else,
+        // and then the notification message will be hidden sooner then it should, but that is ok for now
+        if (message.type === "request") {
+            setTimeout(() => {
+                // since we are always joining the rooms on startup, they would never be of size one if the other person is online but simply ignoring them
+                // that is why, we will simply for now send back the "ignored" message anway
+                // if (client.adapter.rooms.get(message.chatroomId).size === 1) {
+                    client.emit("new:voice-chat-request-received", { type: "ignored", chatroomId: message.chatroomId, userId: message.userId });
+                // }
+            }, 10000);
+            // console.log(client.adapter.rooms.get(message.chatroomId).size);
+        }
     }
 
 }

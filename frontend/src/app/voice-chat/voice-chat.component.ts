@@ -13,6 +13,10 @@ export class VoiceChatComponent implements AfterViewInit {
 
     isInCall: boolean = false;
     inCallWithChatroom!: ChatRoomWithParticipantsExceptSelf;
+    // a flag to look if a call request is already in progress, since we only want to allow one request at a time to be made by one user
+    // (and therefore we only allow once active voice chat)
+    callRequestInProgress: boolean = false;
+    callingChatroomUser: string = "";
 
     currentChatroom!: ChatRoomWithParticipantsExceptSelf;
     @Input()
@@ -27,6 +31,8 @@ export class VoiceChatComponent implements AfterViewInit {
     // current active notifications IDs (element IDs and their corresponding chatrooms)
     notifsCurrentlyActiveMap = new Map<string, ChatRoomWithParticipantsExceptSelf>();
 
+    audioIncomingCall = new Audio("../../assets/They callin me.m4a");
+
     constructor(private callService: CallService, private wsService: WebsocketService, private userService: UserService) { }
 
     async ngAfterViewInit() {
@@ -40,10 +46,13 @@ export class VoiceChatComponent implements AfterViewInit {
                 case "request":
                     this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroomId).subscribe(room => {
                         this.showNotificationOfVoiceChatRequest(room);
+                        this.playRingtone(true);
                     });
                     break;
                 case "accept":
                     console.log("accept", this.isInCall);
+                    this.stopRingtone();
+                    this.callRequestInProgress = false;
                     await this.callService.call(msg.chatroomId, true); // here we are the initiator/caller
                     this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroomId).subscribe(async room => {
                         this.inCallWithChatroom = room;
@@ -52,6 +61,7 @@ export class VoiceChatComponent implements AfterViewInit {
                     break;
                 case "decline":
                     console.log("switch: call declined, noop (atm)");
+                    this.callRequestInProgress = false;
                     break;
                 case "hangup": // just to get the hangup event here as well, to handle some UI stuff
                     console.log(msg);
@@ -60,9 +70,37 @@ export class VoiceChatComponent implements AfterViewInit {
                         this.callService.hangup(msg.chatroomId);
                     }
                     break;
+                default: // e.g case: "ignored", etc. => see websocket backend implementation (might be reworked, so to cover all cases)
+                    console.log("call has been ignored, enabling calling functionality");
+                    this.callRequestInProgress = false;
+                    break;
             }
 
         });
+    }
+
+    /**
+     * Helper function to play a ringtone for incoming audio, no notify the user of this.
+     * The ringtone will either be stopped by the optional 10sec timer, by accepting or declining the call.
+     * 
+     * @param isTimer if a timer should be used to stop the audio from playing
+     */
+    playRingtone(isTimer: boolean) {
+        this.audioIncomingCall.loop = true;
+        this.audioIncomingCall.play();
+        if (isTimer) {
+            setTimeout(() => {
+                this.stopRingtone();
+            }, 10000);
+        }
+    }
+
+    /**
+     * Helper function to stop the ringtone from playing.
+     */
+    stopRingtone() {
+        this.audioIncomingCall.pause()
+        this.audioIncomingCall.currentTime = 0;
     }
 
     /**
@@ -71,12 +109,12 @@ export class VoiceChatComponent implements AfterViewInit {
      * 
      * @param room the chatroom to display information for
      */
-    showNotificationOfVoiceChatRequest(room: ChatRoomWithParticipantsExceptSelf | any) {
+    showNotificationOfVoiceChatRequest(room: ChatRoomWithParticipantsExceptSelf) {
         const divId = Math.random().toString().substring(2, 8);
         this.notifsCurrentlyActiveMap.set(divId, room);
         (this.notifDivElement.nativeElement as HTMLDivElement).style.display = "block";
         setTimeout(() => {
-            this.removeNotification(divId);
+            this.removeNotification(divId, room.chatroom_id);
         }, 10000);
     }
 
@@ -85,7 +123,7 @@ export class VoiceChatComponent implements AfterViewInit {
      * 
      * @param divId the id of the div
      */
-    removeNotification(divId: string) {
+    removeNotification(divId: string, chatroomId: number) {
         if (this.notifsCurrentlyActiveMap.has(divId)) {
             this.notifsCurrentlyActiveMap.delete(divId);
             const div = (document.getElementById(divId) as HTMLDivElement);
@@ -93,6 +131,10 @@ export class VoiceChatComponent implements AfterViewInit {
                 (this.notifDivElement.nativeElement as HTMLDivElement).removeChild(div);
                 div.remove();
             }
+            // since we only allow one call at a time as well as one in progress call request, we should notify the callee about "ignored" requests
+            // this only works for online users
+            // for offline users see websocket backend implementation
+            this.wsService.sendVoiceChatRequest({ type: "decline", chatroomId: chatroomId, userId: this.userService.currentUser.userId });
         }
 
         if (this.notifsCurrentlyActiveMap.size === 0) {
@@ -100,20 +142,22 @@ export class VoiceChatComponent implements AfterViewInit {
         }
     }
 
-    async onAcceptCall(divId: string, chatroomId: number | any) {
+    async onAcceptCall(divId: string, chatroomId: number) {
         console.log("call accepted, notifying the user who send the request and creating peer connection and the like");
+        this.stopRingtone();
         this.inCallWithChatroom = this.notifsCurrentlyActiveMap.get(divId) as any;
         this.isInCall = true;
 
-        this.removeNotification(divId);
+        this.removeNotification(divId, chatroomId);
 
         await this.callService.call(chatroomId, false); // here we are the receiver/accepter
         this.wsService.sendVoiceChatRequest({ type: 'accept', chatroomId: chatroomId, userId: this.userService.currentUser.userId });
     }
 
-    onDeclineCall(divId: string, chatroomId: number | any) {
+    onDeclineCall(divId: string, chatroomId: number) {
         console.log("call declined");
-        this.removeNotification(divId);
+        this.stopRingtone();
+        this.removeNotification(divId, chatroomId);
         this.wsService.sendVoiceChatRequest({ type: 'decline', chatroomId: chatroomId, userId: this.userService.currentUser.userId });
     }
 
@@ -167,7 +211,9 @@ export class VoiceChatComponent implements AfterViewInit {
             this.isInCall = false;
             return;
         }
-        // this.isInCall = true;
+        this.callRequestInProgress = true;
+        this.callingChatroomUser = this.currentChatroom.chatrooms.participants[0].users.display_name;
+        // this.playRingtone(true); // if we want to play a sound as well, we can do it here
         this.wsService.sendVoiceChatRequest({ type: 'request', chatroomId: this.currentChatroom.chatroom_id, userId: this.userService.currentUser.userId });
     }
 
