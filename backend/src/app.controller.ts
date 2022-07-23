@@ -1,7 +1,7 @@
 import { Body, Controller, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { emote, settings, users } from '@prisma/client';
 import { AppService } from './app.service';
-import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser } from '../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction } from '../../shared/types/db-dtos';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -102,6 +102,12 @@ export class AppController {
     async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }): Promise<ChatMessageWithUser> {
         const newMessage = await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
         return newMessage;
+    }
+
+    @UseGuards(AuthGuard())
+    @Post("/api/chat/create/chatmessage/reaction")
+    async insertEmoteReaction(@Body() body: { messageId: number, emoteId: number }): Promise<MessageReaction> {
+        return await this.appService.insertEmoteReaction(body.messageId, body.emoteId);
     }
 
     @UseGuards(AuthGuard())

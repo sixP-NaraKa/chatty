@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from '../auth/auth.service';
-import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf } from '../../../shared/types/db-dtos';
+import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction } from '../../../shared/types/db-dtos';
 
 const options = {
     cors: {
@@ -59,6 +59,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage("send:message")
     async pushMessage(client: any, data: ChatMessageWithUser) {
         client.broadcast.to(data.chatroom_id).emit("get:message", data);
+    }
+
+    @SubscribeMessage("send:message-reaction")
+    async pushEmoteReaction(client: any, chatroomId: number, messageId: number, reaction: MessageReaction) {
+        client.broadcast.to(chatroomId).emit("get:message-reaction", chatroomId, messageId, reaction);
     }
 
     @SubscribeMessage("join:chatroom")

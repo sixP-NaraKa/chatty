@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
-import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser } from '../../shared/types/db-dtos';
+import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction } from '../../shared/types/db-dtos';
 import { emote } from '@prisma/client';
 
 
@@ -165,6 +165,14 @@ export class AppService {
                                 display_name: true,
                                 creation_date: true
                             }
+                        },
+                        reactions: {
+                            select: {
+                                reactions_id: true,
+                                msg_id: true,
+                                emote_id: true,
+                                emote: true
+                            } // or as seen below, simply "include: { emote: true }" also works
                         }
                     }
                 }
@@ -262,7 +270,31 @@ export class AppService {
                         display_name: true,
                         creation_date: true
                     }
+                },
+                reactions: {
+                    include: {
+                        emote: true
+                    }
                 }
+            }
+        });
+    }
+
+    /**
+     * Insert a new chat message reaction.
+     * 
+     * @param messageId the message ID on which the reaction was made on
+     * @param emoteId the ID of the emote used
+     * @returns a MessageReaction
+     */
+    async insertEmoteReaction(messageId: number, emoteId: number): Promise<MessageReaction> {
+        return this.prismaService.reactions.create({
+            data: {
+                msg_id: messageId,
+                emote_id: emoteId
+            },
+            include: {
+                emote: true
             }
         });
     }

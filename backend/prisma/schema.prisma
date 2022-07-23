@@ -18,13 +18,14 @@ model users {
 }
 
 model chat_messages {
-  msg_id      Int       @id @default(autoincrement())
-  posted_at   DateTime  @default(now()) @db.Timestamp(6)
+  msg_id      Int         @id @default(autoincrement())
+  posted_at   DateTime    @default(now()) @db.Timestamp(6)
   msg_content String
   user_id     Int
   chatroom_id Int
-  chatrooms   chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
-  users       users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+  chatrooms   chatrooms   @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
+  users       users       @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+  reactions   reactions[]
 }
 
 model chatrooms {
@@ -54,7 +55,16 @@ model settings {
 }
 
 model emote {
-  emote_id Int    @id @default(autoincrement())
-  emote    String
-  name     String
+  emote_id  Int         @id @default(autoincrement())
+  emote     String
+  name      String
+  reactions reactions[]
+}
+
+model reactions {
+  reactions_id  Int           @id @default(autoincrement())
+  msg_id        Int
+  emote_id      Int
+  emote         emote         @relation(fields: [emote_id], references: [emote_id], onDelete: NoAction, onUpdate: NoAction, map: "emote_id_fk")
+  chat_messages chat_messages @relation(fields: [msg_id], references: [msg_id], onDelete: NoAction, onUpdate: NoAction, map: "msg_id_fk")
 }

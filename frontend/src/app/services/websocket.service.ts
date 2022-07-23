@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Socket } from "ngx-socket-io";
-import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf } from "../../../../shared/types/db-dtos";
+import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction } from "../../../../shared/types/db-dtos";
 import { ApplicationUser } from "../auth/auth.service";
 
 type SignallingDescription = {
@@ -43,6 +43,14 @@ export class WebsocketService {
 
     getChatMessage() {
         return this.socket.fromEvent<ChatMessageWithUser>("get:message");
+    }
+
+    sendEmoteReaction(chatroomId: number, messageId: number, reaction: MessageReaction) {
+        this.socket.emit("send:message-reaction", chatroomId, messageId, reaction);
+    }
+
+    getNewEmoteReaction() {
+        return this.socket.fromEvent<[chatroomId: number, messageId: number, reaction: MessageReaction]>("get:message-reaction");        
     }
 
     joinChatroom(chatroomId: number) {

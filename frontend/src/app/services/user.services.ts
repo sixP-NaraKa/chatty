@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import config from "src/environments/config";
-import { settings, ChatMessageWithUser, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User, emote } from "../../../../shared/types/db-dtos";
+import { settings, ChatMessageWithUser, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User, emote, MessageReaction } from "../../../../shared/types/db-dtos";
 import { ApplicationUser, AuthService } from "../auth/auth.service";
 
 @Injectable({
@@ -85,6 +85,10 @@ export class UserService {
 
     sendMessage(message: string, userId: number, chatroomId: number): Observable<ChatMessageWithUser> {
         return this.http.post<ChatMessageWithUser>(`${this.backendHost}/api/chat/create/chatmessage?user_id=${userId}`, { message: message, userId: userId, chatroomId: chatroomId });
+    }
+
+    sendEmoteReaction(userId: number, messageId: number, emoteId: number) {
+        return this.http.post<MessageReaction>(`${this.backendHost}/api/chat/create/chatmessage/reaction?user_id=${userId}`, { messageId: messageId, emoteId: emoteId });
     }
 
     removeUserFromGroupChat(userId: number, userIdToRemove: number, chatroomId: number): Observable<number> {

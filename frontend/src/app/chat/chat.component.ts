@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { emote, ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
+import { emote, ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -37,6 +37,12 @@ export class ChatComponent implements OnInit {
             if (msg.chatroom_id === this.chatroomId) {
                 this.chatroomMessages.push(msg);
                 this.scrollToLatestMessage();
+            }
+        });
+
+        this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, reaction]) => {
+            if (chatroomId === this.chatroomId) {
+                this.addEmoteReactionToMessage(reaction);
             }
         });
     }
@@ -111,7 +117,7 @@ export class ChatComponent implements OnInit {
     }
 
     /**
-     * Helper method to populate some message specific metadata information, like when it was posted.
+     * Helper method to populate some message specific metadata information, like when it was posted and its reactions.
      * This can be further used to fully populate the whole message itself, if wanted (e.g. the "div" which contains the message).
      * 
      * For now, only metadata information will be injected.
@@ -122,11 +128,21 @@ export class ChatComponent implements OnInit {
     populateMessageHeader(message: ChatMessageWithUser) {
         const isMessageFromCurrentUser = message.user_id === this.currentUser.userId;
         const msgDate = new Date(message.posted_at); // ... just why is this needed? xD
+
+        let emotesHTML = "";
+        if (message.reactions.length >= 1) {
+            // go over each reaction and add them to the message UI
+            message.reactions.forEach(reaction => {
+                emotesHTML += `<span>${reaction.emote.emote}</span>`;
+            });
+        }
+
         // .substr(11, 5) => HH:MM format
         // .substr(11, 8) => HH:MM:SS format
         return `
                 ${!isMessageFromCurrentUser ? `<b class="text-xs text-gray-400">${message.users.display_name}</b>` : ""}
                 <b title="Posted at: ${msgDate}" class="text-xs text-gray-400">${msgDate.toISOString().substr(11, 5)}</b>
+                <div id="messageEmotesContainer">${emotesHTML}</div>
                 `
     }
 
@@ -143,6 +159,31 @@ export class ChatComponent implements OnInit {
         return msg.replace(new RegExp(this.urlRegex), match => {
             return `<a href="${match}" target="_blank" rel="noreferrer noopener" class="text-blue-500">${match}</a>`
         });
+    }
+
+    /**
+     * On click to add reactions to a chat message.
+     * 
+     * @param message the message that was reacted on
+     * @param emote the emote which was used
+     */
+    onEmoteReaction(message: ChatMessageWithUser, emote: emote) {
+        // get messageId and current chatroomId and the selected emoteId
+        // save that info into the db, and once we receive back the MessageReaction, we notify the other user via websockets to show that reaction on their side as well
+        this.userService.sendEmoteReaction(this.currentUser.userId, message.chatroom_id, emote.emote_id).subscribe(reaction => {
+            this.addEmoteReactionToMessage(reaction);
+            this.wsService.sendEmoteReaction(this.chatroomId, message.msg_id, reaction); // send the updates to the other participant(s)
+        });
+    }
+
+    /**
+     * Helper function to add a new reaction to a message.
+     * 
+     * @param reaction the reaction to add to the message
+     */
+    addEmoteReactionToMessage(reaction: MessageReaction) {
+        const [msg, ..._] = this.chatroomMessages.filter(msg => msg.msg_id === reaction.msg_id); // there will only ever be one filtered message here
+        msg.reactions.push(reaction); // show the reaction for the current user (locally)
     }
 
     /**
