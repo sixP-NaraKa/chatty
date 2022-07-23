@@ -22,6 +22,34 @@ export class ChatComponent implements OnInit {
 
     chatroomMessages = new Array<ChatMessageWithUser>();
 
+    preSelectedEmotes: emote[] = [
+        {
+            emote_id: 1,
+            emote: "😁",
+            name: "beaming face with smiling eyes",
+        },
+        {
+            emote_id: 189,
+            emote: "👍",
+            name: "thumbs up"
+        },
+        {
+            emote_id: 141,
+            emote: "❤",
+            name: "red heart"
+        },
+        {
+            emote_id: 75,
+            emote: "😟",
+            name: "worried face"
+        },
+        {
+            emote_id: 100,
+            emote: "😡",
+            name: "pouting face"
+        }
+    ]
+
     constructor(private userService: UserService, private wsService: WebsocketService) {
         this.currentUser = this.userService.currentUser;
     }
@@ -142,7 +170,7 @@ export class ChatComponent implements OnInit {
         return `
                 ${!isMessageFromCurrentUser ? `<b class="text-xs text-gray-400">${message.users.display_name}</b>` : ""}
                 <b title="Posted at: ${msgDate}" class="text-xs text-gray-400">${msgDate.toISOString().substr(11, 5)}</b>
-                <div id="messageEmotesContainer">${emotesHTML}</div>
+                <div id="messageEmotesContainer" class="h-fit text-xs flex gap-x-2">${emotesHTML}</div>
                 `
     }
 
@@ -170,7 +198,7 @@ export class ChatComponent implements OnInit {
     onEmoteReaction(message: ChatMessageWithUser, emote: emote) {
         // get messageId and current chatroomId and the selected emoteId
         // save that info into the db, and once we receive back the MessageReaction, we notify the other user via websockets to show that reaction on their side as well
-        this.userService.sendEmoteReaction(this.currentUser.userId, message.chatroom_id, emote.emote_id).subscribe(reaction => {
+        this.userService.sendEmoteReaction(this.currentUser.userId, message.msg_id, emote.emote_id).subscribe(reaction => {
             this.addEmoteReactionToMessage(reaction);
             this.wsService.sendEmoteReaction(this.chatroomId, message.msg_id, reaction); // send the updates to the other participant(s)
         });

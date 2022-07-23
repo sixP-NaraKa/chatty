@@ -76,6 +76,7 @@ export class ChatTabsComponent implements AfterContentInit {
         this.listenForNewChatroomsAndJoinThem();
         this.listenForMessagesFromNotYetAddedChatrooms();
         this.listenForRemoveChatroomAndRemoveChatFromList();
+        this.listenForNewMessageReactionsFromNotOpenChatrooms();
     }
 
     /**
@@ -125,6 +126,9 @@ export class ChatTabsComponent implements AfterContentInit {
             });
     }
 
+    /**
+     * Listen for new chatrooms the user is a part of and join their respective websocket rooms.
+     */
     listenForNewChatroomsAndJoinThem() {
         // listen for new chatrooms which have been created and the user is a part of.
         // join these chatrooms first, but do not show them in the UI unless there have been messages.
@@ -168,6 +172,9 @@ export class ChatTabsComponent implements AfterContentInit {
         });
     }
 
+    /**
+     * Listen for new messages from not yet added/visible chatrooms the user might be a part of.
+     */
     listenForMessagesFromNotYetAddedChatrooms() {
         this.wsService.getChatMessage().subscribe(msg => {
             const chatroomAlreadyShown = this.chatrooms.some(chatroom => chatroom.chatroom_id === msg.chatroom_id);
@@ -178,23 +185,40 @@ export class ChatTabsComponent implements AfterContentInit {
                         this.chatrooms.push(chatroom);
                     });
             }
-            // reload will empty this again, but for now it is fine
-            console.log("unread message chat ids", this.newUnreadMessagesChatroomIds, "this.selectedChatId", this.selectedChatId);
-            if (this.selectedChatId !== msg.chatroom_id) {
-                if (!this.newUnreadMessagesChatroomIds.includes(msg.chatroom_id)) {
-                    this.newUnreadMessagesChatroomIds.push(msg.chatroom_id);
-                }
-                console.log("playing audio...")
-                // play sound indicating a new message
-                // Note - not needed anymore: reset time to 0, as sometimes the audio does not get played additional times otherwise
-                //                            also, this makes the audio play from the beginning
-                //                            if a new message during the duration of the audio came in, which is quite ok
-                this.audioElementUnreadMessage.currentTime = 0;
-                // Note - Firefox: audio cannot get played due to Firefox blocking it, but only if no chat has been loaded before...
-                //                 after any chat has been loaded (e.g. clicked on), the audio works fine...
-                this.audioElementUnreadMessage.play();
-            }
+            this.addNewUnreadNotificationAndNotifyUser(msg.chatroom_id);
         });
+    }
+
+    /**
+     * Listen to new reactions from other chatrooms.
+     */
+    listenForNewMessageReactionsFromNotOpenChatrooms() {
+        this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, reaction]) => {
+            this.addNewUnreadNotificationAndNotifyUser(chatroomId);
+        });
+    }
+
+    /**
+     * (Extracted) Helper function to add a new unread notification/event and to notify the user via an audio clip.
+     * 
+     * @param chatroomIdFromNotification chatroom ID from the new unread notification/event
+     */
+    addNewUnreadNotificationAndNotifyUser(chatroomIdFromNotification: number) {
+        // reload will empty this again, but for now it is fine
+        if (this.selectedChatId !== chatroomIdFromNotification) {
+            if (!this.newUnreadMessagesChatroomIds.includes(chatroomIdFromNotification)) {
+                this.newUnreadMessagesChatroomIds.push(chatroomIdFromNotification);
+            }
+            console.log("playing audio...")
+            // play sound indicating a new message or reaction
+            // Note - not needed anymore: reset time to 0, as sometimes the audio does not get played additional times otherwise
+            //                            also, this makes the audio play from the beginning
+            //                            if a new message during the duration of the audio came in, which is quite ok
+            this.audioElementUnreadMessage.currentTime = 0;
+            // Note - Firefox: audio cannot get played due to Firefox blocking it, but only if no chat has been loaded before...
+            //                 after any chat has been loaded (e.g. clicked on), the audio works fine...
+            this.audioElementUnreadMessage.play();
+        }
     }
 
     /**

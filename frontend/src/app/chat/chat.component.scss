@@ -1,4 +1,4 @@
-.form-element {
+.form-element, #emoteReactionButtons {
     background-color: rgb(20, 24, 31);
 }
 
@@ -17,4 +17,14 @@
 
 .chat-participant-message {
     background-color: #363636;
+}
+
+#emoteReactionsContainer {
+    visibility: hidden;
+}
+
+#messageContainer:hover + #emoteReactionsContainer,
+#emoteReactionsContainer:hover {
+    // display: flex;
+    visibility: visible;
 }
