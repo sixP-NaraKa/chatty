@@ -14,6 +14,7 @@ model users {
   password      String
   chat_messages chat_messages[]
   participants  participants[]
+  reactions     reactions[]
   settings      settings[]
 }
 
@@ -65,6 +66,8 @@ model reactions {
   reactions_id  Int           @id @default(autoincrement())
   msg_id        Int
   emote_id      Int
+  user_id       Int?
   emote         emote         @relation(fields: [emote_id], references: [emote_id], onDelete: NoAction, onUpdate: NoAction, map: "emote_id_fk")
   chat_messages chat_messages @relation(fields: [msg_id], references: [msg_id], onDelete: NoAction, onUpdate: NoAction, map: "msg_id_fk")
+  users         users?        @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }

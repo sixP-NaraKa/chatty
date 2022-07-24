@@ -62,8 +62,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage("send:message-reaction")
-    async pushEmoteReaction(client: any, chatroomId: number, messageId: number, reaction: MessageReaction) {
-        client.broadcast.to(chatroomId).emit("get:message-reaction", chatroomId, messageId, reaction);
+    async pushEmoteReaction(client: any, chatroomId: number, messageId: number, userId: number, reaction: MessageReaction) {
+        client.broadcast.to(chatroomId).emit("get:message-reaction", chatroomId, messageId, userId, reaction);
     }
 
     @SubscribeMessage("join:chatroom")

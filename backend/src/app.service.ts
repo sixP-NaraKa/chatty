@@ -171,7 +171,9 @@ export class AppService {
                                 reactions_id: true,
                                 msg_id: true,
                                 emote_id: true,
-                                emote: true
+                                user_id: true,
+                                emote: true,
+                                users: true
                             } // or as seen below, simply "include: { emote: true }" also works
                         }
                     }
@@ -273,7 +275,8 @@ export class AppService {
                 },
                 reactions: {
                     include: {
-                        emote: true
+                        emote: true,
+                        users: true
                     }
                 }
             }
@@ -287,14 +290,16 @@ export class AppService {
      * @param emoteId the ID of the emote used
      * @returns a MessageReaction
      */
-    async insertEmoteReaction(messageId: number, emoteId: number): Promise<MessageReaction> {
+    async insertEmoteReaction(messageId: number, userId: number, emoteId: number): Promise<MessageReaction> {
         return this.prismaService.reactions.create({
             data: {
                 msg_id: messageId,
-                emote_id: emoteId
+                emote_id: emoteId,
+                user_id: userId
             },
             include: {
-                emote: true
+                emote: true,
+                users: true
             }
         });
     }

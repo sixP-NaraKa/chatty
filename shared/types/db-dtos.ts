@@ -29,7 +29,8 @@ type ChatRoomWithParticipantsExceptSelf = { //participants & { // doesn't work f
 }
 
 type MessageReaction = (reactions & {
-    emote: emote
+    emote: emote,
+    users: users
 });
 
 type ChatMessageWithUser = chat_messages & {

@@ -193,7 +193,7 @@ export class ChatTabsComponent implements AfterContentInit {
      * Listen to new reactions from other chatrooms.
      */
     listenForNewMessageReactionsFromNotOpenChatrooms() {
-        this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, reaction]) => {
+        this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, userId, reaction]) => {
             this.addNewUnreadNotificationAndNotifyUser(chatroomId);
         });
     }

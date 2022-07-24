@@ -68,7 +68,7 @@ export class ChatComponent implements OnInit {
             }
         });
 
-        this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, reaction]) => {
+        this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, userId, reaction]) => {
             if (chatroomId === this.chatroomId) {
                 this.addEmoteReactionToMessage(reaction);
             }
@@ -161,7 +161,7 @@ export class ChatComponent implements OnInit {
         if (message.reactions.length >= 1) {
             // go over each reaction and add them to the message UI
             message.reactions.forEach(reaction => {
-                emotesHTML += `<span>${reaction.emote.emote}</span>`;
+                emotesHTML += `<span title="${reaction.users.display_name}">${reaction.emote.emote}</span>`;
             });
         }
 
@@ -200,7 +200,7 @@ export class ChatComponent implements OnInit {
         // save that info into the db, and once we receive back the MessageReaction, we notify the other user via websockets to show that reaction on their side as well
         this.userService.sendEmoteReaction(this.currentUser.userId, message.msg_id, emote.emote_id).subscribe(reaction => {
             this.addEmoteReactionToMessage(reaction);
-            this.wsService.sendEmoteReaction(this.chatroomId, message.msg_id, reaction); // send the updates to the other participant(s)
+            this.wsService.sendEmoteReaction(this.chatroomId, message.msg_id, this.currentUser.userId, reaction); // send the updates to the other participant(s)
         });
     }
 

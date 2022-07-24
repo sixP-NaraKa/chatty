@@ -88,7 +88,7 @@ export class UserService {
     }
 
     sendEmoteReaction(userId: number, messageId: number, emoteId: number) {
-        return this.http.post<MessageReaction>(`${this.backendHost}/api/chat/create/chatmessage/reaction?user_id=${userId}`, { messageId: messageId, emoteId: emoteId });
+        return this.http.post<MessageReaction>(`${this.backendHost}/api/chat/create/chatmessage/reaction?user_id=${userId}`, { messageId: messageId, userId: userId, emoteId: emoteId });
     }
 
     removeUserFromGroupChat(userId: number, userIdToRemove: number, chatroomId: number): Observable<number> {

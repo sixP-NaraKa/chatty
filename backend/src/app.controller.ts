@@ -106,8 +106,8 @@ export class AppController {
 
     @UseGuards(AuthGuard())
     @Post("/api/chat/create/chatmessage/reaction")
-    async insertEmoteReaction(@Body() body: { messageId: number, emoteId: number }): Promise<MessageReaction> {
-        return await this.appService.insertEmoteReaction(body.messageId, body.emoteId);
+    async insertEmoteReaction(@Body() body: { messageId: number, userId: number, emoteId: number }): Promise<MessageReaction> {
+        return await this.appService.insertEmoteReaction(body.messageId, body.userId, body.emoteId);
     }
 
     @UseGuards(AuthGuard())

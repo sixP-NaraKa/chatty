@@ -45,12 +45,12 @@ export class WebsocketService {
         return this.socket.fromEvent<ChatMessageWithUser>("get:message");
     }
 
-    sendEmoteReaction(chatroomId: number, messageId: number, reaction: MessageReaction) {
-        this.socket.emit("send:message-reaction", chatroomId, messageId, reaction);
+    sendEmoteReaction(chatroomId: number, messageId: number, userId: number, reaction: MessageReaction) {
+        this.socket.emit("send:message-reaction", chatroomId, messageId, userId, reaction);
     }
 
     getNewEmoteReaction() {
-        return this.socket.fromEvent<[chatroomId: number, messageId: number, reaction: MessageReaction]>("get:message-reaction");        
+        return this.socket.fromEvent<[chatroomId: number, messageId: number, userId: number, reaction: MessageReaction]>("get:message-reaction");        
     }
 
     joinChatroom(chatroomId: number) {
