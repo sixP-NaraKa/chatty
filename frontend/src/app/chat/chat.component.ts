@@ -159,9 +159,18 @@ export class ChatComponent implements OnInit {
 
         let emotesHTML = "";
         if (message.reactions.length >= 1) {
-            // go over each reaction and add them to the message UI
-            message.reactions.forEach(reaction => {
-                emotesHTML += `<span title="${reaction.users.display_name}">${reaction.emote.emote}</span>`;
+            // filter each reaction depending on the pre-selected emotes
+            // this is useful in order to group reactions together, in case multiple people reacted with the same emote
+            this.preSelectedEmotes.forEach(preSelectedEmote => {
+                const messageReactionsByEmoteId = message.reactions.filter(reaction => reaction.emote_id === preSelectedEmote.emote_id);
+                if (messageReactionsByEmoteId.length === 0) {
+                    return;
+                }
+
+                let usernamesString = messageReactionsByEmoteId.map(msgReaction => msgReaction.users.display_name).join("\n");
+                if (usernamesString) {
+                    emotesHTML += `<span title="${usernamesString}">${preSelectedEmote.emote}<i class="text-blue-400 not-italic font-bold">${messageReactionsByEmoteId.length}</i></span>`;
+                }
             });
         }
 
