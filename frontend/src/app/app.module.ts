@@ -22,6 +22,7 @@ import { GroupChatUsersComponent } from './group-chat-users/group-chat-users.com
 import { EmoteSelectComponent } from './emote-select/emote-select.component';
 import config from 'src/environments/config';
 import { VoiceChatComponent } from './voice-chat/voice-chat.component';
+import { SliderComponent } from './slider/slider.component';
 
 const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
 
@@ -39,7 +40,8 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         GroupChatWindowComponent,
         GroupChatUsersComponent,
         EmoteSelectComponent,
-        VoiceChatComponent
+        VoiceChatComponent,
+        SliderComponent
     ],
     imports: [
         BrowserModule,

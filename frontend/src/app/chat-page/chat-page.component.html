@@ -1,6 +1,14 @@
 <app-header (logOutEvent)="logout()" (applySettingsPassthroughEvent)="applySettings($event)"></app-header>
 
 <div id="voiceChatContainer" class="pt-2 pb-4">
+    <!-- sample extra div -->
+    <div>
+        <app-slider [slideFromLeft]="true" [showArrowIcons]="false">
+            <i class="sliderContentInButtonIcon fa-solid fa-bell"></i>
+            <i class="sliderContentOutButtonIcon fa-solid fa-bell"></i>
+            <div class="contentToSlide">eyyyy, sick content bruh</div>
+        </app-slider>
+    </div>
     <app-voice-chat [setChatroom]="this.chatroom"></app-voice-chat>
 </div>
 

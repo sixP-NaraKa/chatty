@@ -1,0 +1,21 @@
+<div class="sliderContainer overflow-x-hidden">
+    <button id="{{slideFromRight ? 'sliderButtonRight' : 'sliderButtonLeft'}}" (click)="onSliderClick()"
+        [class.fade-color]="shouldFadeSliderButton"
+        class="{{slideContentInButtonClass}} absolute w-fit h-fit px-4 space-x-1 bg-white text-gray-800 hover:text-gray-200">
+        <i *ngIf="showArrowIcons" class="fa-solid {{slideContentInButtonArrowPositionIconClass}}"></i>
+        <ng-content select=".sliderContentInButtonIcon"></ng-content>
+    </button>
+    <div id="{{generatedSliderId}}"
+        class="{{sliderContentClass}} {{dismissedClass}} absolute w-32 sm:w-80 border-2 border-gray-700 overflow-x-auto">
+        <!-- that is one way to do it I suppose :D -->
+        <button (click)="onSliderClick()"
+            class="{{slideContentOutButtonClass}} absolute top-0 w-fit h-fit px-4 space-x-1 bg-white text-gray-800 hover:text-gray-600">
+            <i *ngIf="showArrowIcons" class="fa-solid {{slideContentOutButtonArrowPositionIconClass}}"></i>
+            <ng-content select=".sliderContentOutButtonIcon"></ng-content>
+        </button>
+
+        <div class="pt-8 px-2 pb-4 text-xs">
+            <ng-content select=".contentToSlide"></ng-content>
+        </div>
+    </div>
+</div>
