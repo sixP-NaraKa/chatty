@@ -1,6 +1,7 @@
 import { AfterContentInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ChatRoomWithParticipantsExceptSelf, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
+import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -31,7 +32,7 @@ export class ChatTabsComponent implements AfterContentInit {
     // audio element to play sounds indicating a new unread message came in
     audioElementUnreadMessage = new Audio("../../assets/VULULU.m4a");
 
-    constructor(private userService: UserService, private wsService: WebsocketService) {
+    constructor(private userService: UserService, private wsService: WebsocketService, private notificationService: NotificationService) {
         this.audioElementUnreadMessage.volume = 0.10; // 10%
         this.currentUser = this.userService.currentUser;
     }
@@ -74,7 +75,7 @@ export class ChatTabsComponent implements AfterContentInit {
             this.chatrooms = tempArray;
         });
         this.listenForNewChatroomsAndJoinThem();
-        this.listenForMessagesFromNotYetAddedChatrooms();
+        this.listenForNewMessagesFromNotOpenChatrooms();
         this.listenForRemoveChatroomAndRemoveChatFromList();
         this.listenForNewMessageReactionsFromNotOpenChatrooms();
     }
@@ -175,7 +176,7 @@ export class ChatTabsComponent implements AfterContentInit {
     /**
      * Listen for new messages from not yet added/visible chatrooms the user might be a part of.
      */
-    listenForMessagesFromNotYetAddedChatrooms() {
+    listenForNewMessagesFromNotOpenChatrooms() {
         this.wsService.getChatMessage().subscribe(msg => {
             const chatroomAlreadyShown = this.chatrooms.some(chatroom => chatroom.chatroom_id === msg.chatroom_id);
             if (!chatroomAlreadyShown) {
@@ -186,6 +187,7 @@ export class ChatTabsComponent implements AfterContentInit {
                     });
             }
             this.addNewUnreadNotificationAndNotifyUser(msg.chatroom_id);
+            this.emitNewUnreadNotification(msg.chatroom_id, msg.users.user_id, { type: "message", data: msg.msg_content });
         });
     }
 
@@ -195,6 +197,7 @@ export class ChatTabsComponent implements AfterContentInit {
     listenForNewMessageReactionsFromNotOpenChatrooms() {
         this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, userId, reaction]) => {
             this.addNewUnreadNotificationAndNotifyUser(chatroomId);
+            this.emitNewUnreadNotification(chatroomId, userId, { type: "reaction", data: reaction.emote.emote });
         });
     }
 
@@ -209,7 +212,7 @@ export class ChatTabsComponent implements AfterContentInit {
             if (!this.newUnreadMessagesChatroomIds.includes(chatroomIdFromNotification)) {
                 this.newUnreadMessagesChatroomIds.push(chatroomIdFromNotification);
             }
-            console.log("playing audio...")
+            console.log("playing audio...");
             // play sound indicating a new message or reaction
             // Note - not needed anymore: reset time to 0, as sometimes the audio does not get played additional times otherwise
             //                            also, this makes the audio play from the beginning
@@ -219,6 +222,34 @@ export class ChatTabsComponent implements AfterContentInit {
             //                 after any chat has been loaded (e.g. clicked on), the audio works fine...
             this.audioElementUnreadMessage.play();
         }
+    }
+
+    /**
+     * Helper function which sends the next unread notification event to the subscribed components.
+     * 
+     * @param chatroomId the chatroom ID in which the notification event happened
+     * @param userId the user Id which started the notification event
+     * @param content the content of the event, consists of a type and the data
+     */
+    emitNewUnreadNotification(chatroomId: number, userId: number, content: { type: "message" | "reaction" | "call", data: string }) {
+        // add unread message to notificaion summary list (e.g. notify component)
+        const chatroom = this.chatrooms.filter(room => room.chatroom_id === chatroomId)[0];
+        const chatroomName = chatroom.chatrooms.isgroup ? chatroom.chatrooms.name! : chatroom.chatrooms.participants[0].users.display_name;
+        const username = chatroom.chatrooms.isgroup ?
+            chatroom.chatrooms.participants.filter(part => part.users.user_id === userId)[0].users.display_name :
+            chatroom.chatrooms.participants[0].users.display_name;
+        this.notificationService.newUnread({
+            user: {
+                username: username,
+            },
+            chatroom: {
+                chatroomId: chatroomId,
+                chatroomName: chatroomName,
+            },
+            type: content.type,
+            content: content.data,
+            date: new Date(Date.now()),
+        });
     }
 
     /**

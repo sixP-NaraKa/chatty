@@ -23,6 +23,7 @@ import { EmoteSelectComponent } from './emote-select/emote-select.component';
 import config from 'src/environments/config';
 import { VoiceChatComponent } from './voice-chat/voice-chat.component';
 import { SliderComponent } from './slider/slider.component';
+import { NotificationSummaryComponent } from './notification-summary/notification-summary.component';
 
 const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
 
@@ -41,7 +42,8 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         GroupChatUsersComponent,
         EmoteSelectComponent,
         VoiceChatComponent,
-        SliderComponent
+        SliderComponent,
+        NotificationSummaryComponent
     ],
     imports: [
         BrowserModule,

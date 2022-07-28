@@ -1,0 +1,8 @@
+<div *ngFor="let notif of unreadNotifications" class="pb-2 border-b-2 border-gray-700">
+    <p class="text-sm font-bold underline">{{notif.chatroom.chatroomName}} ({{notif.type}})</p>
+    <div>
+        <p class="font-bold">{{notif.user.username}}:</p>
+        <p>{{notif.content}} (on {{notif.date}})</p>
+    </div>
+    <!-- {{notif.user.username}} in {{notif.chatroom.chatroomName}}: {{notif.type}} (on {{notif.date}}) -->
+</div>
