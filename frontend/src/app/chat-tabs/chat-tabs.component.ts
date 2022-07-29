@@ -186,8 +186,7 @@ export class ChatTabsComponent implements AfterContentInit {
                         this.chatrooms.push(chatroom);
                     });
             }
-            this.addNewUnreadNotificationAndNotifyUser(msg.chatroom_id);
-            this.emitNewUnreadNotification(msg.chatroom_id, msg.users.user_id, { type: "message", data: msg.msg_content });
+            this.addNewUnreadNotificationAndNotifyUser(msg.chatroom_id, msg.users.user_id, { type: "message", data: msg.msg_content });
         });
     }
 
@@ -196,8 +195,7 @@ export class ChatTabsComponent implements AfterContentInit {
      */
     listenForNewMessageReactionsFromNotOpenChatrooms() {
         this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, userId, reaction]) => {
-            this.addNewUnreadNotificationAndNotifyUser(chatroomId);
-            this.emitNewUnreadNotification(chatroomId, userId, { type: "reaction", data: reaction.emote.emote });
+            this.addNewUnreadNotificationAndNotifyUser(chatroomId, userId, { type: "reaction", data: reaction.emote.emote });
         });
     }
 
@@ -206,12 +204,17 @@ export class ChatTabsComponent implements AfterContentInit {
      * 
      * @param chatroomIdFromNotification chatroom ID from the new unread notification/event
      */
-    addNewUnreadNotificationAndNotifyUser(chatroomIdFromNotification: number) {
+    addNewUnreadNotificationAndNotifyUser(chatroomIdFromNotification: number,
+        originatedFromUserId: number, content: { type: "message" | "reaction" | "call", data: string }) {
         // reload will empty this again, but for now it is fine
         if (this.selectedChatId !== chatroomIdFromNotification) {
             if (!this.newUnreadMessagesChatroomIds.includes(chatroomIdFromNotification)) {
                 this.newUnreadMessagesChatroomIds.push(chatroomIdFromNotification);
             }
+            // emit new notification event
+            // this will save it into the db and show it in the UI
+            this.emitNewUnreadNotification(chatroomIdFromNotification, originatedFromUserId, content);
+
             console.log("playing audio...");
             // play sound indicating a new message or reaction
             // Note - not needed anymore: reset time to 0, as sometimes the audio does not get played additional times otherwise
@@ -233,19 +236,11 @@ export class ChatTabsComponent implements AfterContentInit {
      */
     emitNewUnreadNotification(chatroomId: number, userId: number, content: { type: "message" | "reaction" | "call", data: string }) {
         // add unread message to notificaion summary list (e.g. notify component)
-        const chatroom = this.chatrooms.filter(room => room.chatroom_id === chatroomId)[0];
-        const chatroomName = chatroom.chatrooms.isgroup ? chatroom.chatrooms.name! : chatroom.chatrooms.participants[0].users.display_name;
-        const username = chatroom.chatrooms.isgroup ?
-            chatroom.chatrooms.participants.filter(part => part.users.user_id === userId)[0].users.display_name :
-            chatroom.chatrooms.participants[0].users.display_name;
         this.notificationService.newUnread({
-            user: {
-                username: username,
-            },
-            chatroom: {
-                chatroomId: chatroomId,
-                chatroomName: chatroomName,
-            },
+            notification_id: -1, // noop
+            user_id: this.currentUser.userId,
+            originated_from: userId,
+            chatroom_id: chatroomId,
             type: content.type,
             content: content.data,
             date: new Date(Date.now()),

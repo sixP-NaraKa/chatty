@@ -169,4 +169,9 @@ export class ChatPageComponent implements OnInit {
         });
     }
 
+    notificationCounter: number = 0;
+    onNotificationCounterChange(count: number) {
+        this.notificationCounter = count;
+    }
+
 }

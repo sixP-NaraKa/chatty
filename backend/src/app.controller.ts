@@ -1,7 +1,7 @@
 import { Body, Controller, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
-import { emote, settings, users } from '@prisma/client';
+import { emote, notifications, settings, users } from '@prisma/client';
 import { AppService } from './app.service';
-import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction } from '../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -29,6 +29,8 @@ export class AppController {
         return users;
     }
 
+    /* USER SETTINGS */
+
     @UseGuards(AuthGuard())
     @Get("/api/user/settings")
     async getUserSettings(@Query("user_id", ParseIntPipe) userId: number) {
@@ -41,11 +43,7 @@ export class AppController {
         return await this.userService.updateUserSettings(body);
     }
 
-    @UseGuards(AuthGuard())
-    @Get("/api/emotes")
-    async getAvailableEmotes(): Promise<emote[]> {
-        return await this.appService.getAllAvailableEmotes();
-    }
+    /* CHATROOMS */
 
     @UseGuards(AuthGuard())
     @Get("/api/user/chatrooms")
@@ -90,6 +88,8 @@ export class AppController {
         await this.appService.addUsersToGroupChat(userIds, chatroomId);
     }
 
+    /* CHAT MESSAGES */
+
     @UseGuards(AuthGuard())
     @Get("/api/chat/chatmessages")
     async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<ChatroomWithMessages> {
@@ -105,6 +105,12 @@ export class AppController {
     }
 
     @UseGuards(AuthGuard())
+    @Get("/api/emotes")
+    async getAvailableEmotes(): Promise<emote[]> {
+        return await this.appService.getAllAvailableEmotes();
+    }
+
+    @UseGuards(AuthGuard())
     @Post("/api/chat/create/chatmessage/reaction")
     async insertEmoteReaction(@Body() body: { messageId: number, userId: number, emoteId: number }): Promise<MessageReaction> {
         return await this.appService.insertEmoteReaction(body.messageId, body.userId, body.emoteId);
@@ -114,6 +120,20 @@ export class AppController {
     @Get("/api/chat/chatmessages/count")
     async getChatroomMessageCount(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<number> {
         return await this.appService.getChatroomMessagesCount(chatroomId);
+    }
+
+    /* NOTIFICATIONS */
+
+    @UseGuards(AuthGuard())
+    @Get("/api/user/notifications")
+    async getAllNotificationsForUser(@Query("user_id", ParseIntPipe) userId: number): Promise<Notification[]> {
+        return await this.appService.getAllNotificationsForUser(userId);
+    }
+
+    @UseGuards(AuthGuard())
+    @Post("/api/user/notifications/new")
+    async insertNewNotification(@Body() body: { userId: number, originatedFrom: number, chatroomId: number, type: string, content: string }): Promise<Notification> {
+        return await this.appService.insertNewNotification(body.userId, body.originatedFrom, body.chatroomId, body.type, body.content);
     }
 
 }

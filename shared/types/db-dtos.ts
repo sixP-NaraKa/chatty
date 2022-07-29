@@ -1,4 +1,4 @@
-import { users, chat_messages, chatrooms, participants, settings, emote, reactions } from '../../backend/node_modules/@prisma/client';
+import { users, chat_messages, chatrooms, participants, settings, emote, reactions, notifications } from '../../backend/node_modules/@prisma/client';
 
 type User = {
     user_id: number,
@@ -43,4 +43,10 @@ type ChatroomWithMessages = chatrooms & {
     participants: participants[];
 }
 
-export { users, chat_messages, participants, chatrooms, settings, emote, reactions, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, UserIdDisplayName, MessageReaction };
+type Notification = notifications & {
+    users: users,
+    originated_from_user: users,
+    chatrooms: chatrooms,
+}
+
+export { users, chat_messages, participants, chatrooms, settings, emote, reactions, notifications, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, UserIdDisplayName, MessageReaction, Notification };

@@ -8,14 +8,16 @@ datasource db {
 }
 
 model users {
-  user_id       Int             @id @default(autoincrement())
-  display_name  String          @unique(map: "display_name_unique")
-  creation_date DateTime        @default(now()) @db.Timestamp(6)
-  password      String
-  chat_messages chat_messages[]
-  participants  participants[]
-  reactions     reactions[]
-  settings      settings[]
+  user_id                                            Int             @id @default(autoincrement())
+  display_name                                       String          @unique(map: "display_name_unique")
+  creation_date                                      DateTime        @default(now()) @db.Timestamp(6)
+  password                                           String
+  chat_messages                                      chat_messages[]
+  notifications_notifications_originated_fromTousers notifications[] @relation("notifications_originated_fromTousers") // will not be used
+  notifications_notifications_user_idTousers         notifications[] @relation("notifications_user_idTousers") // will not be used
+  participants                                       participants[]
+  reactions                                          reactions[]
+  settings                                           settings[]
 }
 
 model chat_messages {
@@ -36,6 +38,7 @@ model chatrooms {
   created_by    Int?
   created_at    DateTime?       @default(now()) @db.Timestamp(6)
   chat_messages chat_messages[]
+  notifications notifications[]
   participants  participants[]
 }
 
@@ -70,4 +73,17 @@ model reactions {
   emote         emote         @relation(fields: [emote_id], references: [emote_id], onDelete: NoAction, onUpdate: NoAction, map: "emote_id_fk")
   chat_messages chat_messages @relation(fields: [msg_id], references: [msg_id], onDelete: NoAction, onUpdate: NoAction, map: "msg_id_fk")
   users         users?        @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+}
+
+model notifications {
+  notification_id                            Int       @id @default(autoincrement())
+  user_id                                    Int
+  chatroom_id                                Int
+  type                                       String
+  content                                    String
+  originated_from                            Int
+  date                                       DateTime  @default(now()) @db.Timestamp(6)
+  chatrooms                                  chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
+  originated_from_user users     @relation("notifications_originated_fromTousers", fields: [originated_from], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "originated_from_fk")
+  users         users     @relation("notifications_user_idTousers", fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }

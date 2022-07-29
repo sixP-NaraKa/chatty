@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
-import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction } from '../../shared/types/db-dtos';
-import { emote } from '@prisma/client';
+import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos';
+import { emote, notifications } from '@prisma/client';
 
 
 const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
@@ -124,7 +124,7 @@ export class AppService {
      * @param participantUserId userId of the participant of the 1on1 chat
      * @returns a @see ChatRoomWithParticipantsExceptSelf chat
      */
-     async getSingleChatroomForUserWithParticipantUserId(userId: number, participantUserId: number): Promise<ChatRoomWithParticipantsExceptSelf> {
+    async getSingleChatroomForUserWithParticipantUserId(userId: number, participantUserId: number): Promise<ChatRoomWithParticipantsExceptSelf> {
         return await this.prismaService.participants.findFirst({
             where: {
                 user_id: userId,
@@ -215,7 +215,7 @@ export class AppService {
                 created_by: userId,
                 participants: {
                     createMany: {
-                        data: data                      
+                        data: data
                     }
                 }
             },
@@ -307,6 +307,53 @@ export class AppService {
     /* EMOTE fetching */
     async getAllAvailableEmotes(): Promise<emote[]> {
         return this.prismaService.emote.findMany();
+    }
+
+    /* NOTIFICATION */
+
+    /**
+     * Fetch all notifications which belong to the given user.
+     * 
+     * @param userId user for which to fetch notifications
+     * @returns a Notification[]
+     */
+    async getAllNotificationsForUser(userId: number): Promise<Notification[]> {
+        return this.prismaService.notifications.findMany({
+            where: {
+                user_id: userId
+            },
+            include: {
+                users: true,
+                originated_from_user: true,
+                chatrooms: true
+            }
+        });
+    }
+
+    /**
+     * 
+     * @param userId user ID (current logged in user)
+     * @param originatedFrom user ID of who triggered the notification
+     * @param chatroomId chatroom ID in which the notification happened
+     * @param type the type of the notification, one of "message", "reaction" or "call"
+     * @param content the content of the notification
+     * @returns a Notification
+     */
+    async insertNewNotification(userId: number, originatedFrom: number, chatroomId: number, type: string, content: string): Promise<Notification> {
+        return this.prismaService.notifications.create({
+            data: {
+                user_id: userId,
+                originated_from: originatedFrom,
+                chatroom_id: chatroomId,
+                type: type,
+                content: content
+            },
+            include: {
+                users: true,
+                originated_from_user: true,
+                chatrooms: true
+            }
+        });
     }
 
 }

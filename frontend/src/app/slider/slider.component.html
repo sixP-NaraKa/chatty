@@ -6,7 +6,7 @@
         <ng-content select=".sliderContentInButtonIcon"></ng-content>
     </button>
     <div id="{{generatedSliderId}}"
-        class="{{sliderContentClass}} {{dismissedClass}} absolute w-32 sm:w-80 border-2 border-gray-700 overflow-x-auto">
+        class="slide-content {{sliderContentClass}} {{dismissedClass}} absolute w-64 sm:w-80 border-2 border-gray-700 overflow-x-auto">
         <!-- that is one way to do it I suppose :D -->
         <button (click)="onSliderClick()"
             class="{{slideContentOutButtonClass}} absolute top-0 w-fit h-fit px-4 space-x-1 bg-white text-gray-800 hover:text-gray-600">
