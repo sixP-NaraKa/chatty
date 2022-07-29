@@ -30,12 +30,9 @@ export class NotificationSummaryComponent implements OnInit {
 
         // subscribe to the Observable to get new notifications during runtime
         this.unreadSubscription = this.notificationService.unreadNotification$.subscribe(unreadNotif => {
-            this.notificationService.insertNewNotification(unreadNotif.user_id, unreadNotif.originated_from, unreadNotif.chatroom_id, unreadNotif.type, unreadNotif.content)
-                .subscribe(notif => {
-                    this.notificationCounter++;
-                    this.notificationCounterEvent.emit(this.notificationCounter);
-                    this.unreadNotifications.push(notif);
-                });
+            this.notificationCounter++;
+            this.notificationCounterEvent.emit(this.notificationCounter);
+            this.unreadNotifications.push(unreadNotif);
         });
     }
 

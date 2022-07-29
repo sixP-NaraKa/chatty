@@ -10,7 +10,7 @@ import { Notification, notifications } from '../../../../shared/types/db-dtos';
 })
 export class NotificationService {
 
-    private unreadNotificationSource = new Subject<notifications>();
+    private unreadNotificationSource = new Subject<Notification>();
 
     public unreadNotification$ = this.unreadNotificationSource.asObservable();
 
@@ -20,7 +20,11 @@ export class NotificationService {
     }
 
     newUnread(notif: notifications) {
-        this.unreadNotificationSource.next(notif);
+        // save the new notification into the db
+        // then sent it to the observers
+        this.insertNewNotification(notif.user_id, notif.originated_from, notif.chatroom_id, notif.type, notif.content).subscribe(notif => {
+            this.unreadNotificationSource.next(notif);
+        });
     }
 
     getAllNotificationsForUser(userId: number) {
