@@ -136,7 +136,8 @@ export class AppService {
                                     user_id: participantUserId
                                 }
                             }
-                        }
+                        },
+                        isgroup: false
                     }
                 },
             },
