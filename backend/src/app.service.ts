@@ -357,4 +357,17 @@ export class AppService {
         });
     }
 
+    /**
+     * Deletes a notification.
+     * 
+     * @param notificationId the notification to delete
+     */
+    async deleteNotification(notificationId: number) {
+        return this.prismaService.notifications.delete({
+            where: {
+                notification_id: notificationId
+            }
+        });
+    }
+
 }

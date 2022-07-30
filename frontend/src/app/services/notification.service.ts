@@ -35,4 +35,8 @@ export class NotificationService {
         return this.http.post<Notification>(`${this.backendHost}/api/user/notifications/new?user_id=${userId}`, { userId: userId, originatedFrom: originatedFrom, chatroomId: chatroomId, type: type, content: content });
     }
 
+    deleteNotification(userId: number, notificationId: number) {
+        return this.http.post(`${this.backendHost}/api/user/notifications/delete?user_id=${userId}`, { notificationId: notificationId });
+    }
+
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Notification } from '../../../../shared/types/db-dtos';
 import { NotificationService } from '../services/notification.service';
@@ -7,7 +7,8 @@ import { UserService } from '../services/user.services';
 @Component({
     selector: 'app-notification-summary',
     templateUrl: './notification-summary.component.html',
-    styleUrls: ['./notification-summary.component.scss']
+    styleUrls: ['./notification-summary.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotificationSummaryComponent implements OnInit {
 
@@ -41,6 +42,16 @@ export class NotificationSummaryComponent implements OnInit {
 
     ngOnDestroy() {
         this.unreadSubscription.unsubscribe();
+    }
+
+    onNotificationDelete(notif: Notification) {
+        this.notificationService.deleteNotification(this.userService.currentUser.userId, notif.notification_id).subscribe(event => {
+            const idxOf = this.unreadNotifications.indexOf(notif);
+            this.unreadNotifications.splice(idxOf, 1);
+            this.notificationCounter--;
+            this.notificationCounterEvent.emit(this.notificationCounter);
+        });
+
     }
 
 }

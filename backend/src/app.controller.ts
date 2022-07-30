@@ -136,4 +136,10 @@ export class AppController {
         return await this.appService.insertNewNotification(body.userId, body.originatedFrom, body.chatroomId, body.type, body.content);
     }
 
+    @UseGuards(AuthGuard())
+    @Post("/api/user/notifications/delete")
+    async deleteNotification(@Body() body: { notificationId: number }) {
+        return await this.appService.deleteNotification(body.notificationId);
+    }
+
 }

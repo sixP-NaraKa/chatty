@@ -1,7 +1,8 @@
 <div *ngFor="let notif of unreadNotifications" class="pb-2 border-b-2 border-gray-700">
     <p class="text-sm font-bold underline">{{notif.chatrooms.isgroup ? notif.chatrooms.name : notif.originated_from_user.display_name}} ({{notif.type}})</p>
-    <div>
-        <p class="font-bold">{{notif.originated_from_user.display_name}}:</p>
+    <p class="font-bold">{{notif.originated_from_user.display_name}}:</p>
+    <div class="flex justify-between">
         <p>{{notif.content}} (on {{notif.date}})</p>
+        <button (click)="onNotificationDelete(notif)" title="Delete" class="fa-solid fa-xmark px-2 hover:bg-red-200 text-red-400"></button>
     </div>
 </div>
