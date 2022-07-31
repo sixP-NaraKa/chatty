@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { ChatRoomWithParticipantsExceptSelf } from '../../../../shared/types/db-dtos';
 import { CallService } from '../services/call.service';
+import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -17,6 +18,7 @@ export class VoiceChatComponent implements AfterViewInit {
     // (and therefore we only allow once active voice chat)
     callRequestInProgress: boolean = false;
     callingChatroomUser: string = "";
+    // callingChatroomUserId: number = -1;
 
     currentChatroom!: ChatRoomWithParticipantsExceptSelf;
     @Input()
@@ -33,7 +35,8 @@ export class VoiceChatComponent implements AfterViewInit {
 
     audioIncomingCall = new Audio("../../assets/They callin me.m4a");
 
-    constructor(private callService: CallService, private wsService: WebsocketService, private userService: UserService) { }
+    constructor(private callService: CallService, private wsService: WebsocketService, private userService: UserService,
+        private notificationService: NotificationService) { }
 
     async ngAfterViewInit() {
         await this.callService.addIncomingMessageHandler();
@@ -47,6 +50,17 @@ export class VoiceChatComponent implements AfterViewInit {
                     this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroomId).subscribe(room => {
                         this.showNotificationOfVoiceChatRequest(room);
                         this.playRingtone(true);
+                        // save a call notification event for the current user,
+                        // regardless if they accpeted, declined or ignored the call request
+                        this.notificationService.newUnread(this.userService.currentUser.userId, {
+                            notification_id: -1, // noop
+                            user_id: this.userService.currentUser.userId,
+                            originated_from: msg.userId,
+                            chatroom_id: msg.chatroomId,
+                            type: "call",
+                            content: "",
+                            date: new Date(Date.now()),
+                        });
                     });
                     break;
                 case "accept":
@@ -213,6 +227,8 @@ export class VoiceChatComponent implements AfterViewInit {
         }
         this.callRequestInProgress = true;
         this.callingChatroomUser = this.currentChatroom.chatrooms.participants[0].users.display_name;
+        // this.callingChatroomUserId = this.currentChatroom.chatrooms.participants[0].users.user_id;
+        
         // this.playRingtone(true); // if we want to play a sound as well, we can do it here
         this.wsService.sendVoiceChatRequest({ type: 'request', chatroomId: this.currentChatroom.chatroom_id, userId: this.userService.currentUser.userId });
     }

@@ -236,7 +236,7 @@ export class ChatTabsComponent implements AfterContentInit {
      */
     emitNewUnreadNotification(chatroomId: number, userId: number, content: { type: "message" | "reaction" | "call", data: string }) {
         // add unread message to notificaion summary list (e.g. notify component)
-        this.notificationService.newUnread({
+        this.notificationService.newUnread(this.currentUser.userId, {
             notification_id: -1, // noop
             user_id: this.currentUser.userId,
             originated_from: userId,

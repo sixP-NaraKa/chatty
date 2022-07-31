@@ -19,10 +19,10 @@ export class NotificationService {
         this.backendHost = config.BACKEND_HOST;
     }
 
-    newUnread(notif: notifications) {
+    newUnread(userId: number, notif: notifications) {
         // save the new notification into the db
         // then sent it to the observers
-        this.insertNewNotification(notif.user_id, notif.originated_from, notif.chatroom_id, notif.type, notif.content).subscribe(notif => {
+        this.insertNewNotification(userId, notif.user_id, notif.originated_from, notif.chatroom_id, notif.type, notif.content).subscribe(notif => {
             this.unreadNotificationSource.next(notif);
         });
     }
@@ -31,8 +31,8 @@ export class NotificationService {
         return this.http.get<Notification[]>(`${this.backendHost}/api/user/notifications?user_id=${userId}`);
     }
 
-    insertNewNotification(userId: number, originatedFrom: number, chatroomId: number, type: string, content: string) {
-        return this.http.post<Notification>(`${this.backendHost}/api/user/notifications/new?user_id=${userId}`, { userId: userId, originatedFrom: originatedFrom, chatroomId: chatroomId, type: type, content: content });
+    insertNewNotification(userId: number, forUser: number, originatedFrom: number, chatroomId: number, type: string, content: string) {
+        return this.http.post<Notification>(`${this.backendHost}/api/user/notifications/new?user_id=${userId}`, { userId: forUser, originatedFrom: originatedFrom, chatroomId: chatroomId, type: type, content: content });
     }
 
     deleteNotification(userId: number, notificationId: number) {
