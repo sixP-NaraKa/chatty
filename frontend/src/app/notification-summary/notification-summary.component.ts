@@ -51,7 +51,20 @@ export class NotificationSummaryComponent implements OnInit {
             this.notificationCounter--;
             this.notificationCounterEvent.emit(this.notificationCounter);
         });
+    }
 
+    /**
+     * Helper function to populate some of the notification content.
+     * 
+     * @param notif the notification
+     * @returns the innerHTML string
+     */
+    populateNotificationContent(notif: Notification) {
+        const date = new Date(notif.date);
+        const time = date.toISOString().substr(11, 5);
+        return `
+            <span>${notif.content} <i title="${date}">(on ${time})</i></span>
+        `
     }
 
 }
