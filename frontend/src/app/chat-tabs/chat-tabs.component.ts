@@ -78,6 +78,7 @@ export class ChatTabsComponent implements AfterContentInit {
         this.listenForNewMessagesFromNotOpenChatrooms();
         this.listenForRemoveChatroomAndRemoveChatFromList();
         this.listenForNewMessageReactionsFromNotOpenChatrooms();
+        this.listenForAvailabilityStatusChanges();
     }
 
     /**
@@ -270,6 +271,17 @@ export class ChatTabsComponent implements AfterContentInit {
      */
     onCreateGroupChatEvent(chatroom: ChatRoomWithParticipantsExceptSelf) {
         this.chatrooms.push(chatroom);
+    }
+
+    availabilityStatusUsers = new Array<number>();
+    /**
+     * Listens for user availability changes and saves them locally.
+     */
+    listenForAvailabilityStatusChanges() {
+        // get after each connect/disconnect by users the up-to-date availability statuses
+        this.wsService.getChangedAvailabilities().subscribe(ids => {
+            this.availabilityStatusUsers = ids;
+        });
     }
 
 }

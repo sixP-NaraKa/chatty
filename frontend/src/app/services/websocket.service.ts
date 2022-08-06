@@ -3,11 +3,6 @@ import { Socket } from "ngx-socket-io";
 import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction } from "../../../../shared/types/db-dtos";
 import { ApplicationUser } from "../auth/auth.service";
 
-type SignallingDescription = {
-    desc: RTCSessionDescriptionInit,
-    chatroomId: number,
-}
-
 type VoiceChatMessage = {
     type: "offer" | "answer" | "hangup" | "icecandidate",
     chatroomId: number,
@@ -91,26 +86,6 @@ export class WebsocketService {
         return this.socket.fromEvent<VoiceChatMessage>("new:voice-chat-message-received");
     }
 
-    // sendVoiceChatRequest(chatroomId: number) {
-    //     this.socket.emit("new:voice-chat-request-sent", chatroomId);
-    // }
-
-    // getVoiceChatRequest() { // number = chatroomId needed only
-    //     return this.socket.fromEvent<number>("new:voice-chat-request-received");
-    // }
-
-    // acceptVoiceChatRequest(chatroomId: number) {
-    //     this.socket.emit("new:voice-chat-request-accept", chatroomId);
-    // }
-
-    // getAcceptedVoiceChatRequest() { // number = chatroomId needed only
-    //     return this.socket.fromEvent<number>("new:voice-chat-request-accepted");
-    // }
-
-    // declineVoiceChatRequest(chatroomId: number) {
-    //     this.socket.emit("new:voice-chat-request-decline", chatroomId);
-    // }
-
     /** Voice Chat request creation */
 
     sendVoiceChatRequest(message: VoiceChatRequest) {
@@ -119,6 +94,12 @@ export class WebsocketService {
 
     getVoiceChatRequest() {
         return this.socket.fromEvent<VoiceChatRequest>("new:voice-chat-request-received");
+    }
+
+    /** User Availability Status */
+
+    getChangedAvailabilities() {
+        return this.socket.fromEvent<number[]>("changed-availabilities");
     }
 
 

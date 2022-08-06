@@ -25,6 +25,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     numConnections = 0;
 
+    userIdsConnected = new Array<number>();
+
     constructor(private authService: AuthService, private userService: UsersService) { }
 
     async handleConnection(client: any, ...args: any[]) {
@@ -50,10 +52,24 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         
         this.numConnections++;
         console.log("connected, num conn => ", this.numConnections);
+
+        // notify users of login, to display corresponding statuses
+        this.userIdsConnected.push(dbUser.user_id);
+        client.broadcast.emit("changed-availabilities", this.userIdsConnected);
+        // send also response to sender, so they get the initial statuses
+        // this could be done before adding to the local list, but it does not matter too much
+        client.emit("changed-availabilities", this.userIdsConnected);
     }
     async handleDisconnect(client: any) {
         this.numConnections--;
         console.log("disconnected, num conn => ", this.numConnections);
+
+        // notify users of logout, to display corresponding statuses
+        const jwtUser = await this.authService.verifyToken(client.handshake.auth.token);
+        const idxOf = this.userIdsConnected.indexOf(jwtUser.sub);
+        this.userIdsConnected.splice(idxOf, 1);
+        console.log(this.userIdsConnected);
+        client.broadcast.emit("changed-availabilities", this.userIdsConnected);
     }
 
     @SubscribeMessage("send:message")
@@ -97,22 +113,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     /* WebRTC */
-
-    // @SubscribeMessage("new:voice-chat-offer-sent")
-    // async onVoiceChatOffer(client: any, offer: any) {
-    //     client.broadcast.to(offer.chatroomId).emit("new:voice-chat-offer-received", ["offer", offer]);
-    // }
-
-    // @SubscribeMessage("new:voice-chat-answer-sent")
-    // async onVoiceChatAnswer(client: any, answer: any) {
-    //     client.broadcast.to(answer.chatroomId).emit("new:voice-chat-answer-received", ["answer", answer]);
-    // }
-
-    // @SubscribeMessage("new:voice-chat-ice-candidate-sent")
-    // async onVoiceChatIceCandidate(client: any, candidateInfo: any) {
-    //     console.log("ws backend: ice candidate received", candidateInfo);
-    //     client.broadcast.to(candidateInfo.chatroomId).emit("new:voice-chat-ice-candidate-received", candidateInfo.candidate);
-    // }
 
     @SubscribeMessage("new:voice-chat-message")
     async onVoiceChatMessage(client: any, message: { type: "offer" | "answer" | "hangup" | "icecandidate", chatroomId: number, userId: number, data: any }) {
