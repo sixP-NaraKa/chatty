@@ -39,6 +39,7 @@ Run `npm run serve` for a dev server. Navigate to `http://localhost:4300/`. The 
 
 
 ## About running it locally
+
 The application is configured to use https (frontend and backend - using self-signed certificates) in the `frontend` and `backend` directories respectively.
 
 ### Frontend:
@@ -49,6 +50,8 @@ See also in `frontend/src` > `package.json` > `npm run sas`.
 
 File: [package.json](https://github.com/sixP-NaraKa/chatty/blob/main/frontend/package.json).
 
+Additionally, within the `src/environments` directory a `config.ts` file is expected (needs to be created), which exports a property called `BACKEND_HOST`, which is used for the WebSocket implementation.
+
 ### Backend:
 
 The `src/backend` is expecting the self-signed certificates per default, see `backend/src/main.ts`.
@@ -57,7 +60,9 @@ If this is not wanted, simply remove the affecting lines of code.
 File: [main.ts](https://github.com/sixP-NaraKa/chatty/blob/main/backend/src/main.ts).
 
 
-### Database tables
+### Database
+
+A `.env` file with a `DATABASE_URL` property is required for the usage of Prisma. This `.env` file should reside in the root directory of the application.
 
 chatty uses the database tables mentioned in the [schema.prisma](https://github.com/sixP-NaraKa/chatty/blob/main/backend/prisma/schema.prisma) file.
 
