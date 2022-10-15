@@ -54,6 +54,8 @@ Additionally, within the `src/environments` directory a `config.ts` file is expe
 
 ### Backend:
 
+A `.env` file with a `JWT_SECRET` property is required for authentication via JWT.
+
 The `src/backend` is expecting the self-signed certificates per default, see `backend/src/main.ts`.
 If this is not wanted, simply remove the affecting lines of code.
 
