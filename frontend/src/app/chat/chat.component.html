@@ -6,7 +6,7 @@
             [class.chat-participant-message]="message.user_id !== currentUser.userId"
             [class.bg-owndigo]="message.user_id === currentUser.userId">
             <span class="flex gap-4" [innerHTML]="populateMessageHeader(message)"></span>
-            <span [innerHTML]="urlify(message.msg_content)"></span>
+            <span [innerHTML]="message.msg_content | urlify"></span>
         </p>
         <!-- or maybe put them all in one div with the same [class.] conditions and with an added [class.text-right]/[class.text-left] to the emotes container -->
         <!-- flex here on the parent container needed for the [class.] conditions to work -->
