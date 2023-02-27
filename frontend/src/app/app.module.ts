@@ -25,6 +25,9 @@ import { VoiceChatComponent } from './voice-chat/voice-chat.component';
 import { SliderComponent } from './slider/slider.component';
 import { NotificationSummaryComponent } from './notification-summary/notification-summary.component';
 import { UrlifyPipe } from './pipes/urlify.pipe';
+import { GetImagePipe } from './pipes/getimage.pipe';
+import { ImageifyPipe } from './pipes/imageify.pipe';
+import { ScrollintoviewPipe } from './pipes/scrollintoview.pipe';
 
 const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
 
@@ -46,6 +49,9 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         SliderComponent,
         NotificationSummaryComponent,
         UrlifyPipe,
+        GetImagePipe,
+        ImageifyPipe,
+        ScrollintoviewPipe,
     ],
     imports: [
         BrowserModule,

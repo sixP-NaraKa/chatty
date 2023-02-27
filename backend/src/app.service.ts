@@ -152,6 +152,11 @@ export class AppService {
      * @returns a @see ChatroomWithMessages
      */
     async getAllMessagesForChatroom(chatroomId: number): Promise<ChatroomWithMessages> {
+        // add pagination to only fetch, e.g., 25 messages at a time
+        // in the UI add a button (e.g. on top of the latest 25 messages always) with which more can be loaded
+        // or add infnite scrolling (maybe, idk)
+        // endpoint needs to be adapted to take in a page object in which the current page and page size are given
+        // then use this here in "skip" and "take" - "skip" will be something like "(pageNumber - 1) * take" if pageNumber is not 0-based
         return await this.prismaService.chatrooms.findUnique({
             where: {
                 chatroom_id: chatroomId
@@ -257,14 +262,16 @@ export class AppService {
      * @param message message content
      * @param userId userId of the user who wrote the message
      * @param chatroomId the chatroomId in which the message was written
+     * @param isimage if the message is an image, defaults to false
      * @returns a @see ChatMessageWithUser
      */
-    async insertMessage(message: string, userId: number, chatroomId: number): Promise<ChatMessageWithUser> {
+    async insertMessage(message: string, userId: number, chatroomId: number, isimage: boolean = false): Promise<ChatMessageWithUser> {
         return this.prismaService.chat_messages.create({
             data: {
                 msg_content: message,
                 user_id: userId,
-                chatroom_id: chatroomId
+                chatroom_id: chatroomId,
+                isimage: isimage
             },
             include: {
                 users: {

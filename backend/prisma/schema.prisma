@@ -26,6 +26,7 @@ model chat_messages {
   msg_content String
   user_id     Int
   chatroom_id Int
+  isimage     Boolean     @default(false)
   chatrooms   chatrooms   @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
   users       users       @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
   reactions   reactions[]

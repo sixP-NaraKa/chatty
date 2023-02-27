@@ -1,4 +1,4 @@
-import { Body, Controller, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { emote, notifications, settings, users } from '@prisma/client';
 import { AppService } from './app.service';
 import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos';
@@ -6,9 +6,15 @@ import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users/users.service';
+import * as fs from 'fs';
+import { randomUUID } from 'crypto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller()
 export class AppController {
+
+    imageFilesFolder: string = "files/images";
+
     constructor(private readonly appService: AppService, private authService: AuthService, private userService: UsersService) { }
 
     @UseGuards(LocalAuthGuard)
@@ -102,6 +108,23 @@ export class AppController {
     async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }): Promise<ChatMessageWithUser> {
         const newMessage = await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
         return newMessage;
+    }
+
+    @UseGuards(AuthGuard())
+    @UseInterceptors(FileInterceptor("image"))
+    @Post("/api/chat/create/chatimagemessage")
+    async insertImageMessage(@Query("chatroom_id", ParseIntPipe) chatroomId: number, @Query("user_id", ParseIntPipe) userId: number, @UploadedFile() image: Express.Multer.File): Promise<ChatMessageWithUser> {
+        var uuid: string = randomUUID();
+        fs.writeFileSync(`${this.imageFilesFolder}/${uuid}.png`, image.buffer, {encoding: "binary"});
+        const newMessage = await this.appService.insertMessage(uuid, userId, chatroomId, true);
+        return newMessage;
+    }
+
+    @UseGuards(AuthGuard())
+    @Get("/api/chat/chatimage")
+    async getImageMessage(@Query("imageId") imageId: string): Promise<StreamableFile> {
+        const file = fs.createReadStream(`${this.imageFilesFolder}/${imageId}.png`);
+        return new StreamableFile(file);
     }
 
     @UseGuards(AuthGuard())

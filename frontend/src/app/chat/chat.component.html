@@ -1,19 +1,23 @@
 <div class="chat-scrollbar text-left h-full overflow-y-auto">
     <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-6 pt-2 px-2 sm:mb-4">
-        <p  id="messageContainer" class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 py-1 rounded-lg"
+        <p id="messageContainer" class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 py-1 rounded-lg"
             [class.mr-auto]="message.user_id !== currentUser.userId"
             [class.ml-auto]="message.user_id === currentUser.userId"
             [class.chat-participant-message]="message.user_id !== currentUser.userId"
             [class.bg-owndigo]="message.user_id === currentUser.userId">
             <span class="flex gap-4" [innerHTML]="populateMessageHeader(message)"></span>
-            <span [innerHTML]="message.msg_content | urlify"></span>
+            <span *ngIf="!message.isimage" [innerHTML]="message.msg_content | urlify"></span>
+            <img *ngIf="message.isimage" [src]="message | getimage | async | imageify | async | scrollintoview"
+                alt="Loading image..." class="max-h-80">
         </p>
         <!-- or maybe put them all in one div with the same [class.] conditions and with an added [class.text-right]/[class.text-left] to the emotes container -->
         <!-- flex here on the parent container needed for the [class.] conditions to work -->
         <div id="emoteReactionsContainer" class="flex">
-            <div id="emoteReactionButtons" class="flex flex-row gap-x-4 px-2 rounded-lg" [class.mr-auto]="message.user_id !== currentUser.userId"
+            <div id="emoteReactionButtons" class="flex flex-row gap-x-4 px-2 rounded-lg"
+                [class.mr-auto]="message.user_id !== currentUser.userId"
                 [class.ml-auto]="message.user_id === currentUser.userId">
-                <button *ngFor="let emote of preSelectedEmotes" title="{{emote.name}}" (click)="onEmoteReaction(message, emote)">
+                <button *ngFor="let emote of preSelectedEmotes" title="{{emote.name}}"
+                    (click)="onEmoteReaction(message, emote)">
                     {{emote.emote}}
                 </button>
             </div>
@@ -25,7 +29,7 @@
 <div *ngIf="this.chatroomId !== -1" class="absolute bottom-0 w-full h-fit text-xs md:text-base">
     <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate
         class="form-element mb-0 border-t-2 border-gray-700 h-full">
-        <input id="messageInput" required formControlName="messageInput"
+        <input id="messageInput" required formControlName="messageInput" (paste)="onPaste($event)"
             class="bg-transparent w-[75%] h-full px-2 placeholder:text-violet-200 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden border-r-2 border-gray-700"
             placeholder="Write your message..." />
         <button type="button" id="emotesButton" class="w-[7.5%] h-full text-yellow-300" (click)="onEmoteMenu()">

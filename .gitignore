@@ -48,3 +48,4 @@ Thumbs.db
 */dist
 */src/environments/config.ts
 *.pem
+*.png

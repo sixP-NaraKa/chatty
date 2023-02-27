@@ -110,16 +110,30 @@ export class ChatComponent implements OnInit {
     sendMessage() {
         if (this.chatroomId !== -1) {
             this.userService.sendMessage(this.formGroup.value.messageInput, this.currentUser.userId, this.chatroomId)
-                .subscribe(msg => {
-                    this.formGroup.reset();
-                    this.chatroomMessages.push(msg);
-
-                    // emit msg via websocket
-                    this.wsService.sendChatMessage(msg);
-
-                    this.scrollToLatestMessage();
-                });
+                .subscribe(msg => this.messageSubscribeCallback(msg));
         }
+    }
+
+    /**
+     * Sends a message that contains only an image.
+     * 
+     * @param image image to send
+     */
+    sendImageMessage(image: File) {
+        if (this.chatroomId !== -1) {
+            this.userService.sendImageMessage(this.currentUser.userId, this.chatroomId, image)
+                .subscribe(msg => this.messageSubscribeCallback(msg));
+        }
+    }
+
+    private messageSubscribeCallback(msg: ChatMessageWithUser) {
+        if (!msg.isimage) this.formGroup.reset();
+        this.chatroomMessages.push(msg);
+
+        // emit msg via websocket
+        this.wsService.sendChatMessage(msg);
+
+        this.scrollToLatestMessage();
     }
 
     /* EMOTES */
@@ -212,12 +226,25 @@ export class ChatComponent implements OnInit {
      * Helper function to scroll to the latest message available in the UI.
      * Is being used by initial load of the chat messages,
      * and when writing, sending and receiving chat messages.
+     * 
+     * This is also available via a pipe, made for the "lazy loaded" image messages.
      */
     scrollToLatestMessage() {
         setTimeout(function () {
             const lastMessageDiv = Array.from(document.getElementsByClassName("chat-message-div")).pop();
             lastMessageDiv?.scrollIntoView({ behavior: 'smooth' });
         }, 1);
+    }
+
+    onPaste(event: ClipboardEvent | any) {
+        const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        let blob: File;
+        for (const item of items) {
+            if (item.type.indexOf("image") === 0) {
+                blob = item.getAsFile();
+                this.sendImageMessage(blob);
+            }
+        }
     }
 
 }

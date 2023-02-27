@@ -13,14 +13,31 @@ export class UrlifyPipe implements PipeTransform {
     urlRegex = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
     /**
      * Helper method to highlight URLs in a given message. Returns the new replaced message with, if available, highlighted URLs.
+     * Also checks if the matched message is a "valid" image URL and constructs an <img> tag out of it.
      * 
      * @param msg message to highlight URLs in
      * @returns 
      */
     urlify(msg: string): string {
         return msg.replace(new RegExp(this.urlRegex), match => {
-            return `<a href="${match}" target="_blank" rel="noreferrer noopener" class="text-blue-500">${match}</a>`
+            const isImageUrl = this.isImageUrl(match);
+            return `<a href="${match}" target="_blank" rel="noreferrer noopener" class="text-blue-500">${match}</a>
+            ${isImageUrl ? `<img src="${match}" alt="Loading image..." class="max-h-80">` : ""}`
         });
+    }
+
+    // https://stackoverflow.com/a/19395606 - slightly modified
+    private isImageUrl(url: string): boolean {
+        //make sure we remove any nasty GET params 
+        url = url.split('?')[0];
+        //moving on, split the uri into parts that had dots before them
+        var parts = url.split('.');
+        //get the last part ( should be the extension )
+        var extension = parts[parts.length - 1];
+        //define some image types to test against
+        var imageTypes = ['jpg', 'jpeg', 'tiff', 'png', 'gif', 'bmp'];
+        //check if the extension matches anything in the list.
+        return imageTypes.indexOf(extension) !== -1;
     }
 
 }

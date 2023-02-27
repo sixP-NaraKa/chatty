@@ -15,7 +15,7 @@ export class UserService {
         this.backendHost = config.BACKEND_HOST;
     }
 
-    public get currentUser() : ApplicationUser {
+    public get currentUser(): ApplicationUser {
         return this.authService.currentUserValue;
     }
 
@@ -69,6 +69,12 @@ export class UserService {
         return this.http.get<ChatroomWithMessages>(`${this.backendHost}/api/chat/chatmessages?chatroom_id=${chatroomId}&user_id=${userId}`);
     }
 
+    getChatroomImageMessage(chatroomId: number, imageId: string): Observable<Blob> {
+        const userId = this.currentUser.userId;
+        return this.http.get(`${this.backendHost}/api/chat/chatimage?chatroom_id=${chatroomId}&user_id=${userId}&imageId=${imageId}`,
+        {responseType: "blob"});
+    }
+
     getChatroomMessagesCount(chatroomId: number, userId: number): Observable<number> {
         return this.http.get<number>(`${this.backendHost}/api/chat/chatmessages/count?chatroom_id=${chatroomId}&user_id=${userId}`);
     }
@@ -78,13 +84,19 @@ export class UserService {
     }
 
     /* INSERTING / EDITING OF DATA */
-    
+
     updateUserSettings(userSettings: settings) {
         this.http.post<any>(`${this.backendHost}/api/user/update/settings?user_id=${userSettings.user_id}`, userSettings).subscribe(); // no-op
     }
 
     sendMessage(message: string, userId: number, chatroomId: number): Observable<ChatMessageWithUser> {
         return this.http.post<ChatMessageWithUser>(`${this.backendHost}/api/chat/create/chatmessage?user_id=${userId}`, { message: message, userId: userId, chatroomId: chatroomId });
+    }
+
+    sendImageMessage(userId: number, chatroomId: number, image: File): Observable<ChatMessageWithUser> {
+        const formData = new FormData();
+        formData.append("image", image);
+        return this.http.post<ChatMessageWithUser>(`${this.backendHost}/api/chat/create/chatimagemessage?user_id=${userId}&chatroom_id=${chatroomId}`, formData);
     }
 
     sendEmoteReaction(userId: number, messageId: number, emoteId: number) {
