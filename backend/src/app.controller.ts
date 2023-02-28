@@ -115,7 +115,7 @@ export class AppController {
     @Post("/api/chat/create/chatimagemessage")
     async insertImageMessage(@Query("chatroom_id", ParseIntPipe) chatroomId: number, @Query("user_id", ParseIntPipe) userId: number, @UploadedFile() image: Express.Multer.File): Promise<ChatMessageWithUser> {
         var uuid: string = randomUUID();
-        fs.writeFileSync(`${this.imageFilesFolder}/${uuid}.png`, image.buffer, {encoding: "binary"});
+        fs.writeFileSync(`${this.imageFilesFolder}/${uuid}.png`, image.buffer, { encoding: "binary" });
         const newMessage = await this.appService.insertMessage(uuid, userId, chatroomId, true);
         return newMessage;
     }
@@ -123,14 +123,9 @@ export class AppController {
     @UseGuards(AuthGuard())
     @Get("/api/chat/chatimage")
     async getImageMessage(@Query("imageId") imageId: string): Promise<StreamableFile> {
-        try {
-            const file = fs.createReadStream(`${this.imageFilesFolder}/${imageId}.png`, {autoClose: true});
-            return new StreamableFile(file);
-        }
-        catch (error) {
-            console.log("could not read image file", imageId, "as it does not exist");
-            return new StreamableFile(null);
-        }
+        const file = fs.createReadStream(`${this.imageFilesFolder}/${imageId}.png`, { autoClose: true });
+        file.on("error", () => console.log("could not read image file", imageId, "as it does not exist"));
+        return new StreamableFile(file);
     }
 
     @UseGuards(AuthGuard())
