@@ -123,8 +123,14 @@ export class AppController {
     @UseGuards(AuthGuard())
     @Get("/api/chat/chatimage")
     async getImageMessage(@Query("imageId") imageId: string): Promise<StreamableFile> {
-        const file = fs.createReadStream(`${this.imageFilesFolder}/${imageId}.png`);
-        return new StreamableFile(file);
+        try {
+            const file = fs.createReadStream(`${this.imageFilesFolder}/${imageId}.png`, {autoClose: true});
+            return new StreamableFile(file);
+        }
+        catch (error) {
+            console.log("could not read image file", imageId, "as it does not exist");
+            return new StreamableFile(null);
+        }
     }
 
     @UseGuards(AuthGuard())
