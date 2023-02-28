@@ -20,6 +20,8 @@ Here are the things "chatty" can do:
     - message reactions
     - emotes
     - URL highlighting
+    - copy-paste images
+    - display images from URLs (jpg, jpeg, png, gif, tiff, bmp)
 - Group chats
     - adding and removing people
 - 1 on 1 voice chats (via WebSockets)
@@ -30,7 +32,9 @@ Here are the things "chatty" can do:
 
 Possible TODOs:
 
-- displaying of images / gifs
+- add pagination to chats, e.g. via a button to load more messages or infinite scrolling
+- file sharing
+- group voice chats (not sure if the current implementation would support this to some degree already)
 
 
 ## Development server
