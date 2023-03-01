@@ -4,6 +4,7 @@ import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { WebsocketService } from '../services/websocket.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-chat',
@@ -50,7 +51,7 @@ export class ChatComponent implements OnInit {
         }
     ]
 
-    constructor(private userService: UserService, private wsService: WebsocketService) {
+    constructor(private userService: UserService, private wsService: WebsocketService, public domSanitizer: DomSanitizer) {
         this.currentUser = this.userService.currentUser;
     }
 
@@ -244,6 +245,20 @@ export class ChatComponent implements OnInit {
                 blob = item.getAsFile();
                 this.sendImageMessage(blob);
             }
+        }
+    }
+
+    /**
+     * Opens an image in a new tab to view it in the original dimensions.
+     * 
+     * @param event the onclick event
+     */
+    openImage(event: any) {
+        const newTab = window.open();
+        if (newTab) {
+            const srcUrl = event.target.src;
+            newTab.document.body.style.backgroundColor = "rgb(26, 32, 44)";
+            newTab.document.body.innerHTML = `<img src="${srcUrl}">`;
         }
     }
 

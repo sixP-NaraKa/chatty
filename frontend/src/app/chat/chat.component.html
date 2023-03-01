@@ -7,8 +7,12 @@
             [class.bg-owndigo]="message.user_id === currentUser.userId">
             <span class="flex gap-4" [innerHTML]="populateMessageHeader(message)"></span>
             <span *ngIf="!message.isimage" [innerHTML]="message.msg_content | urlify"></span>
-            <img *ngIf="message.isimage" [src]="message | getimage | async | imageify | async | scrollintoview"
-                alt="Loading image..." class="max-h-80">
+            <ng-container *ngIf="message.isimage">
+                <ng-container *ngIf="(message | getimage | async | imageify | async | scrollintoview) as srcUrl">
+                    <img [src]="srcUrl" alt="Loading image..." class="max-h-80 cursor-pointer"
+                        (click)="openImage($event)">
+                </ng-container>
+            </ng-container>
         </p>
         <!-- or maybe put them all in one div with the same [class.] conditions and with an added [class.text-right]/[class.text-left] to the emotes container -->
         <!-- flex here on the parent container needed for the [class.] conditions to work -->
