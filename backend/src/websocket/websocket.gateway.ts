@@ -35,12 +35,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             jwtUser = await this.authService.verifyToken(client.handshake.auth.token);
         }
-        catch(e) {
+        catch (e) {
             console.log("=> Websocket: Token is invalid. <=");
             client.disconnect(); // disconnecting just for good measure
             return;
         }
-        
+
         // fetch user from db to completely verify
         const dbUser = await this.userService.findOneById(jwtUser.sub);
 
@@ -49,7 +49,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.disconnect(); // disconnecting just for good measure
             return;
         }
-        
+
         this.numConnections++;
         console.log("connected, num conn => ", this.numConnections);
 
@@ -77,6 +77,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.broadcast.to(data.chatroom_id).emit("get:message", data);
     }
 
+    @SubscribeMessage("delete:message")
+    async pushDeleteMessage(client: any, messageIdAndChatroomId: number[]) {
+        const [messageId, chatroomId] = messageIdAndChatroomId;
+        client.broadcast.to(chatroomId).emit("get:delete-message", messageIdAndChatroomId);
+    }
+
     @SubscribeMessage("send:message-reaction")
     async pushEmoteReaction(client: any, chatroomId: number, messageId: number, userId: number, reaction: MessageReaction) {
         client.broadcast.to(chatroomId).emit("get:message-reaction", chatroomId, messageId, userId, reaction);
@@ -94,7 +100,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage("remove-user:chatroom")
     async onRemoveUserFromChatroom(client: any, userIdAndChatroomId: number[]) {
-        const [ userId, chatroomId ] = userIdAndChatroomId;
+        const [userId, chatroomId] = userIdAndChatroomId;
         client.broadcast.to(chatroomId).emit("removed-from:chatroom", [userId, chatroomId]);
     }
 
@@ -124,7 +130,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.broadcast.to(message.chatroomId).emit("new:voice-chat-request-received", message);
 
         // TODO: do this differently, to cover all cases accruately, maybe?
-        
+
         // if no one else is in this room after 10sec after we send the request,
         // we send ourselves a "ignored" message with the original chatroom Id to compare against later on
         // Note: there is actually no need to compare anything, as the button will be disabled anyway for the duration (until acceptance of the request, etc.),
@@ -137,7 +143,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 // since we are always joining the rooms on startup, they would never be of size one if the other person is online but simply ignoring them
                 // that is why, we will simply for now send back the "ignored" message anway
                 // if (client.adapter.rooms.get(message.chatroomId).size === 1) {
-                    client.emit("new:voice-chat-request-received", { type: "ignored", chatroomId: message.chatroomId, userId: message.userId });
+                client.emit("new:voice-chat-request-received", { type: "ignored", chatroomId: message.chatroomId, userId: message.userId });
                 // }
             }, 10000);
             // console.log(client.adapter.rooms.get(message.chatroomId).size);

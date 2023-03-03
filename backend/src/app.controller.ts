@@ -1,4 +1,4 @@
-import { Body, Controller, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { emote, notifications, settings, users } from '@prisma/client';
 import { AppService } from './app.service';
 import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos';
@@ -108,6 +108,16 @@ export class AppController {
     async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }): Promise<ChatMessageWithUser> {
         const newMessage = await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
         return newMessage;
+    }
+
+    @UseGuards(AuthGuard())
+    @Delete("/api/chat/delete/chatmessage")
+    async deleteMessage(@Body() body: { messageId: number, userId: number }): Promise<boolean> {
+        const message = await this.appService.getMessageById(body.messageId);
+        if (!message || message.user_id !== body.userId) {
+            return false;
+        }
+        return await this.appService.deleteMessage(body.messageId);
     }
 
     @UseGuards(AuthGuard())

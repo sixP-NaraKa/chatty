@@ -73,6 +73,12 @@ export class ChatComponent implements OnInit {
                 this.addEmoteReactionToMessage(reaction);
             }
         });
+
+        this.wsService.getDeleteChatMessage().subscribe(([messageId, chatroomId]) => {
+            if (chatroomId === this.chatroomId) {
+                this.deleteFromMessagesById(messageId);
+            }
+        });
     }
 
     /**
@@ -258,6 +264,43 @@ export class ChatComponent implements OnInit {
             const srcUrl = event.target.src;
             newTab.document.body.style.backgroundColor = "rgb(26, 32, 44)";
             newTab.document.body.innerHTML = `<img src="${srcUrl}">`;
+        }
+    }
+
+    /**
+     * Delete a message that the currently logged in user posted.
+     * 
+     * @param message the message to delete
+     */
+    deleteMessage(message: ChatMessageWithUser) {
+        this.userService.deleteMessage(this.currentUser.userId, message.msg_id).subscribe(hasDeleted => {
+            if (!hasDeleted) {
+                return;
+            }
+            this.deleteFromMessagesById(message.msg_id);
+            this.wsService.deleteChatMessage(message.msg_id, message.chatroom_id);
+        })
+    }
+
+    /**
+     * Get the index of the message that matches the given message ID.
+     * 
+     * @param messageId message index to get
+     * @returns index of the message, -1 if not found
+     */
+    private getIndexOfMessageById(messageId: number): number {
+        return this.chatroomMessages.findIndex(msg => msg.msg_id === messageId);
+    }
+
+    /**
+     * Remove (delete) the message from the array by its ID.
+     * 
+     * @param messageId the message to remove from the array
+     */
+    private deleteFromMessagesById(messageId: number): void {
+        const indexOfMessage = this.getIndexOfMessageById(messageId);
+        if (indexOfMessage !== -1) {
+            this.chatroomMessages.splice(indexOfMessage, 1);
         }
     }
 

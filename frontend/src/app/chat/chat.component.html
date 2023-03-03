@@ -5,7 +5,13 @@
             [class.ml-auto]="message.user_id === currentUser.userId"
             [class.chat-participant-message]="message.user_id !== currentUser.userId"
             [class.bg-owndigo]="message.user_id === currentUser.userId">
-            <span class="flex gap-4" [innerHTML]="populateMessageHeader(message)"></span>
+            <span class="messageHeader flex">
+                <span class="flex gap-4" [innerHTML]="populateMessageHeader(message)"></span>
+                <span *ngIf="message.user_id === currentUser.userId"
+                    class="deleteMessageSpan not-italic text-xs ml-auto" (click)="deleteMessage(message)">
+                    <button class="deleteMessageButton fa-regular fa-trash-can text-red-400"></button>
+                </span>
+            </span>
             <span *ngIf="!message.isimage" [innerHTML]="message.msg_content | urlify"></span>
             <ng-container *ngIf="message.isimage">
                 <ng-container *ngIf="(message | getimage | async | imageify | async | scrollintoview) as srcUrl">

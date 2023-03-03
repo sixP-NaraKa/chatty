@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Socket } from "ngx-socket-io";
+import { Observable } from "rxjs";
 import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction } from "../../../../shared/types/db-dtos";
 import { ApplicationUser } from "../auth/auth.service";
 
@@ -40,12 +41,20 @@ export class WebsocketService {
         return this.socket.fromEvent<ChatMessageWithUser>("get:message");
     }
 
+    deleteChatMessage(messageId: number, chatroomId: number) {
+        this.socket.emit("delete:message", messageId, chatroomId);
+    }
+
+    getDeleteChatMessage(): Observable<[messageId: number, chatroomId: number]> {
+        return this.socket.fromEvent<[messageId: number, chatroomId: number]>("get:delete-message");
+    }
+
     sendEmoteReaction(chatroomId: number, messageId: number, userId: number, reaction: MessageReaction) {
         this.socket.emit("send:message-reaction", chatroomId, messageId, userId, reaction);
     }
 
     getNewEmoteReaction() {
-        return this.socket.fromEvent<[chatroomId: number, messageId: number, userId: number, reaction: MessageReaction]>("get:message-reaction");        
+        return this.socket.fromEvent<[chatroomId: number, messageId: number, userId: number, reaction: MessageReaction]>("get:message-reaction");
     }
 
     joinChatroom(chatroomId: number) {

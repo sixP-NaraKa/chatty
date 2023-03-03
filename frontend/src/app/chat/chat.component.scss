@@ -1,13 +1,14 @@
-.form-element, #emoteReactionButtons {
+.form-element,
+#emoteReactionButtons {
     background-color: rgb(20, 24, 31);
 }
 
-#emotesButton > .fa + .fa,
-#emotesButton:hover > .fa {
+#emotesButton>.fa+.fa,
+#emotesButton:hover>.fa {
     display: none;
 }
 
-#emotesButton:hover > .fa + .fa {
+#emotesButton:hover>.fa+.fa {
     display: inherit;
 }
 
@@ -19,12 +20,16 @@
     background-color: #363636;
 }
 
-#emoteReactionsContainer {
+#emoteReactionsContainer,
+/*#messageContainer .deleteMessageButton*/
+.deleteMessageButton {
     visibility: hidden;
 }
 
-#messageContainer:hover + #emoteReactionsContainer,
-#emoteReactionsContainer:hover {
+#messageContainer:hover+#emoteReactionsContainer,
+#emoteReactionsContainer:hover,
+/*#messageContainer:hover .messageHeader .deleteMessageSpan .deleteMessageButton*/
+#messageContainer:hover .deleteMessageButton {
     // display: flex;
     visibility: visible;
 }

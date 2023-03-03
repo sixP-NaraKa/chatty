@@ -72,7 +72,7 @@ export class UserService {
     getChatroomImageMessage(chatroomId: number, imageId: string): Observable<Blob> {
         const userId = this.currentUser.userId;
         return this.http.get(`${this.backendHost}/api/chat/chatimage?chatroom_id=${chatroomId}&user_id=${userId}&imageId=${imageId}`,
-        {responseType: "blob"});
+            { responseType: "blob" });
     }
 
     getChatroomMessagesCount(chatroomId: number, userId: number): Observable<number> {
@@ -109,6 +109,12 @@ export class UserService {
 
     addUsersToGroupChat(userId: number, userIdsToAdd: number | number[], chatroomId: number): Observable<void> {
         return this.http.get<void>(`${this.backendHost}/api/user/chatrooms/groups/add?user_id=${userId}&userIdsToAdd=${userIdsToAdd}&chatroomId=${chatroomId}`);
+    }
+
+    /* DELETION OF DATA */
+
+    deleteMessage(userId: number, messageId: number): Observable<ArrayBuffer> {
+        return this.http.delete<ArrayBuffer>(`${this.backendHost}/api/chat/delete/chatmessage?user_id=${userId}`, { body: { messageId: messageId, userId: userId } });
     }
 
 }

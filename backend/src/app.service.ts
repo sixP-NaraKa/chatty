@@ -292,6 +292,50 @@ export class AppService {
     }
 
     /**
+     * Get the message by its ID.
+     * 
+     * @param messageId the message to get
+     * @returns @see ChatMessageWithUser
+     */
+    async getMessageById(messageId: number): Promise<ChatMessageWithUser | undefined> {
+        return this.prismaService.chat_messages.findUnique({
+            where: {
+                msg_id: messageId
+            },
+            include: {
+                users: {
+                    select: {
+                        user_id: true,
+                        display_name: true,
+                        creation_date: true
+                    }
+                },
+                reactions: {
+                    include: {
+                        emote: true,
+                        users: true
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * Delete a chat message and its related reactions.
+     * 
+     * @param messageId the message to delete
+     * @returns if the message has been deleted
+     */
+    async deleteMessage(messageId: number): Promise<boolean> {
+        const message = await this.prismaService.chat_messages.delete({
+            where: {
+                msg_id: messageId
+            }
+        });
+        return message !== null || message !== undefined ? true : false;
+    }
+
+    /**
      * Insert a new chat message reaction.
      * 
      * @param messageId the message ID on which the reaction was made on
