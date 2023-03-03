@@ -65,8 +65,8 @@ export class UserService {
         return this.http.get<ChatRoomWithParticipantsExceptSelf>(`${this.backendHost}/api/user/chatrooms/create?user_id=${userId}&participant_user_id=${participantUserIds}&is_group=${is_group}&group_name=${groupName}`);
     }
 
-    getChatroomMessages(chatroomId: number, userId: number): Observable<ChatroomWithMessages> {
-        return this.http.get<ChatroomWithMessages>(`${this.backendHost}/api/chat/chatmessages?chatroom_id=${chatroomId}&user_id=${userId}`);
+    getChatroomMessages(chatroomId: number, userId: number, oldCursor: number | undefined | null): Observable<[ChatMessageWithUser[], number]> {
+        return this.http.get<[ChatMessageWithUser[], number]>(`${this.backendHost}/api/chat/chatmessages?chatroom_id=${chatroomId}&user_id=${userId}&oldCursor=${oldCursor}`);
     }
 
     getChatroomImageMessage(chatroomId: number, imageId: string): Observable<Blob> {

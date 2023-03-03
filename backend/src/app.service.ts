@@ -145,18 +145,13 @@ export class AppService {
         });
     }
 
-    /**
+    /** @deprecated
      * Get the given chatroom and all its chat messages.
      * 
      * @param chatroomId chatroomId to fetch messages for
      * @returns a @see ChatroomWithMessages
      */
     async getAllMessagesForChatroom(chatroomId: number): Promise<ChatroomWithMessages> {
-        // add pagination to only fetch, e.g., 25 messages at a time
-        // in the UI add a button (e.g. on top of the latest 25 messages always) with which more can be loaded
-        // or add infnite scrolling (maybe, idk)
-        // endpoint needs to be adapted to take in a page object in which the current page and page size are given
-        // then use this here in "skip" and "take" - "skip" will be something like "(pageNumber - 1) * take" if pageNumber is not 0-based
         return await this.prismaService.chatrooms.findUnique({
             where: {
                 chatroom_id: chatroomId
@@ -182,10 +177,69 @@ export class AppService {
                                 users: true
                             } // or as seen below, simply "include: { emote: true }" also works
                         }
+                    },
+                    orderBy: {
+                        posted_at: "asc" // or msg_id, or leave out
                     }
                 }
             },
         });
+    }
+
+    /**
+     * Get all chat messages by a chatroom ID as a cursor-based pagination.
+     * 
+     * @param chatroomId chatroom to fetch messages for
+     * @param oldCursor cursor (ID of )
+     * @returns up to 10 items of @see ChatMessageWithUser and the ID of the oldest message to be used as the next "oldCursor" 
+     */
+    async getAllChatMessagesByChatroomId(chatroomId: number, oldCursor: number): Promise<[ChatMessageWithUser[], number]> {
+        let cursorPagination: any;
+        if (oldCursor === -1) {
+            cursorPagination = {
+                take: -10,
+            };
+        }
+        else {
+            cursorPagination = {
+                take: -10,
+                skip: 1,
+                cursor: {
+                    msg_id: oldCursor
+                }
+            };
+        }
+
+        const queryResults = await this.prismaService.chat_messages.findMany({
+            ...cursorPagination,
+            where: {
+                chatroom_id: chatroomId
+            },
+            orderBy: {
+                posted_at: "asc"
+            },
+            include: {
+                users: {
+                    select: {
+                        user_id: true,
+                        display_name: true,
+                        creation_date: true
+                    }
+                },
+                reactions: {
+                    include: {
+                        emote: true,
+                        users: true
+                    }
+                }
+            }
+        });
+
+        if (queryResults.length == 0) {
+            return [[], 0];
+        }
+        // its literally the same, but ok
+        return [queryResults as ChatMessageWithUser[], queryResults[0].msg_id];
     }
 
     /**
@@ -378,6 +432,9 @@ export class AppService {
                 users: true,
                 originated_from_user: true,
                 chatrooms: true
+            },
+            orderBy: {
+                date: "asc"
             }
         });
     }

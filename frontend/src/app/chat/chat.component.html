@@ -1,4 +1,5 @@
-<div class="chat-scrollbar text-left h-full overflow-y-auto">
+<div class="chat-scrollbar text-left h-full overflow-y-auto" infiniteScroll [scrollWindow]="false"
+    [infiniteScrollThrottle]="500" [infiniteScrollUpDistance]="1" (scrolledUp)="onScrollUp()">
     <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-6 pt-2 px-2 sm:mb-4">
         <p id="messageContainer" class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 py-1 rounded-lg"
             [class.mr-auto]="message.user_id !== currentUser.userId"
@@ -14,7 +15,7 @@
             </span>
             <span *ngIf="!message.isimage" [innerHTML]="message.msg_content | urlify"></span>
             <ng-container *ngIf="message.isimage">
-                <ng-container *ngIf="(message | getimage | async | imageify | async | scrollintoview) as srcUrl">
+                <ng-container *ngIf="(message | getimage | async | imageify | async) as srcUrl">
                     <img [src]="srcUrl" alt="Loading image..." class="max-h-80 cursor-pointer"
                         (click)="openImage($event)">
                 </ng-container>

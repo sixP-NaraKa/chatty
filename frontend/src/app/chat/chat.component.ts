@@ -21,6 +21,7 @@ export class ChatComponent implements OnInit {
     }
 
     chatroomMessages = new Array<ChatMessageWithUser>();
+    cursor: number = -1;
 
     preSelectedEmotes: emote[] = [
         {
@@ -91,19 +92,38 @@ export class ChatComponent implements OnInit {
         if (chatroomIdToLoad !== -1) {
             // create new instance here, in case any errors might happen during chatroom navigation or whatnot
             this.chatroomMessages = new Array<ChatMessageWithUser>();
-            this.fetchAndDisplayChatMessages(chatroomIdToLoad);
+            this.cursor = -1;
+            this.fetchAndDisplayChatMessages(chatroomIdToLoad, this.cursor);
         }
     }
 
     /**
-     * Fetches and displays the chat messages in the UI.
+     * Fetches and displays the (next) chat messages in the UI.
      */
-    fetchAndDisplayChatMessages(chatroomIdToLoad: number) {
-        this.userService.getChatroomMessages(chatroomIdToLoad, this.currentUser.userId).subscribe(chatroomData => {
-            const { chat_messages, ..._ } = chatroomData;
-            this.chatroomMessages = chat_messages;
-            this.scrollToLatestMessage();
+    fetchAndDisplayChatMessages(chatroomIdToLoad: number, oldCursor: number) {
+        return this.userService.getChatroomMessages(chatroomIdToLoad, this.currentUser.userId, oldCursor).subscribe(chatroomData => {
+            const [chat_messages, cursor] = chatroomData;
+            this.chatroomMessages.unshift(...chat_messages);
+            this.cursor = cursor;
+            // if the cursor simply points to "nothing" (e.g. this is a first load of the chat), then scroll down
+            // either here, or make a separate function/method and "duplicate" this function, but with no scrolling down
+            if (oldCursor === -1) {
+                this.scrollToLatestMessage();
+            }
         });
+    }
+
+    /**
+     * On scroll up load the next available messages.
+     * Used with the ngx-infinite-scroll library.
+     * Note: some finnicky things I saw with the library:
+     *      > for example, if the zoom of the page changes (and therefore the height of the scrollable element),
+     *        then this method will be called again, even though there would be nothing to scroll up to
+     *      > if a message has been sent/received and the "scrollToLatestMessage" method is called (also even if it did not actually scroll),
+     *        we can scroll up again and the onScrollUp method will be callable once more, even though the end was already reached
+     */
+    onScrollUp() {
+        this.fetchAndDisplayChatMessages(this.chatroomId, this.cursor);
     }
 
     /**
@@ -235,11 +255,11 @@ export class ChatComponent implements OnInit {
      * 
      * This is also available via a pipe, made for the "lazy loaded" image messages.
      */
-    scrollToLatestMessage() {
+    scrollToLatestMessage(ms: number = 100) {
         setTimeout(function () {
             const lastMessageDiv = Array.from(document.getElementsByClassName("chat-message-div")).pop();
             lastMessageDiv?.scrollIntoView({ behavior: 'smooth' });
-        }, 1);
+        }, ms);
     }
 
     onPaste(event: ClipboardEvent | any) {

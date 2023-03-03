@@ -31,8 +31,7 @@ export class AppController {
     @UseGuards(AuthGuard())
     @Get("/api/user/users")
     async getAllUsers() {
-        const users = await this.appService.getAllUsers();
-        return users;
+        return await this.appService.getAllUsers();
     }
 
     /* USER SETTINGS */
@@ -54,8 +53,7 @@ export class AppController {
     @UseGuards(AuthGuard())
     @Get("/api/user/chatrooms")
     async getChatroomsForUserWithParticipantsExceptSelf(@Query("user_id", ParseIntPipe) userId: number): Promise<ChatRoomWithParticipantsExceptSelf[]> {
-        const chatrooms = await this.appService.getChatroomsForUserWithParticipantsExceptSelf(userId);
-        return chatrooms;
+        return await this.appService.getChatroomsForUserWithParticipantsExceptSelf(userId);
     }
 
     @UseGuards(AuthGuard())
@@ -77,8 +75,7 @@ export class AppController {
     async createChatroomWithParticipants(@Query("user_id", ParseIntPipe) userId: number,
         @Query("participant_user_id", new ParseArrayPipe({ items: Number, separator: "," })) participantUserIds: number[],
         @Query("is_group", ParseBoolPipe) isGroup: boolean, @Query("group_name") groupName?: string | null): Promise<ChatRoomWithParticipantsExceptSelf> {
-        const chatroom = await this.appService.createChatroomWithParticipants(userId, participantUserIds, isGroup, groupName);
-        return chatroom;
+        return await this.appService.createChatroomWithParticipants(userId, participantUserIds, isGroup, groupName);
     }
 
     @UseGuards(AuthGuard())
@@ -98,16 +95,14 @@ export class AppController {
 
     @UseGuards(AuthGuard())
     @Get("/api/chat/chatmessages")
-    async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<ChatroomWithMessages> {
-        const messages = await this.appService.getAllMessagesForChatroom(chatroomId);
-        return messages;
+    async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number, @Query("oldCursor", ParseIntPipe) oldCursor: number): Promise<[ChatMessageWithUser[], number]> {
+        return await this.appService.getAllChatMessagesByChatroomId(chatroomId, oldCursor);
     }
 
     @UseGuards(AuthGuard())
     @Post("/api/chat/create/chatmessage")
     async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }): Promise<ChatMessageWithUser> {
-        const newMessage = await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
-        return newMessage;
+        return await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
     }
 
     @UseGuards(AuthGuard())
@@ -126,8 +121,7 @@ export class AppController {
     async insertImageMessage(@Query("chatroom_id", ParseIntPipe) chatroomId: number, @Query("user_id", ParseIntPipe) userId: number, @UploadedFile() image: Express.Multer.File): Promise<ChatMessageWithUser> {
         var uuid: string = randomUUID();
         fs.writeFileSync(`${this.imageFilesFolder}/${uuid}.png`, image.buffer, { encoding: "binary" });
-        const newMessage = await this.appService.insertMessage(uuid, userId, chatroomId, true);
-        return newMessage;
+        return await this.appService.insertMessage(uuid, userId, chatroomId, true);
     }
 
     @UseGuards(AuthGuard())

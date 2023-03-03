@@ -28,6 +28,7 @@ import { UrlifyPipe } from './pipes/urlify.pipe';
 import { GetImagePipe } from './pipes/getimage.pipe';
 import { ImageifyPipe } from './pipes/imageify.pipe';
 import { ScrollintoviewPipe } from './pipes/scrollintoview.pipe';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
 
@@ -59,11 +60,12 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         HttpClientModule,
         ReactiveFormsModule,
         SocketIoModule.forRoot(socketconfig),
+        InfiniteScrollModule,
     ],
     providers: [
         jwtInterceptorProvider,
         WebsocketService,
-        {provide: ErrorHandler, useClass: UnauthorizedErroHandler}
+        { provide: ErrorHandler, useClass: UnauthorizedErroHandler }
     ],
     bootstrap: [AppComponent]
 })
