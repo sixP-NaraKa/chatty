@@ -1,19 +1,24 @@
 import { Body, Controller, Delete, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { emote, notifications, settings, users } from '@prisma/client';
-import { AppService } from './app.service';
-import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos';
-import { LocalAuthGuard } from './auth/local-auth.guard';
-import { AuthService } from './auth/auth.service';
+import { AppService } from './app.service.js';
+import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos.js';
+import { LocalAuthGuard } from './auth/local-auth.guard.js';
+import { AuthService } from './auth/auth.service.js';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersService } from './users/users.service';
+import { UsersService } from './users/users.service.js';
 import * as fs from 'fs';
 import { randomUUID } from 'crypto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import * as fileType from "file-type";
+import { FileTypeResult } from 'file-type/core';
+import { BadRequestException, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 @Controller()
 export class AppController {
 
     imageFilesFolder: string = "files/images";
+    filesUploadFolder: string = "files/upload";
 
     constructor(private readonly appService: AppService, private authService: AuthService, private userService: UsersService) { }
 
@@ -115,6 +120,8 @@ export class AppController {
         return await this.appService.deleteMessage(body.messageId);
     }
 
+    /* IMAGE MESSAGES */
+
     @UseGuards(AuthGuard())
     @UseInterceptors(FileInterceptor("image"))
     @Post("/api/chat/create/chatimagemessage")
@@ -131,6 +138,56 @@ export class AppController {
         file.on("error", () => console.log("could not read image file", imageId, "as it does not exist"));
         return new StreamableFile(file);
     }
+
+    /* FILE UPLOAD */
+
+    @UseGuards(AuthGuard())
+    @UseInterceptors(FileInterceptor("file"))
+    @Post("/api/file/validate")
+    async validateFileType(@UploadedFile() file: Express.Multer.File): Promise<[isValid: boolean, fileType: FileTypeResult]> {
+        const ft: FileTypeResult = await fileType.fileTypeFromBuffer(file.buffer);
+        if (ft === undefined) return [false, undefined];
+        if (ft.ext === "exe" || ft.ext === "elf") return [false, ft];
+        return [true, ft];
+    }
+
+    // TODO: add backend validation of the files, e.g. file size, extension/mimetype
+    @UseGuards(AuthGuard())
+    @UseInterceptors(FileInterceptor("file"))
+    @Post("/api/chat/create/chatfilemessage")
+    async insertFileMessage(@Res() res: Response, @Query("chatroom_id", ParseIntPipe) chatroomId: number, @Query("user_id", ParseIntPipe) userId: number, @UploadedFile() file: Express.Multer.File): Promise<ChatMessageWithUser> {
+        const [isValid, ft] = await this.validateFileType(file);
+        if (!isValid) {
+            // check if the result is null and the file.name has extension ".txt"
+            // if that is the case, we will treat the file as valid
+            // Note: a similar valdiation is done in the frontend as well
+            if (ft === null || ft === undefined) {
+                if (file.originalname.split(".").pop()?.toLowerCase() !== "txt") {
+                    res.status(400).send(`File Type is unknown.`);
+                    return;
+                }
+            }
+            else {
+                res.status(400).send(`File Type '${ft.ext}' is invalid.`);
+                return;
+            }
+        }
+        var uuid: string = randomUUID();
+        console.log("file before writing", file, uuid);
+        fs.writeFileSync(`${this.filesUploadFolder}/${uuid}`, file.buffer, { encoding: "binary" });
+        const m = await this.appService.insertFileMessage(file.originalname, uuid, userId, chatroomId);
+        res.status(201).send(m);
+    }
+
+    @UseGuards(AuthGuard())
+    @Get("/api/chat/chatfile")
+    async getFileMessage(@Query("fileId") fileId: string): Promise<StreamableFile> {
+        const file = fs.createReadStream(`${this.filesUploadFolder}/${fileId}`, { autoClose: true });
+        file.on("error", () => console.log("could not read file", fileId, "as it does not exist"));
+        return new StreamableFile(file);
+    }
+
+    /* EMOTES */
 
     @UseGuards(AuthGuard())
     @Get("/api/emotes")

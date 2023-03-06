@@ -1,8 +1,8 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as fs from 'fs';
-import { AppModule } from './app.module';
-import { PrismaService } from './prisma/prisma.service';
+import { AppModule } from './app.module.js';
+import { PrismaService } from './prisma/prisma.service.js';
 
 async function bootstrap() {
     const httpsOptions = {

@@ -33,3 +33,17 @@
     // display: flex;
     visibility: visible;
 }
+
+.dragAndDropArea * {
+    pointer-events: none;
+}
+
+$blur-px: 3px;
+
+.blurDuringDragAndDrop * {
+    -webkit-filter: blur($blur-px);
+    -moz-filter: blur($blur-px);
+    -o-filter: blur($blur-px);
+    -ms-filter: blur($blur-px);
+    filter: blur($blur-px);
+}

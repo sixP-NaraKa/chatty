@@ -5,9 +5,9 @@ import {
     OnGatewayConnection,
     OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { UsersService } from 'src/users/users.service';
-import { AuthService } from '../auth/auth.service';
-import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction } from '../../../shared/types/db-dtos';
+import { UsersService } from '../users/users.service.js';
+import { AuthService } from '../auth/auth.service.js';
+import { ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction } from '../../../shared/types/db-dtos.js';
 
 const options = {
     cors: {

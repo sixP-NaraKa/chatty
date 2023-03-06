@@ -75,6 +75,12 @@ export class UserService {
             { responseType: "blob" });
     }
 
+    downloadFile(chatroomId: number, fileId: string): Observable<Blob> {
+        const userId = this.currentUser.userId;
+        return this.http.get(`${this.backendHost}/api/chat/chatfile?chatroom_id=${chatroomId}&user_id=${userId}&fileId=${fileId}`,
+            { responseType: "blob" });
+    }
+
     getChatroomMessagesCount(chatroomId: number, userId: number): Observable<number> {
         return this.http.get<number>(`${this.backendHost}/api/chat/chatmessages/count?chatroom_id=${chatroomId}&user_id=${userId}`);
     }
@@ -99,6 +105,13 @@ export class UserService {
         return this.http.post<ChatMessageWithUser>(`${this.backendHost}/api/chat/create/chatimagemessage?user_id=${userId}&chatroom_id=${chatroomId}`, formData);
     }
 
+    sendFileMessage(chatroomId: number, file: File): Observable<ChatMessageWithUser> {
+        const userId = this.currentUser.userId;
+        const formData = new FormData();
+        formData.append("file", file);
+        return this.http.post<ChatMessageWithUser>(`${this.backendHost}/api/chat/create/chatfilemessage?user_id=${userId}&chatroom_id=${chatroomId}`, formData);
+    }
+
     sendEmoteReaction(userId: number, messageId: number, emoteId: number) {
         return this.http.post<MessageReaction>(`${this.backendHost}/api/chat/create/chatmessage/reaction?user_id=${userId}`, { messageId: messageId, userId: userId, emoteId: emoteId });
     }
@@ -115,6 +128,13 @@ export class UserService {
 
     deleteMessage(userId: number, messageId: number): Observable<ArrayBuffer> {
         return this.http.delete<ArrayBuffer>(`${this.backendHost}/api/chat/delete/chatmessage?user_id=${userId}`, { body: { messageId: messageId, userId: userId } });
+    }
+
+    /* UTILS (FILE TYPE VALIDATION, ...) */
+    validateFileType(blob: Blob): Observable<[boolean, { ext: any, mime: any } | null]> {
+        const formData = new FormData();
+        formData.append("file", blob);
+        return this.http.post<[boolean, { ext: any, mime: any } | null]>(`${this.backendHost}/api/file/validate?user_id=${this.currentUser.userId}`, formData);
     }
 
 }

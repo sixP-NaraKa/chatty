@@ -1,10 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { emote, ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction, settings } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { WebsocketService } from '../services/websocket.service';
 import { UserSettingsService } from '../services/user-settings.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-chat',
@@ -52,7 +53,8 @@ export class ChatComponent implements OnInit {
         }
     ]
 
-    constructor(private userService: UserService, private wsService: WebsocketService, private settingsService: UserSettingsService) {
+    constructor(private userService: UserService, private wsService: WebsocketService, private settingsService: UserSettingsService,
+        private toastrService: ToastrService) {
         this.currentUser = this.userService.currentUser;
     }
 
@@ -170,7 +172,7 @@ export class ChatComponent implements OnInit {
     }
 
     private messageSubscribeCallback(msg: ChatMessageWithUser) {
-        if (!msg.isimage) this.formGroup.reset();
+        if (!msg.isimage || !msg.isfile) this.formGroup.reset();
         this.chatroomMessages.push(msg);
 
         // emit msg via websocket
@@ -339,6 +341,55 @@ export class ChatComponent implements OnInit {
         if (indexOfMessage !== -1) {
             this.chatroomMessages.splice(indexOfMessage, 1);
         }
+    }
+
+    /**
+     * Catches the event emitted from the "appDragAndDropFile" directive and does some validation.
+     * If the file(s) are ok, upload them and show them as downloadable links to click (e.g. fetches the actual file data from the backend).
+     * 
+     * @param files files that were drag-and-dropped into the chat area
+     */
+    async onFileDrop(files: Array<File>) {
+        for (let file of files) {
+            console.log("file to download", file);
+            if (file.size === 0) {
+                this.toastrService.error("File is either empty or a folder.", "Invalid Upload");
+            }
+            else if (file.size < (20 * 1024 * 1024)) {
+                const blob = file.slice(0, 16);
+                this.userService.validateFileType(blob).subscribe(([isValid, result]) => {
+                    console.log(isValid, result, typeof (result));
+                    if (!isValid) {
+                        // check if the result is null and the file.name has extension ".txt"
+                        // if that is the case, we will treat the file as valid
+                        if (result === null) {
+                            if (file.name.split(".").pop()?.toLowerCase() !== "txt") {
+                                this.toastrService.error(`File '${file.name}' could not be uploaded`, `Unknown file type detected.`);
+                                return;
+                            }
+                        }
+                        else {
+                            this.toastrService.error(`File '${file.name}' could not be uploaded`, `Invalid file type '${result.ext}' detected.`);
+                            return;
+                        }
+                    }
+                    this.userService.sendFileMessage(this.chatroomId, file).subscribe(msg => this.messageSubscribeCallback(msg));
+                });
+            }
+            else {
+                this.toastrService.error("File is bigger than 20MB.", "Invalid file size");
+            }
+        }
+    }
+
+    downloadFile(message: ChatMessageWithUser) {
+        // TODO: make/add some type of progress bar?
+        this.userService.downloadFile(this.chatroomId, message.file_uuid).subscribe(fileBlob => {
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(fileBlob);
+            link.download = `${message.msg_content}`;
+            link.click();
+        });
     }
 
 }

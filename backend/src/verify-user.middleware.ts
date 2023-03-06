@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { AuthService } from './auth/auth.service';
-import { UsersService } from './users/users.service';
+import { AuthService } from './auth/auth.service.js';
+import { UsersService } from './users/users.service.js';
 
 @Injectable()
 export class VerifyUserMiddleware implements NestMiddleware {
@@ -16,7 +16,7 @@ export class VerifyUserMiddleware implements NestMiddleware {
         try {
             jwtUser = await this.authService.verifyToken(bearerToken);
         }
-        catch(e) {
+        catch (e) {
             console.log("=> Middlware: Token is invalid. <=");
             res.status(401).send();
             return;
@@ -42,5 +42,5 @@ export class VerifyUserMiddleware implements NestMiddleware {
         next();
     }
 
-    
+
 }

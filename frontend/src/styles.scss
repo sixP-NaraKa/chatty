@@ -3,6 +3,25 @@
 @tailwind components;
 @tailwind utilities;
 
+// regular style toast
+@import 'ngx-toastr/toastr';
+
+.toast-container .toast-error {
+    // .toast-container .ngx-toastr {
+    background-color: #3e1e25;
+    box-shadow: 0 0 6px #d92b2b;
+
+    &:hover {
+        box-shadow: 0 0 6px #8a1c1c;
+    }
+
+    & .toast-progress {
+        background-color: #e83131;
+        opacity: 1;
+    }
+}
+
+
 html {
     height: 100%;
 }
@@ -12,7 +31,8 @@ body {
     // background-color: #0a0a0a;
 }
 
-.chat-tabs, #emotesContainerId {
+.chat-tabs,
+#emotesContainerId {
     background-color: rgb(20, 24, 31);
     // background-color: #141414;
 }
@@ -22,7 +42,12 @@ body {
     // background-color: #1f1f1f;
 }
 
-html, .chat-scrollbar, .search-scrollbar, #voice-chat-call-notification, #slideContent, .slide-content {
+html,
+.chat-scrollbar,
+.search-scrollbar,
+#voice-chat-call-notification,
+#slideContent,
+.slide-content {
     &::-webkit-scrollbar {
         width: 0.35rem;
     }
@@ -42,7 +67,8 @@ html, .chat-scrollbar, .search-scrollbar, #voice-chat-call-notification, #slideC
     scrollbar-track-color: rgb(26, 32, 44);
 }
 
-.login-input, .register-input {
+.login-input,
+.register-input {
     border: 1px solid rgb(44, 53, 71);
     background-color: rgb(44, 53, 71);
 
@@ -61,7 +87,8 @@ html, .chat-scrollbar, .search-scrollbar, #voice-chat-call-notification, #slideC
     }
 }
 
-.login-fieldset, .register-fieldset {
+.login-fieldset,
+.register-fieldset {
     // border: 1px solid rgb(53, 108, 219);
     border-bottom: 0;
 }

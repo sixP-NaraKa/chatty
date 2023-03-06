@@ -1,90 +1,92 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model users {
-  user_id                                            Int             @id @default(autoincrement())
-  display_name                                       String          @unique(map: "display_name_unique")
-  creation_date                                      DateTime        @default(now()) @db.Timestamp(6)
-  password                                           String
-  chat_messages                                      chat_messages[]
-  notifications_notifications_originated_fromTousers notifications[] @relation("notifications_originated_fromTousers") // will not be used
-  notifications_notifications_user_idTousers         notifications[] @relation("notifications_user_idTousers") // will not be used
-  participants                                       participants[]
-  reactions                                          reactions[]
-  settings                                           settings[]
+    user_id                                            Int             @id @default(autoincrement())
+    display_name                                       String          @unique(map: "display_name_unique")
+    creation_date                                      DateTime        @default(now()) @db.Timestamp(6)
+    password                                           String
+    chat_messages                                      chat_messages[]
+    notifications_notifications_originated_fromTousers notifications[] @relation("notifications_originated_fromTousers") // will not be used
+    notifications_notifications_user_idTousers         notifications[] @relation("notifications_user_idTousers") // will not be used
+    participants                                       participants[]
+    reactions                                          reactions[]
+    settings                                           settings[]
 }
 
 model chat_messages {
-  msg_id      Int         @id @default(autoincrement())
-  posted_at   DateTime    @default(now()) @db.Timestamp(6)
-  msg_content String
-  user_id     Int
-  chatroom_id Int
-  isimage     Boolean     @default(false)
-  chatrooms   chatrooms   @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
-  users       users       @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
-  reactions   reactions[]
+    msg_id      Int         @id @default(autoincrement())
+    posted_at   DateTime    @default(now()) @db.Timestamp(6)
+    msg_content String
+    user_id     Int
+    chatroom_id Int
+    isimage     Boolean     @default(false)
+    isfile      Boolean     @default(false)
+    file_uuid   String      @default("")
+    chatrooms   chatrooms   @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
+    users       users       @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+    reactions   reactions[]
 }
 
 model chatrooms {
-  chatroom_id   Int             @id @default(autoincrement())
-  name          String?
-  isgroup       Boolean
-  created_by    Int?
-  created_at    DateTime?       @default(now()) @db.Timestamp(6)
-  chat_messages chat_messages[]
-  notifications notifications[]
-  participants  participants[]
+    chatroom_id   Int             @id @default(autoincrement())
+    name          String?
+    isgroup       Boolean
+    created_by    Int?
+    created_at    DateTime?       @default(now()) @db.Timestamp(6)
+    chat_messages chat_messages[]
+    notifications notifications[]
+    participants  participants[]
 }
 
 model participants {
-  p_id        Int       @id @default(autoincrement())
-  user_id     Int
-  chatroom_id Int
-  chatrooms   chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
-  users       users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+    p_id        Int       @id @default(autoincrement())
+    user_id     Int
+    chatroom_id Int
+    chatrooms   chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
+    users       users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }
 
 model settings {
-  settings_id Int    @id @default(autoincrement())
-  user_id     Int
-  filter      String @default("filter")
-  font_size   String @default("default")
-  users       users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+    settings_id Int    @id @default(autoincrement())
+    user_id     Int
+    filter      String @default("filter")
+    font_size   String @default("default")
+    users       users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }
 
 model emote {
-  emote_id  Int         @id @default(autoincrement())
-  emote     String
-  name      String
-  reactions reactions[]
+    emote_id  Int         @id @default(autoincrement())
+    emote     String
+    name      String
+    reactions reactions[]
 }
 
 model reactions {
-  reactions_id  Int           @id @default(autoincrement())
-  msg_id        Int
-  emote_id      Int
-  user_id       Int?
-  emote         emote         @relation(fields: [emote_id], references: [emote_id], onDelete: NoAction, onUpdate: NoAction, map: "emote_id_fk")
-  chat_messages chat_messages @relation(fields: [msg_id], references: [msg_id], onDelete: NoAction, onUpdate: NoAction, map: "msg_id_fk")
-  users         users?        @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+    reactions_id  Int           @id @default(autoincrement())
+    msg_id        Int
+    emote_id      Int
+    user_id       Int?
+    emote         emote         @relation(fields: [emote_id], references: [emote_id], onDelete: NoAction, onUpdate: NoAction, map: "emote_id_fk")
+    chat_messages chat_messages @relation(fields: [msg_id], references: [msg_id], onDelete: NoAction, onUpdate: NoAction, map: "msg_id_fk")
+    users         users?        @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }
 
 model notifications {
-  notification_id                            Int       @id @default(autoincrement())
-  user_id                                    Int
-  chatroom_id                                Int
-  type                                       String
-  content                                    String
-  originated_from                            Int
-  date                                       DateTime  @default(now()) @db.Timestamp(6)
-  chatrooms                                  chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
-  originated_from_user users     @relation("notifications_originated_fromTousers", fields: [originated_from], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "originated_from_fk")
-  users         users     @relation("notifications_user_idTousers", fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+    notification_id      Int       @id @default(autoincrement())
+    user_id              Int
+    chatroom_id          Int
+    type                 String
+    content              String
+    originated_from      Int
+    date                 DateTime  @default(now()) @db.Timestamp(6)
+    chatrooms            chatrooms @relation(fields: [chatroom_id], references: [chatroom_id], onDelete: NoAction, onUpdate: NoAction, map: "chatroom_id_fk")
+    originated_from_user users     @relation("notifications_originated_fromTousers", fields: [originated_from], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "originated_from_fk")
+    users                users     @relation("notifications_user_idTousers", fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }

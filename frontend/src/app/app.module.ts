@@ -29,6 +29,9 @@ import { GetImagePipe } from './pipes/getimage.pipe';
 import { ImageifyPipe } from './pipes/imageify.pipe';
 import { ScrollintoviewPipe } from './pipes/scrollintoview.pipe';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { DragAndDropFileDirective } from './directives/drag-and-drop-file.directive';
+import { FilehrefPipe } from './pipes/filehref.pipe';
+import { ToastrModule, ToastNoAnimationModule } from 'ngx-toastr';
 
 const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
 
@@ -53,6 +56,8 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         GetImagePipe,
         ImageifyPipe,
         ScrollintoviewPipe,
+        DragAndDropFileDirective,
+        FilehrefPipe,
     ],
     imports: [
         BrowserModule,
@@ -61,6 +66,16 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         ReactiveFormsModule,
         SocketIoModule.forRoot(socketconfig),
         InfiniteScrollModule,
+        ToastrModule,
+        ToastNoAnimationModule.forRoot({
+            timeOut: 7500,
+            extendedTimeOut: 2500,
+            closeButton: true,
+            tapToDismiss: true,
+            progressBar: true,
+            positionClass: "toast-top-right",
+            onActivateTick: true
+        }),
     ],
     providers: [
         jwtInterceptorProvider,

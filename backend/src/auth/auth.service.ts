@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service.js';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { users } from '@prisma/client';
-import { User } from '../../../shared/types/db-dtos';
-import { UserAlreadyExistsError } from '../errors';
-import { jwtConstants } from './constants';
+import { User } from '../../../shared/types/db-dtos.js';
+import { UserAlreadyExistsError } from '../errors.js';
+import { jwtConstants } from './constants.js';
 
 @Injectable()
 export class AuthService {

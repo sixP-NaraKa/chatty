@@ -1,5 +1,6 @@
-<div class="chat-scrollbar text-left h-full overflow-y-auto" infiniteScroll [scrollWindow]="false"
-    [infiniteScrollThrottle]="500" [infiniteScrollUpDistance]="1" (scrolledUp)="onScrollUp()">
+<div class="chat-scrollbar z-50 text-left h-full overflow-y-auto" id="chatWindow" infiniteScroll [scrollWindow]="false"
+    [infiniteScrollThrottle]="500" [infiniteScrollUpDistance]="1" (scrolledUp)="onScrollUp()" appDragAndDropFile
+    (onFileDrop)="onFileDrop($event)">
     <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-6 pt-2 px-2 sm:mb-4">
         <p id="messageContainer" class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 py-1 rounded-lg"
             [class.mr-auto]="message.user_id !== currentUser.userId"
@@ -13,13 +14,18 @@
                     <button class="deleteMessageButton fa-regular fa-trash-can text-red-400"></button>
                 </span>
             </span>
-            <span *ngIf="!message.isimage" [innerHTML]="message.msg_content | urlify"></span>
+            <span *ngIf="!message.isimage && !message.isfile" [innerHTML]="message.msg_content | urlify"></span>
             <ng-container *ngIf="message.isimage">
                 <ng-container *ngIf="(message | getimage | async | imageify | async) as srcUrl">
                     <img [src]="srcUrl" alt="Loading image..." class="max-h-80 cursor-pointer"
                         (click)="openImage($event)">
                 </ng-container>
             </ng-container>
+            <span *ngIf="message.isfile">
+                <a #fileDownload (click)="downloadFile(message)" [download]="message.msg_content"
+                    href="javascript:void(0)" class="text-blue-400 underline">{{message.msg_content}}<i
+                        class="pl-2 fa-solid fa-file"></i></a>
+            </span>
         </p>
         <!-- or maybe put them all in one div with the same [class.] conditions and with an added [class.text-right]/[class.text-left] to the emotes container -->
         <!-- flex here on the parent container needed for the [class.] conditions to work -->

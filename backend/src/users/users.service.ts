@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { settings, users } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from '../../../shared/types/db-dtos';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { User } from '../../../shared/types/db-dtos.js';
 
 @Injectable()
 export class UsersService {
@@ -37,7 +37,7 @@ export class UsersService {
                 settings: {
                     create: { // no explicit declarations, simply use default values
                     }
-                }  
+                }
             },
             select: {
                 user_id: true,

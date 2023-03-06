@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from './prisma/prisma.service';
-import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos';
+import { PrismaService } from './prisma/prisma.service.js';
+import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos.js';
 import { emote, notifications } from '@prisma/client';
 
 
@@ -311,7 +311,7 @@ export class AppService {
     }
 
     /**
-     * Insert a new chat message record.
+     * Insert a new image chat message record.
      * 
      * @param message message content
      * @param userId userId of the user who wrote the message
@@ -326,6 +326,42 @@ export class AppService {
                 user_id: userId,
                 chatroom_id: chatroomId,
                 isimage: isimage
+            },
+            include: {
+                users: {
+                    select: {
+                        user_id: true,
+                        display_name: true,
+                        creation_date: true
+                    }
+                },
+                reactions: {
+                    include: {
+                        emote: true,
+                        users: true
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Insert a new file chat message record.
+     * 
+     * @param fileName file name (as the message content)
+     * @param fileId file ID
+     * @param userId userId of the user who wrote the message
+     * @param chatroomId the chatroomId in which the message was written
+     * @returns a @see ChatMessageWithUser
+     */
+    async insertFileMessage(fileName: string, fileId: string, userId: number, chatroomId: number): Promise<ChatMessageWithUser> {
+        return this.prismaService.chat_messages.create({
+            data: {
+                msg_content: fileName,
+                user_id: userId,
+                chatroom_id: chatroomId,
+                isfile: true,
+                file_uuid: fileId
             },
             include: {
                 users: {
