@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { settings } from '../../../../shared/types/db-dtos';
+import { UserSettingsService } from '../services/user-settings.service';
 import { UserService } from '../services/user.services';
 
 @Component({
@@ -18,6 +19,9 @@ export class SettingsMenuComponent implements OnInit {
     @Output()
     settingsMenuClosedEvent = new EventEmitter<boolean>();
 
+    /**
+     * @deprecated
+    */
     @Output()
     applySettingsEvent = new EventEmitter<settings>();
 
@@ -35,8 +39,9 @@ export class SettingsMenuComponent implements OnInit {
         { value: "text-2xl", text: "text-2xl (22px)" },
     ];
 
-    constructor(private userService: UserService) {
-        this.userService.getUserSettings(this.userService.currentUser.userId).subscribe(stts => {
+    constructor(private userService: UserService, private settingsService: UserSettingsService) {
+        this.settingsService.currentUserSettingsSubject$.subscribe(stts => {
+            if (stts == null) return;
             this.userSettings = stts;
             // for now, as a workaround, simply overwrite the existing FormGroup to the correct one
             this.settingsMenuFormGroup = new FormGroup({
@@ -68,6 +73,7 @@ export class SettingsMenuComponent implements OnInit {
         this.userService.updateUserSettings(this.userSettings);
         // emit the user settings
         this.applySettingsEvent.emit(this.userSettings);
+        this.settingsService.currentUserSettingsSubject$.next(this.userSettings);
     }
 
 }

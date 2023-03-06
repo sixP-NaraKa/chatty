@@ -1,11 +1,12 @@
-<app-header (logOutEvent)="logout()" (applySettingsPassthroughEvent)="applySettings($event)"></app-header>
+<app-header (logOutEvent)="logout()"></app-header>
 
 <div id="voiceChatContainer" class="pt-2 pb-4">
     <div>
         <app-slider [slideFromLeft]="true" [showArrowIcons]="false">
             <i class="sliderContentInButtonIcon fa-solid fa-bell"> {{notificationCounter}}</i>
             <i class="sliderContentOutButtonIcon fa-solid fa-bell"> {{notificationCounter}}</i>
-            <app-notification-summary class="contentToSlide" (notificationCounterEvent)="onNotificationCounterChange($event)"></app-notification-summary>
+            <app-notification-summary class="contentToSlide"
+                (notificationCounterEvent)="onNotificationCounterChange($event)"></app-notification-summary>
         </app-slider>
     </div>
     <app-voice-chat [setChatroom]="this.chatroom"></app-voice-chat>
@@ -43,8 +44,8 @@
                 </div>
             </div>
         </div>
-        <div class="chat-content-main overflow-y-auto">
-            <app-chat id="chatWindowDiv" [setChatroom]="chatroom"></app-chat>
+        <div *ngIf="this.chatroom" class="chat-content-main overflow-y-auto">
+            <app-chat id="chatWindowDiv" [setChatroom]="this.chatroom.chatroom_id"></app-chat>
         </div>
         <!-- in case a footer component should be added, e.g. the chat-message form could be done here -->
         <!-- <div class="border border-pink-400 chat-content-footer">footer content</div> -->

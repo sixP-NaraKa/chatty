@@ -16,12 +16,6 @@ export class HeaderComponent implements OnInit {
     @Output()
     userSelectionEvent = new EventEmitter<User>();
 
-    /**
-     * EventEmitter to passthrough the catched "applySettingsEveent" event to the subscribed components.
-     */
-    @Output()
-    applySettingsPassthroughEvent = new EventEmitter<settings>();
-
     showMenu: boolean = false;
 
     currentUser: ApplicationUser;
@@ -33,10 +27,11 @@ export class HeaderComponent implements OnInit {
     }
 
     /**
-     * Emits the logout event to subscribed components.
+     * Logs out the user and emits the logout event to subscribed components for further processing if needed.
      */
     logout() {
         this.logOutEvent.emit(true);
+        this.userService.logout();
     }
 
     /**
@@ -53,9 +48,4 @@ export class HeaderComponent implements OnInit {
     onSettingsMenuClosed() {
         this.showMenu = false;
     }
-
-    applySettingsPassthrough(userSettings: settings) {
-        this.applySettingsPassthroughEvent.emit(userSettings);
-    }
-
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatRoomWithParticipantsExceptSelf, settings, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
+import { UserSettingsService } from '../services/user-settings.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 
@@ -23,12 +24,12 @@ export class ChatPageComponent implements OnInit {
     chatroom!: ChatRoomWithParticipantsExceptSelf;
 
     // locally stored user settings with default values
-    userSettings!: settings;
+    userSettings!: settings | null;
 
     // current user
     currentUser: ApplicationUser;
 
-    constructor(private userService: UserService, private wsService: WebsocketService) {
+    constructor(private userService: UserService, private wsService: WebsocketService, private settingsService: UserSettingsService) {
         this.currentUser = this.userService.currentUser;
 
         // (re)connect the websocket on page reload
@@ -36,11 +37,9 @@ export class ChatPageComponent implements OnInit {
         // give the current User token to authenticate connection
         this.wsService.connect(this.currentUser);
 
-        // fetch initial user settings
-        this.userService.getUserSettings(this.userService.currentUser.userId).subscribe(stts => {
-            // this will (re)trigger the [filterOutEmpty1on1Chats] directive (as it seems) before it gets loaded (?)
-            this.userSettings = stts;
-            this.editChatWindowElementFontSize(stts); // both will have the same values, but this doesn't matter
+        this.userSettings = null;
+        this.settingsService.currentUserSettingsSubject$.subscribe(settings => {
+            this.applyFilterSettings(settings);
         });
     }
 
@@ -48,12 +47,11 @@ export class ChatPageComponent implements OnInit {
     }
 
     /**
-     * Log out the user. Catches the "logoutOutEvent(...)" event from the app-header component.
+     * Log out the user. Catches the "logoutOutEvent(...)" event from the app-header component to do some further "cleanup".
      */
     logout() {
         // document.onclick = null; // otherwise "window" if used
         document.removeAllListeners!("click");
-        this.userService.logout();
     }
 
     /**
@@ -73,36 +71,20 @@ export class ChatPageComponent implements OnInit {
         this.hideDropdown = true;
     }
 
-    applySettings(usrSetts: settings) {
-        // TODO: no idea why after the first time here, both userSettings are ALWAYS the same... makes no sense
-        //       does not matter for the filter changes, but font-size changes need therefore a small,
-        //       rather insignificant workaround, but a workaround nonetheless
-        console.log("passed usersettings", usrSetts, "this.userSettings", this.userSettings);
+    applyFilterSettings(usrSetts: settings) {
+        // console.log("passed usersettings", usrSetts, "this.userSettings", this.userSettings);
         let shouldReload: boolean = false;
-        this.editChatWindowElementFontSize(usrSetts);
 
-        if (this.userSettings.filter !== usrSetts.filter) {
+        if (this.userSettings !== null && this.userSettings.filter !== usrSetts.filter) {
             shouldReload = true;
         }
-        this.userSettings = usrSetts;
+        this.userSettings = { ...usrSetts };
 
         // page reload will, if it happened, repopulate the settings, etc.
         // TODO: either reload the page, or pass an event to the chat-tabs component, to reload the chat-tabs?
         if (shouldReload) {
             window.alert("Filter changes will be applied after a page reload. Reloading page for the changes to take effect...");
             document.location.reload();
-        }
-    }
-
-    editChatWindowElementFontSize(usrSetts: settings) {
-        let chatWindowElement = (document.getElementById("chatWindowDiv") as HTMLDivElement);
-        if (usrSetts.font_size === "default") {
-            chatWindowElement.classList.add("text-xs", "md:text-base");
-            chatWindowElement.classList.remove("text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
-        }
-        else {
-            chatWindowElement.classList.remove("text-xs", "md:text-base", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
-            chatWindowElement.classList.add(`${usrSetts.font_size}`);
         }
     }
 

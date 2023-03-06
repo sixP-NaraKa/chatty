@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { emote, ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction } from '../../../../shared/types/db-dtos';
+import { emote, ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction, settings } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { WebsocketService } from '../services/websocket.service';
+import { UserSettingsService } from '../services/user-settings.service';
 
 @Component({
     selector: 'app-chat',
@@ -15,8 +16,8 @@ export class ChatComponent implements OnInit {
     currentUser: ApplicationUser;
 
     chatroomId: number = -1;
-    @Input() set setChatroom(chatroom: ChatRoomWithParticipantsExceptSelf) {
-        this.chatroomId = chatroom ? chatroom.chatroom_id : -1;
+    @Input() set setChatroom(chatroomId: number) {
+        this.chatroomId = chatroomId;
         this.displayChat(this.chatroomId);
     }
 
@@ -51,7 +52,7 @@ export class ChatComponent implements OnInit {
         }
     ]
 
-    constructor(private userService: UserService, private wsService: WebsocketService) {
+    constructor(private userService: UserService, private wsService: WebsocketService, private settingsService: UserSettingsService) {
         this.currentUser = this.userService.currentUser;
     }
 
@@ -80,6 +81,22 @@ export class ChatComponent implements OnInit {
                 this.deleteFromMessagesById(messageId);
             }
         });
+
+        this.settingsService.currentUserSettingsSubject$.subscribe(settings => {
+            this.applyFontSizeSettings(settings);
+        });
+    }
+
+    applyFontSizeSettings(usrSetts: settings) {
+        let chatWindowElement = (document.getElementById("chatWindowDiv") as HTMLDivElement);
+        if (usrSetts.font_size === "default") {
+            chatWindowElement.classList.add("text-xs", "md:text-base");
+            chatWindowElement.classList.remove("text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
+        }
+        else {
+            chatWindowElement.classList.remove("text-xs", "md:text-base", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
+            chatWindowElement.classList.add(`${usrSetts.font_size}`);
+        }
     }
 
     /**
