@@ -22,7 +22,7 @@
         "@angular/platform-browser-dynamic": "~13.3.0",
         "@angular/router": "~13.3.0",
         "@nestjs/cli": "^8.2.6",
-        "@nestjs/serve-static": "^2.2.2",
+        "@nestjs/serve-static": "^3.0.1",
         "ngx-infinite-scroll": "^13.0.0",
         "ngx-socket-io": "^4.2.0",
         "rxjs": "~7.5.0",
