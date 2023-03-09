@@ -5,7 +5,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Disclaimer
 
-Chat web application (private use).
+Chat web application (intended for private/local use).
 
 This application is more of a "proof of concept", due to it being the first time for me using TypeScript + Angular, Prisma and NestJS.
 
@@ -23,6 +23,7 @@ Here are the things "chatty" can do:
     - copy-paste images
     - display images from URLs (jpg, jpeg, png, gif, tiff, bmp)
     - pagination via infinite scrolling
+    - file sharing/uploading via drag-and-drop into a chat
 - Group chats
     - adding and removing people
 - 1 on 1 voice chats (via WebSockets)
@@ -33,7 +34,6 @@ Here are the things "chatty" can do:
 
 Possible TODOs:
 
-- file sharing
 - group voice chats (not sure if the current implementation would support this to some degree already)
 
 
