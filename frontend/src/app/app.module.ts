@@ -30,7 +30,6 @@ import { ImageifyPipe } from './pipes/imageify.pipe';
 import { ScrollintoviewPipe } from './pipes/scrollintoview.pipe';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { DragAndDropFileDirective } from './directives/drag-and-drop-file.directive';
-import { FilehrefPipe } from './pipes/filehref.pipe';
 import { ToastrModule, ToastNoAnimationModule } from 'ngx-toastr';
 
 const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
@@ -57,7 +56,6 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         ImageifyPipe,
         ScrollintoviewPipe,
         DragAndDropFileDirective,
-        FilehrefPipe,
     ],
     imports: [
         BrowserModule,
