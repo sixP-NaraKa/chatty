@@ -81,19 +81,25 @@ The schema leaves quite a bit to be desired (:D), but it functions as needed for
 In the following a couple of screenshots on how chatty looks like:
 
 Login
+
 ![login](/docs/screenshots/chatty_login.PNG)
 
 Register
+
 ![register](/docs/screenshots/chatty_register.PNG)
 
 Homescreen
+
 ![homescreen](/docs/screenshots/chatty_homescreen.PNG)
 
 Notifications and Calls "menus"
+
 ![menus](/docs/screenshots/chatty_notifications_and_calls.PNG)
 
 Example chat
+
 ![example chat](/docs/screenshots/chatty_example_chat.PNG)
 
 Mobile-friendly layout example
+
 ![mobile-friendly layout example](/docs/screenshots/chatty_mobile_view.PNG)
