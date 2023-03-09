@@ -6,14 +6,14 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class ImageifyPipe implements PipeTransform {
 
-    constructor(private domSanitizer: DomSanitizer) {}
+    constructor(private domSanitizer: DomSanitizer) { }
 
     async transform(value: Blob | null, ...args: unknown[]): Promise<any> {
         if (value === null) return;
-        return await this.imagefiy(value);
+        return await this.imageify(value);
     }
 
-    private async imagefiy(image: Blob): Promise<any> {
+    private async imageify(image: Blob): Promise<any> {
         // const img: Blob = image ?? new File([], "image.png");
         const url: any = await new Promise(resolve => {
             const reader = new FileReader();

@@ -54,11 +54,12 @@ model participants {
 }
 
 model settings {
-    settings_id Int    @id @default(autoincrement())
-    user_id     Int
-    filter      String @default("filter")
-    font_size   String @default("default")
-    users       users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
+    settings_id     Int     @id @default(autoincrement())
+    user_id         Int
+    filter          String  @default("filter")
+    font_size       String  @default("default")
+    embed_yt_videos Boolean @default(true)
+    users           users   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fk")
 }
 
 model emote {

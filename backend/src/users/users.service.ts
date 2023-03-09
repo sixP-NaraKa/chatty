@@ -63,7 +63,8 @@ export class UsersService {
             },
             data: {
                 filter: body.filter,
-                font_size: body.font_size
+                font_size: body.font_size,
+                embed_yt_videos: body.embed_yt_videos
             }
         })
     }

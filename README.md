@@ -24,6 +24,7 @@ Here are the things "chatty" can do:
     - display images from URLs (jpg, jpeg, png, gif, tiff, bmp)
     - pagination via infinite scrolling
     - file sharing/uploading via drag-and-drop into a chat
+    - embed YouTube videos if setting enabled (placed at the end of messages)
 - Group chats
     - adding and removing people
 - 1 on 1 voice chats (via WebSockets)
@@ -94,5 +95,5 @@ Notifications and Calls "menus"
 Example chat
 ![example chat](/docs/screenshots/chatty_example_chat.PNG)
 
-Mobile-friendly layout example (depending on the available space, some more space for the chat window or not)
+Mobile-friendly layout example
 ![mobile-friendly layout example](/docs/screenshots/chatty_mobile_view.PNG)

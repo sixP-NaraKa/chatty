@@ -53,6 +53,8 @@ export class ChatComponent implements OnInit {
         }
     ]
 
+    embedYouTubeVideos: boolean | undefined = undefined;
+
     constructor(private userService: UserService, private wsService: WebsocketService, private settingsService: UserSettingsService,
         private toastrService: ToastrService) {
         this.currentUser = this.userService.currentUser;
@@ -84,8 +86,9 @@ export class ChatComponent implements OnInit {
             }
         });
 
-        this.settingsService.currentUserSettingsSubject$.subscribe(settings => {
-            this.applyFontSizeSettings(settings);
+        this.settingsService.currentUserSettingsSubject$.subscribe(stts => {
+            this.applyFontSizeSettings(stts);
+            this.embedYouTubeVideoSettings(stts);
         });
     }
 
@@ -99,6 +102,10 @@ export class ChatComponent implements OnInit {
             chatWindowElement.classList.remove("text-xs", "md:text-base", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl");
             chatWindowElement.classList.add(`${usrSetts.font_size}`);
         }
+    }
+
+    embedYouTubeVideoSettings(usrSetts: settings) {
+        this.embedYouTubeVideos = usrSetts.embed_yt_videos;
     }
 
     /**

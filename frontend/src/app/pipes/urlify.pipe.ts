@@ -19,11 +19,16 @@ export class UrlifyPipe implements PipeTransform {
      * @returns 
      */
     urlify(msg: string): string {
-        return msg.replace(new RegExp(this.urlRegex), match => {
+        return this.replaceWhenMatched(msg, (match) => {
             const isImageUrl = this.isImageUrl(match);
-            return `<a href="${match}" target="_blank" rel="noreferrer noopener" class="text-blue-500">${match}</a>
+            const html = `<a href="${match}" target="_blank" rel="noreferrer noopener" class="text-blue-500">${match}</a>
             ${isImageUrl ? `<img src="${match}" alt="Loading image..." class="max-h-80">` : ""}`
+            return html;
         });
+    }
+
+    replaceWhenMatched(msg: string, callbackWhenMatched: (match: string) => string): string {
+        return msg.replace(new RegExp(this.urlRegex, "g"), match => callbackWhenMatched(match));
     }
 
     // https://stackoverflow.com/a/19395606 - slightly modified
@@ -39,5 +44,4 @@ export class UrlifyPipe implements PipeTransform {
         //check if the extension matches anything in the list.
         return imageTypes.indexOf(extension) !== -1;
     }
-
 }

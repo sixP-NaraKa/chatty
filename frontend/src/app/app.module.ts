@@ -31,6 +31,7 @@ import { ScrollintoviewPipe } from './pipes/scrollintoview.pipe';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { DragAndDropFileDirective } from './directives/drag-and-drop-file.directive';
 import { ToastrModule, ToastNoAnimationModule } from 'ngx-toastr';
+import { EmbedPipe } from './pipes/embed.pipe';
 
 const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
 
@@ -56,6 +57,7 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         ImageifyPipe,
         ScrollintoviewPipe,
         DragAndDropFileDirective,
+        EmbedPipe,
     ],
     imports: [
         BrowserModule,
@@ -78,7 +80,8 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
     providers: [
         jwtInterceptorProvider,
         WebsocketService,
-        { provide: ErrorHandler, useClass: UnauthorizedErroHandler }
+        { provide: ErrorHandler, useClass: UnauthorizedErroHandler },
+        UrlifyPipe,
     ],
     bootstrap: [AppComponent]
 })

@@ -14,7 +14,17 @@
                     <button class="deleteMessageButton fa-regular fa-trash-can text-red-400"></button>
                 </span>
             </span>
-            <span *ngIf="!message.isimage && !message.isfile" [innerHTML]="message.msg_content | urlify"></span>
+            <span *ngIf="!message.isimage && !message.isfile">
+                <span [innerHTML]="message.msg_content | urlify"></span>
+                <span *ngIf="embedYouTubeVideos">
+                    <span *ngFor="let url of message.msg_content | embed">
+                        <iframe class="max-h-[120px] max-w-full sm:min-h-[240px] sm:min-w-full" [src]="url"
+                            allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+                            allowfullscreen>
+                        </iframe>
+                    </span>
+                </span>
+            </span>
             <ng-container *ngIf="message.isimage">
                 <ng-container *ngIf="(message | getimage | async | imageify | async) as srcUrl">
                     <img [src]="srcUrl" alt="Loading image..." class="max-h-80 cursor-pointer"
