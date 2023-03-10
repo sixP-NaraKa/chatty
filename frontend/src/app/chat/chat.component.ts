@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { emote, ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, MessageReaction, settings } from '../../../../shared/types/db-dtos';
+import { Emote, ChatMessageWithUser, MessageReaction, Settings } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
@@ -25,7 +25,7 @@ export class ChatComponent implements OnInit {
     chatroomMessages = new Array<ChatMessageWithUser>();
     cursor: number = -1;
 
-    preSelectedEmotes: emote[] = [
+    preSelectedEmotes: Emote[] = [
         {
             emote_id: 1,
             emote: "😁",
@@ -92,7 +92,7 @@ export class ChatComponent implements OnInit {
         });
     }
 
-    applyFontSizeSettings(usrSetts: settings) {
+    applyFontSizeSettings(usrSetts: Settings) {
         let chatWindowElement = (document.getElementById("chatWindowDiv") as HTMLDivElement);
         if (usrSetts.font_size === "default") {
             chatWindowElement.classList.add("text-xs", "md:text-base");
@@ -104,7 +104,7 @@ export class ChatComponent implements OnInit {
         }
     }
 
-    embedYouTubeVideoSettings(usrSetts: settings) {
+    embedYouTubeVideoSettings(usrSetts: Settings) {
         this.embedYouTubeVideos = usrSetts.embed_yt_videos;
     }
 
@@ -201,7 +201,7 @@ export class ChatComponent implements OnInit {
         }
     }
 
-    onEmoteSelect(emote: emote) {
+    onEmoteSelect(emote: Emote) {
         this.formGroup.setValue({
             messageInput: this.formGroup.value.messageInput + emote.emote
         });
@@ -255,7 +255,7 @@ export class ChatComponent implements OnInit {
      * @param message the message that was reacted on
      * @param emote the emote which was used
      */
-    onEmoteReaction(message: ChatMessageWithUser, emote: emote) {
+    onEmoteReaction(message: ChatMessageWithUser, emote: Emote) {
         // get messageId and current chatroomId and the selected emoteId
         // save that info into the db, and once we receive back the MessageReaction, we notify the other user via websockets to show that reaction on their side as well
         this.userService.sendEmoteReaction(this.currentUser.userId, message.msg_id, emote.emote_id).subscribe(reaction => {

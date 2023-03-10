@@ -46,7 +46,6 @@ Thumbs.db
 */node_modules
 */.angular/cache
 */dist
-*/src/environments/config.ts
 *.pem
 *.png
 */files/upload

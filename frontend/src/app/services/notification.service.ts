@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import config from 'src/environments/config';
-import { Notification, notifications } from '../../../../shared/types/db-dtos';
+import { Notification, NotificationUnread } from '../../../../shared/types/db-dtos';
 
 
 @Injectable({
@@ -19,7 +19,7 @@ export class NotificationService {
         this.backendHost = config.BACKEND_HOST;
     }
 
-    newUnread(userId: number, notif: notifications) {
+    newUnread(userId: number, notif: NotificationUnread) {
         // save the new notification into the db
         // then sent it to the observers
         this.insertNewNotification(userId, notif.user_id, notif.originated_from, notif.chatroom_id, notif.type, notif.content).subscribe(notif => {

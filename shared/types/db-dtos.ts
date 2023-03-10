@@ -1,5 +1,3 @@
-import { users, chat_messages, chatrooms, participants, settings, emote, reactions, notifications } from '../../backend/node_modules/@prisma/client';
-
 type User = {
     user_id: number,
     display_name: string,
@@ -13,40 +11,106 @@ type UserIdDisplayName = {
     }
 }
 
-type ChatRoomWithParticipantsExceptSelf = { //participants & { // doesn't work for some reason..., but manually does?
+type Chatroom = {
+    chatroom_id: number,
+    name: string | null,
+    isgroup: boolean,
+    created_by: number | null,
+    created_at: Date | null
+};
+
+type ChatRoomWithParticipantsExceptSelf = {
     p_id: number,
     user_id: number,
     chatroom_id: number,
-    chatrooms: chatrooms & {
+    chatrooms: Chatroom & {
         participants: {
-            users: {
-                user_id: number,
-                display_name: string,
-                creation_date: Date
-            };
+            users: User
         }[];
     };
 }
 
-type MessageReaction = (reactions & {
-    emote: emote,
-    users: users
+type Reaction = {
+    reactions_id: number,
+    msg_id: number,
+    emote_id: number,
+    user_id: number | null
+};
+
+type Emote = {
+    emote_id: number,
+    emote: string,
+    name: string
+};
+
+type MessageReaction = (Reaction & {
+    emote: Emote,
+    users: User
 });
 
-type ChatMessageWithUser = chat_messages & {
+type ChatMessage = {
+    msg_id: number,
+    posted_at: Date,
+    msg_content: string,
+    user_id: number,
+    chatroom_id: number,
+    isimage: boolean,
+    isfile: boolean,
+    file_uuid: string
+};
+
+type ChatMessageWithUser = ChatMessage & {
     users: User,
     reactions: MessageReaction[],
 };
 
-type ChatroomWithMessages = chatrooms & {
+type Participant = {
+    p_id: number,
+    user_id: number,
+    chatroom_id: number
+};
+
+type ChatroomWithMessages = Chatroom & {
     chat_messages: ChatMessageWithUser[];
-    participants: participants[];
-}
+    participants: Participant[];
+};
 
-type Notification = notifications & {
-    users: users,
-    originated_from_user: users,
-    chatrooms: chatrooms,
-}
+type NotificationUnread = {
+    notification_id: number,
+    user_id: number,
+    chatroom_id: number,
+    type: string,
+    content: string,
+    originated_from: number,
+    date: Date
+};
 
-export { users, chat_messages, participants, chatrooms, settings, emote, reactions, notifications, User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, UserIdDisplayName, MessageReaction, Notification };
+type Notification = NotificationUnread & {
+    users: User,
+    originated_from_user: User,
+    chatrooms: Chatroom
+};
+
+type Settings = {
+    settings_id: number
+    user_id: number
+    filter: string
+    font_size: string
+    embed_yt_videos: boolean
+};
+
+export {
+    User,
+    Chatroom,
+    Participant,
+    ChatRoomWithParticipantsExceptSelf,
+    ChatroomWithMessages,
+    ChatMessageWithUser,
+    UserIdDisplayName,
+    MessageReaction,
+    NotificationUnread,
+    Notification,
+    Settings,
+    Emote,
+    Reaction,
+};
