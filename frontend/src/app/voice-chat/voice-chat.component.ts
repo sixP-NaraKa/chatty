@@ -51,7 +51,7 @@ export class VoiceChatComponent implements AfterViewInit {
                         this.showNotificationOfVoiceChatRequest(room);
                         this.playRingtone(true);
                         // save a call notification event for the current user,
-                        // regardless if they accpeted, declined or ignored the call request
+                        // regardless if they accepted, declined or ignored the call request
                         this.notificationService.newUnread(this.userService.currentUser.userId, {
                             notification_id: -1, // noop
                             user_id: this.userService.currentUser.userId,
@@ -228,7 +228,7 @@ export class VoiceChatComponent implements AfterViewInit {
         this.callRequestInProgress = true;
         this.callingChatroomUser = this.currentChatroom.chatrooms.participants[0].users.display_name;
         // this.callingChatroomUserId = this.currentChatroom.chatrooms.participants[0].users.user_id;
-        
+
         // this.playRingtone(true); // if we want to play a sound as well, we can do it here
         this.wsService.sendVoiceChatRequest({ type: 'request', chatroomId: this.currentChatroom.chatroom_id, userId: this.userService.currentUser.userId });
     }

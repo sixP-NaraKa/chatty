@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ChatRoomWithParticipantsExceptSelf, settings, User } from '../../../../shared/types/db-dtos';
+import { ChatRoomWithParticipantsExceptSelf, Settings, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserSettingsService } from '../services/user-settings.service';
 import { UserService } from '../services/user.services';
@@ -24,7 +24,7 @@ export class ChatPageComponent implements OnInit {
     chatroom!: ChatRoomWithParticipantsExceptSelf;
 
     // locally stored user settings with default values
-    userSettings!: settings | null;
+    userSettings!: Settings | null;
 
     // current user
     currentUser: ApplicationUser;
@@ -71,7 +71,7 @@ export class ChatPageComponent implements OnInit {
         this.hideDropdown = true;
     }
 
-    applyFilterSettings(usrSetts: settings) {
+    applyFilterSettings(usrSetts: Settings) {
         // console.log("passed usersettings", usrSetts, "this.userSettings", this.userSettings);
         let shouldReload: boolean = false;
 

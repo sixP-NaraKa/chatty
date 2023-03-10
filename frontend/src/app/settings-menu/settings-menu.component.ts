@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { settings } from '../../../../shared/types/db-dtos';
+import { Settings } from '../../../../shared/types/db-dtos';
 import { UserSettingsService } from '../services/user-settings.service';
 import { UserService } from '../services/user.services';
 
@@ -11,7 +11,7 @@ import { UserService } from '../services/user.services';
 })
 export class SettingsMenuComponent implements OnInit {
 
-    userSettings!: settings;
+    userSettings!: Settings;
 
     @Input()
     shouldShowMenu: boolean = false;
@@ -23,7 +23,7 @@ export class SettingsMenuComponent implements OnInit {
      * @deprecated
     */
     @Output()
-    applySettingsEvent = new EventEmitter<settings>();
+    applySettingsEvent = new EventEmitter<Settings>();
 
     settingsMenuFormGroup: FormGroup = new FormGroup({
         filterRadio: new FormControl(this.userSettings?.filter, Validators.required),

@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import config from "src/environments/config";
-import { settings, ChatMessageWithUser, ChatroomWithMessages, ChatRoomWithParticipantsExceptSelf, User, emote, MessageReaction } from "../../../../shared/types/db-dtos";
+import { Settings, ChatMessageWithUser, ChatRoomWithParticipantsExceptSelf, User, Emote, MessageReaction } from "../../../../shared/types/db-dtos";
 import { ApplicationUser, AuthService } from "../auth/auth.service";
 
 @Injectable({
@@ -41,8 +41,8 @@ export class UserService {
 
     /* FETCHING OF DATA */
 
-    getUserSettings(userId: number): Observable<settings> {
-        return this.http.get<settings>(`${this.backendHost}/api/user/settings?user_id=${userId}`);
+    getUserSettings(userId: number): Observable<Settings> {
+        return this.http.get<Settings>(`${this.backendHost}/api/user/settings?user_id=${userId}`);
     }
 
     getRegisteredUsers(userId: number) {
@@ -85,13 +85,13 @@ export class UserService {
         return this.http.get<number>(`${this.backendHost}/api/chat/chatmessages/count?chatroom_id=${chatroomId}&user_id=${userId}`);
     }
 
-    getAvailableEmotes(userId: number): Observable<emote[]> {
-        return this.http.get<emote[]>(`${this.backendHost}/api/emotes?user_id=${userId}`);
+    getAvailableEmotes(userId: number): Observable<Emote[]> {
+        return this.http.get<Emote[]>(`${this.backendHost}/api/emotes?user_id=${userId}`);
     }
 
     /* INSERTING / EDITING OF DATA */
 
-    updateUserSettings(userSettings: settings) {
+    updateUserSettings(userSettings: Settings) {
         this.http.post<any>(`${this.backendHost}/api/user/update/settings?user_id=${userSettings.user_id}`, userSettings).subscribe(); // no-op
     }
 

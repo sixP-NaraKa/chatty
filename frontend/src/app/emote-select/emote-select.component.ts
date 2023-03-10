@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { emote } from '../../../../shared/types/db-dtos';
+import { Emote } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
 
 @Component({
@@ -13,13 +13,13 @@ export class EmoteSelectComponent implements AfterViewInit {
     showEmotesMenu: boolean = false;
 
     @Output()
-    emoteSelectedEvent = new EventEmitter<emote>();
+    emoteSelectedEvent = new EventEmitter<Emote>();
 
     emoteSearchInputElement!: HTMLInputElement;
 
     // emotes
-    availableEmotes = new Array<emote>();
-    filteredEmotes = new Array<emote>();
+    availableEmotes = new Array<Emote>();
+    filteredEmotes = new Array<Emote>();
 
     constructor(private userService: UserService) { }
 
@@ -36,7 +36,7 @@ export class EmoteSelectComponent implements AfterViewInit {
 
     }
 
-    emoteSelect(emote: emote) {
+    emoteSelect(emote: Emote) {
         this.emoteSelectedEvent.emit(emote);
     }
 

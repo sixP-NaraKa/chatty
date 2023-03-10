@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { User, UserIdDisplayName, users } from '../../../../shared/types/db-dtos';
+import { User, UserIdDisplayName } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
 
 @Component({
