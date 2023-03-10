@@ -55,7 +55,7 @@ See also in `frontend/src` > `package.json` > `npm run sas`.
 
 File: [package.json](https://github.com/sixP-NaraKa/chatty/blob/main/frontend/package.json).
 
-Additionally, within the `src/environments` directory a `config.ts` file is expected (needs to be created), which exports a property called `BACKEND_HOST`, which is used for the WebSocket implementation.
+Additionally, within the `src/environments` directory a `config.ts` file is present, which exports a property called `BACKEND_HOST`, which is used for the WebSocket implementation. This `BACKEND_HOST` property needs to be adjusted to your needs.
 
 ### Backend:
 
