@@ -1,9 +1,6 @@
-import { Body, Controller, Delete, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, Request, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { emote, notifications, settings, users } from '@prisma/client';
+import { Body, Controller, Delete, Get, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service.js';
-import { ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos.js';
-import { LocalAuthGuard } from './auth/local-auth.guard.js';
-import { AuthService } from './auth/auth.service.js';
+import { ChatRoomWithParticipantsExceptSelf, ChatMessageWithUser, MessageReaction, Notification, Settings, Emote } from '../../shared/types/db-dtos.js';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users/users.service.js';
 import * as fs from 'fs';
@@ -11,29 +8,19 @@ import { randomUUID } from 'crypto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fileType from "file-type";
 import { FileTypeResult } from 'file-type/core';
-import { BadRequestException, Res } from '@nestjs/common';
+import { Res } from '@nestjs/common';
 import { Response } from 'express';
+import { ChatroomGuard } from './guards/chatroom.guard.js';
 
 @Controller()
+@UseGuards(AuthGuard())
 export class AppController {
 
     imageFilesFolder: string = "files/images";
     filesUploadFolder: string = "files/upload";
 
-    constructor(private readonly appService: AppService, private authService: AuthService, private userService: UsersService) { }
+    constructor(private readonly appService: AppService, private userService: UsersService) { }
 
-    @UseGuards(LocalAuthGuard)
-    @Post("/auth/login")
-    async login(@Request() req) {
-        return this.authService.login(req.user as users);
-    }
-
-    @Post("/auth/create")
-    async createUser(@Body() body: { username: string, password: string }) {
-        return this.authService.createUser(body)
-    }
-
-    @UseGuards(AuthGuard())
     @Get("/api/user/users")
     async getAllUsers() {
         return await this.appService.getAllUsers();
@@ -41,55 +28,47 @@ export class AppController {
 
     /* USER SETTINGS */
 
-    @UseGuards(AuthGuard())
     @Get("/api/user/settings")
-    async getUserSettings(@Query("user_id", ParseIntPipe) userId: number) {
+    async getUserSettings(@Query("userId", ParseIntPipe) userId: number) {
         return await this.userService.getUserSettings(userId);
     }
 
-    @UseGuards(AuthGuard())
     @Post("/api/user/update/settings")
-    async updateUserSettings(@Body() body: settings) {
+    async updateUserSettings(@Body() body: Settings) {
         return await this.userService.updateUserSettings(body);
     }
 
     /* CHATROOMS */
 
-    @UseGuards(AuthGuard())
     @Get("/api/user/chatrooms")
-    async getChatroomsForUserWithParticipantsExceptSelf(@Query("user_id", ParseIntPipe) userId: number): Promise<ChatRoomWithParticipantsExceptSelf[]> {
+    async getChatroomsForUserWithParticipantsExceptSelf(@Query("userId", ParseIntPipe) userId: number): Promise<ChatRoomWithParticipantsExceptSelf[]> {
         return await this.appService.getChatroomsForUserWithParticipantsExceptSelf(userId);
     }
 
-    @UseGuards(AuthGuard())
     @Get("/api/user/chatroom")
-    async getSingleChatroomForUserWithParticipantsExceptSelf(@Query("user_id", ParseIntPipe) userId: number,
-        @Query("chatroom_id", ParseIntPipe) chatroomId: number) {
+    async getSingleChatroomForUserWithParticipantsExceptSelf(@Query("userId", ParseIntPipe) userId: number,
+        @Query("chatroomId", ParseIntPipe) chatroomId: number) {
         return await this.appService.getSingleChatroomForUserWithParticipantsExceptSelf(userId, chatroomId);
     }
 
-    @UseGuards(AuthGuard())
     @Get("/api/user/chatroom/1on1")
-    async getSingleChatroomforUserByUserAndParticipantUserId(@Query("user_id", ParseIntPipe) userId: number,
+    async getSingleChatroomforUserByUserAndParticipantUserId(@Query("userId", ParseIntPipe) userId: number,
         @Query("participant_user_id", ParseIntPipe) participantUserId: number) {
         return await this.appService.getSingleChatroomForUserWithParticipantUserId(userId, participantUserId);
     }
 
-    @UseGuards(AuthGuard())
     @Get("/api/user/chatrooms/create")
-    async createChatroomWithParticipants(@Query("user_id", ParseIntPipe) userId: number,
+    async createChatroomWithParticipants(@Query("userId", ParseIntPipe) userId: number,
         @Query("participant_user_id", new ParseArrayPipe({ items: Number, separator: "," })) participantUserIds: number[],
         @Query("is_group", ParseBoolPipe) isGroup: boolean, @Query("group_name") groupName?: string | null): Promise<ChatRoomWithParticipantsExceptSelf> {
         return await this.appService.createChatroomWithParticipants(userId, participantUserIds, isGroup, groupName);
     }
 
-    @UseGuards(AuthGuard())
     @Post("/api/user/chatrooms/groups/remove")
     async removeUserFromGroupChat(@Body() body: { userId: number, chatroomId: number }): Promise<number> {
         return await this.appService.removeUserFromGroupChat(body.userId, body.chatroomId);
     }
 
-    @UseGuards(AuthGuard())
     @Get("/api/user/chatrooms/groups/add")
     async addUsersToGroupChat(@Query("userIdsToAdd", new ParseArrayPipe({ items: Number, separator: "," })) userIds: number[],
         @Query("chatroomId", ParseIntPipe) chatroomId: number) {
@@ -98,21 +77,20 @@ export class AppController {
 
     /* CHAT MESSAGES */
 
-    @UseGuards(AuthGuard())
     @Get("/api/chat/chatmessages")
-    async getMessagesForChatroom(@Query("chatroom_id", ParseIntPipe) chatroomId: number, @Query("oldCursor", ParseIntPipe) oldCursor: number): Promise<[ChatMessageWithUser[], number]> {
+    async getMessagesForChatroom(@Query("chatroomId", ParseIntPipe) chatroomId: number, @Query("oldCursor", ParseIntPipe) oldCursor: number): Promise<[ChatMessageWithUser[], number]> {
         return await this.appService.getAllChatMessagesByChatroomId(chatroomId, oldCursor);
     }
 
-    @UseGuards(AuthGuard())
+    @UseGuards(ChatroomGuard)
     @Post("/api/chat/create/chatmessage")
     async insertMessage(@Body() body: { message: string, userId: number, chatroomId: number }): Promise<ChatMessageWithUser> {
         return await this.appService.insertMessage(body.message, body.userId, body.chatroomId);
     }
 
-    @UseGuards(AuthGuard())
+    @UseGuards(ChatroomGuard)
     @Delete("/api/chat/delete/chatmessage")
-    async deleteMessage(@Body() body: { messageId: number, userId: number }): Promise<boolean> {
+    async deleteMessage(@Body() body: { messageId: number, userId: number, chatroomId: number }): Promise<boolean> {
         const message = await this.appService.getMessageById(body.messageId);
         if (!message || message.user_id !== body.userId) {
             return false;
@@ -122,16 +100,15 @@ export class AppController {
 
     /* IMAGE MESSAGES */
 
-    @UseGuards(AuthGuard())
+    @UseGuards(ChatroomGuard)
     @UseInterceptors(FileInterceptor("image"))
     @Post("/api/chat/create/chatimagemessage")
-    async insertImageMessage(@Query("chatroom_id", ParseIntPipe) chatroomId: number, @Query("user_id", ParseIntPipe) userId: number, @UploadedFile() image: Express.Multer.File): Promise<ChatMessageWithUser> {
+    async insertImageMessage(@Query("chatroomId", ParseIntPipe) chatroomId: number, @Query("userId", ParseIntPipe) userId: number, @UploadedFile() image: Express.Multer.File): Promise<ChatMessageWithUser> {
         var uuid: string = randomUUID();
         fs.writeFileSync(`${this.imageFilesFolder}/${uuid}.png`, image.buffer, { encoding: "binary" });
         return await this.appService.insertMessage(uuid, userId, chatroomId, true);
     }
 
-    @UseGuards(AuthGuard())
     @Get("/api/chat/chatimage")
     async getImageMessage(@Query("imageId") imageId: string): Promise<StreamableFile> {
         const file = fs.createReadStream(`${this.imageFilesFolder}/${imageId}.png`, { autoClose: true });
@@ -141,7 +118,6 @@ export class AppController {
 
     /* FILE UPLOAD */
 
-    @UseGuards(AuthGuard())
     @UseInterceptors(FileInterceptor("file"))
     @Post("/api/file/validate")
     async validateFileType(@UploadedFile() file: Express.Multer.File): Promise<[isValid: boolean, fileType: FileTypeResult]> {
@@ -151,11 +127,11 @@ export class AppController {
         return [true, ft];
     }
 
-    // TODO: add backend validation of the files, e.g. file size, extension/mimetype
-    @UseGuards(AuthGuard())
+    // TODO: add backend validation of file size
+    @UseGuards(ChatroomGuard)
     @UseInterceptors(FileInterceptor("file"))
     @Post("/api/chat/create/chatfilemessage")
-    async insertFileMessage(@Res() res: Response, @Query("chatroom_id", ParseIntPipe) chatroomId: number, @Query("user_id", ParseIntPipe) userId: number, @UploadedFile() file: Express.Multer.File): Promise<ChatMessageWithUser> {
+    async insertFileMessage(@Res() res: Response, @Query("chatroomId", ParseIntPipe) chatroomId: number, @Query("userId", ParseIntPipe) userId: number, @UploadedFile() file: Express.Multer.File): Promise<ChatMessageWithUser> {
         const [isValid, ft] = await this.validateFileType(file);
         if (!isValid) {
             // check if the result is null and the file.name has extension ".txt"
@@ -179,7 +155,6 @@ export class AppController {
         res.status(201).send(m);
     }
 
-    @UseGuards(AuthGuard())
     @Get("/api/chat/chatfile")
     async getFileMessage(@Query("fileId") fileId: string): Promise<StreamableFile> {
         const file = fs.createReadStream(`${this.filesUploadFolder}/${fileId}`, { autoClose: true });
@@ -189,39 +164,34 @@ export class AppController {
 
     /* EMOTES */
 
-    @UseGuards(AuthGuard())
     @Get("/api/emotes")
-    async getAvailableEmotes(): Promise<emote[]> {
+    async getAvailableEmotes(): Promise<Emote[]> {
         return await this.appService.getAllAvailableEmotes();
     }
 
-    @UseGuards(AuthGuard())
     @Post("/api/chat/create/chatmessage/reaction")
     async insertEmoteReaction(@Body() body: { messageId: number, userId: number, emoteId: number }): Promise<MessageReaction> {
         return await this.appService.insertEmoteReaction(body.messageId, body.userId, body.emoteId);
     }
 
-    @UseGuards(AuthGuard())
     @Get("/api/chat/chatmessages/count")
-    async getChatroomMessageCount(@Query("chatroom_id", ParseIntPipe) chatroomId: number): Promise<number> {
+    async getChatroomMessageCount(@Query("chatroomId", ParseIntPipe) chatroomId: number): Promise<number> {
         return await this.appService.getChatroomMessagesCount(chatroomId);
     }
 
     /* NOTIFICATIONS */
 
-    @UseGuards(AuthGuard())
     @Get("/api/user/notifications")
-    async getAllNotificationsForUser(@Query("user_id", ParseIntPipe) userId: number): Promise<Notification[]> {
+    async getAllNotificationsForUser(@Query("userId", ParseIntPipe) userId: number): Promise<Notification[]> {
         return await this.appService.getAllNotificationsForUser(userId);
     }
 
-    @UseGuards(AuthGuard())
     @Post("/api/user/notifications/new")
     async insertNewNotification(@Body() body: { userId: number, originatedFrom: number, chatroomId: number, type: string, content: string }): Promise<Notification> {
+        console.log(body);
         return await this.appService.insertNewNotification(body.userId, body.originatedFrom, body.chatroomId, body.type, body.content);
     }
 
-    @UseGuards(AuthGuard())
     @Post("/api/user/notifications/delete")
     async deleteNotification(@Body() body: { notificationId: number }) {
         return await this.appService.deleteNotification(body.notificationId);

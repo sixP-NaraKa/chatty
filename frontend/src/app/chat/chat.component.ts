@@ -19,6 +19,12 @@ export class ChatComponent implements OnInit {
     chatroomId: number = -1;
     @Input() set setChatroom(chatroomId: number) {
         this.chatroomId = chatroomId;
+        // re-autofocus the message input box upon chat loads
+        // revisit once the overall HTML structure has been reworked/restructured
+        const input = (document.getElementById("messageInput") as HTMLInputElement);
+        if (input !== null) {
+            input.focus();
+        }
         this.displayChat(this.chatroomId);
     }
 
@@ -127,7 +133,7 @@ export class ChatComponent implements OnInit {
      * Fetches and displays the (next) chat messages in the UI.
      */
     fetchAndDisplayChatMessages(chatroomIdToLoad: number, oldCursor: number) {
-        return this.userService.getChatroomMessages(chatroomIdToLoad, this.currentUser.userId, oldCursor).subscribe(chatroomData => {
+        return this.userService.getChatroomMessages(chatroomIdToLoad, oldCursor).subscribe(chatroomData => {
             const [chat_messages, cursor] = chatroomData;
             this.chatroomMessages.unshift(...chat_messages);
             this.cursor = cursor;
@@ -161,7 +167,7 @@ export class ChatComponent implements OnInit {
     });
     sendMessage() {
         if (this.chatroomId !== -1) {
-            this.userService.sendMessage(this.formGroup.value.messageInput, this.currentUser.userId, this.chatroomId)
+            this.userService.sendMessage(this.formGroup.value.messageInput, this.chatroomId)
                 .subscribe(msg => this.messageSubscribeCallback(msg));
         }
     }
@@ -173,7 +179,7 @@ export class ChatComponent implements OnInit {
      */
     sendImageMessage(image: File) {
         if (this.chatroomId !== -1) {
-            this.userService.sendImageMessage(this.currentUser.userId, this.chatroomId, image)
+            this.userService.sendImageMessage(this.chatroomId, image)
                 .subscribe(msg => this.messageSubscribeCallback(msg));
         }
     }
@@ -258,7 +264,7 @@ export class ChatComponent implements OnInit {
     onEmoteReaction(message: ChatMessageWithUser, emote: Emote) {
         // get messageId and current chatroomId and the selected emoteId
         // save that info into the db, and once we receive back the MessageReaction, we notify the other user via websockets to show that reaction on their side as well
-        this.userService.sendEmoteReaction(this.currentUser.userId, message.msg_id, emote.emote_id).subscribe(reaction => {
+        this.userService.sendEmoteReaction(message.msg_id, emote.emote_id).subscribe(reaction => {
             this.addEmoteReactionToMessage(reaction);
             this.wsService.sendEmoteReaction(this.chatroomId, message.msg_id, this.currentUser.userId, reaction); // send the updates to the other participant(s)
         });
@@ -319,7 +325,7 @@ export class ChatComponent implements OnInit {
      * @param message the message to delete
      */
     deleteMessage(message: ChatMessageWithUser) {
-        this.userService.deleteMessage(this.currentUser.userId, message.msg_id).subscribe(hasDeleted => {
+        this.userService.deleteMessage(message.msg_id, this.chatroomId).subscribe(hasDeleted => {
             if (!hasDeleted) {
                 return;
             }

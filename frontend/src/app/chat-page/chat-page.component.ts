@@ -95,7 +95,7 @@ export class ChatPageComponent implements OnInit {
      */
     showUsersForGroupChat() {
         if (this.groupChatParticipants.length === 0) {
-            this.hideDropdown = false;
+            this.hideDropdown = !this.hideDropdown;
             this.groupChatParticipants = new Array<User>();
             this.chatroom.chatrooms.participants.forEach(user => this.groupChatParticipants.push(user.users));
         }
@@ -118,7 +118,7 @@ export class ChatPageComponent implements OnInit {
         // + remove the chat from the chats list (only important if the user is logged in)
         this.wsService.removeUserFromChatroom(user.user_id, chatroomIdToRemoveParticipantFrom);
 
-        this.userService.removeUserFromGroupChat(this.userService.currentUser.userId, user.user_id, chatroomIdToRemoveParticipantFrom).subscribe(
+        this.userService.removeUserFromGroupChat(user.user_id, chatroomIdToRemoveParticipantFrom).subscribe(
             amountDeleted => {
                 if (amountDeleted > 0) {
                     // remove user from the locally stored chatroom (only important until a page reload is done)
@@ -146,7 +146,7 @@ export class ChatPageComponent implements OnInit {
         this.chatroom.chatrooms.participants.push({ users: user });
 
         // notify user via websocket(s), and store in db
-        this.userService.addUsersToGroupChat(this.currentUser.userId, user.user_id, chatroomIdToAddUsersTo).subscribe(_ => {
+        this.userService.addUsersToGroupChat(user.user_id, chatroomIdToAddUsersTo).subscribe(_ => {
             this.wsService.addUserToChatroom(this.chatroom, user.user_id);
         });
     }

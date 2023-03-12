@@ -25,7 +25,7 @@ export class EmoteSelectComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         // fetch emotes
-        this.userService.getAvailableEmotes(this.userService.currentUser.userId).subscribe(emotes => {
+        this.userService.getAvailableEmotes().subscribe(emotes => {
             this.availableEmotes = emotes;
             this.filteredEmotes = this.availableEmotes;
         });

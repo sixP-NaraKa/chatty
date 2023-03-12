@@ -28,7 +28,7 @@ export class UserSearchComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.searchResultsetDivElement = (document.getElementById(this.searchResultSetDivElementId) as HTMLDivElement);
 
-        this.userService.getRegisteredUsers(this.userService.currentUser.userId).subscribe(users => {
+        this.userService.getRegisteredUsers().subscribe(users => {
             this.registeredUsers = users;
             (document.getElementById(this.userSearchInputElementId) as any).onkeyup = () => this.filterUsers();
         });

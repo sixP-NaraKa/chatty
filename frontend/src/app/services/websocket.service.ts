@@ -66,7 +66,7 @@ export class WebsocketService {
     }
 
     createChatroom(chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]) {
-        this.socket.emit("create:chatroom", chatroom, participantUserIds);
+        this.socket.emit("create:chatroom", { chatroom: chatroom, userIds: participantUserIds });
     }
 
     removeUserFromChatroom(userIdToRemove: number, chatroomId: number) {
@@ -78,11 +78,11 @@ export class WebsocketService {
     }
 
     listenForRemoveChatroom() {
-        return this.socket.fromEvent<[userId: number, chatroomId: number]>("removed-from:chatroom")
+        return this.socket.fromEvent<number>("removed-from:chatroom")
     }
 
     getNewChatroom() {
-        return this.socket.fromEvent<[chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]]>("new:chatroom");
+        return this.socket.fromEvent<ChatRoomWithParticipantsExceptSelf>("new:chatroom");
     }
 
     /* WebRTC WebSocket events (once call request accepted) */

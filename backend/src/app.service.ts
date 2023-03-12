@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service.js';
-import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification } from '../../shared/types/db-dtos.js';
-import { emote, notifications } from '@prisma/client';
+import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification, Emote } from '../../shared/types/db-dtos.js';
 
 
 const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
@@ -15,13 +14,7 @@ const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
                 include: {
                     participants: {
                         select: {
-                            users: {
-                                select: {
-                                    user_id: true,
-                                    display_name: true,
-                                    creation_date: true
-                                },
-                            }
+                            users: includeUser()
                         },
                         where: {
                             NOT: {
@@ -31,6 +24,17 @@ const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
                     }
                 }
             }
+        }
+    }
+}
+
+const includeUser = () => {
+    return {
+        select: {
+            user_id: true,
+            display_name: true,
+            creation_date: true,
+            password: false
         }
     }
 }
@@ -48,14 +52,7 @@ export class AppService {
      * @returns @see Promise<User[]>: a User[] of all registered users
      */
     async getAllUsers(): Promise<User[]> {
-        return await this.prismaService.users.findMany({
-            select: {
-                user_id: true,
-                display_name: true,
-                creation_date: true,
-                password: false
-            }
-        });
+        return await this.prismaService.users.findMany(includeUser());
     }
 
     /**
@@ -76,13 +73,7 @@ export class AppService {
                     include: {
                         participants: {
                             select: {
-                                users: {
-                                    select: {
-                                        user_id: true,
-                                        display_name: true,
-                                        creation_date: true
-                                    },
-                                }
+                                users: includeUser()
                             },
                             where: {
                                 NOT: {
@@ -160,13 +151,7 @@ export class AppService {
                 participants: true,
                 chat_messages: {
                     include: {
-                        users: {
-                            select: {
-                                user_id: true,
-                                display_name: true,
-                                creation_date: true
-                            }
-                        },
+                        users: includeUser(),
                         reactions: {
                             select: {
                                 reactions_id: true,
@@ -174,7 +159,7 @@ export class AppService {
                                 emote_id: true,
                                 user_id: true,
                                 emote: true,
-                                users: true
+                                users: includeUser()
                             } // or as seen below, simply "include: { emote: true }" also works
                         }
                     },
@@ -219,17 +204,11 @@ export class AppService {
                 posted_at: "asc"
             },
             include: {
-                users: {
-                    select: {
-                        user_id: true,
-                        display_name: true,
-                        creation_date: true
-                    }
-                },
+                users: includeUser(),
                 reactions: {
                     include: {
                         emote: true,
-                        users: true
+                        users: includeUser()
                     }
                 }
             }
@@ -310,6 +289,20 @@ export class AppService {
         });
     }
 
+    async isUserPartOfChatroom(userId: number, chatroomId: number): Promise<boolean> {
+        const participant = await this.prismaService.participants.findFirst({
+            where: {
+                user_id: userId,
+                AND: {
+                    chatrooms: {
+                        chatroom_id: chatroomId
+                    }
+                }
+            }
+        });
+        return participant.user_id === userId && participant.chatroom_id === chatroomId;
+    }
+
     /**
      * Insert a new image chat message record.
      * 
@@ -328,17 +321,11 @@ export class AppService {
                 isimage: isimage
             },
             include: {
-                users: {
-                    select: {
-                        user_id: true,
-                        display_name: true,
-                        creation_date: true
-                    }
-                },
+                users: includeUser(),
                 reactions: {
                     include: {
                         emote: true,
-                        users: true
+                        users: includeUser()
                     }
                 }
             }
@@ -364,17 +351,11 @@ export class AppService {
                 file_uuid: fileId
             },
             include: {
-                users: {
-                    select: {
-                        user_id: true,
-                        display_name: true,
-                        creation_date: true
-                    }
-                },
+                users: includeUser(),
                 reactions: {
                     include: {
                         emote: true,
-                        users: true
+                        users: includeUser()
                     }
                 }
             }
@@ -403,7 +384,7 @@ export class AppService {
                 reactions: {
                     include: {
                         emote: true,
-                        users: true
+                        users: includeUser()
                     }
                 }
             }
@@ -441,13 +422,13 @@ export class AppService {
             },
             include: {
                 emote: true,
-                users: true
+                users: includeUser()
             }
         });
     }
 
     /* EMOTE fetching */
-    async getAllAvailableEmotes(): Promise<emote[]> {
+    async getAllAvailableEmotes(): Promise<Emote[]> {
         return this.prismaService.emote.findMany();
     }
 
@@ -465,8 +446,8 @@ export class AppService {
                 user_id: userId
             },
             include: {
-                users: true,
-                originated_from_user: true,
+                users: includeUser(),
+                originated_from_user: includeUser(),
                 chatrooms: true
             },
             orderBy: {
@@ -494,8 +475,8 @@ export class AppService {
                 content: content
             },
             include: {
-                users: true,
-                originated_from_user: true,
+                users: includeUser(),
+                originated_from_user: includeUser(),
                 chatrooms: true
             }
         });

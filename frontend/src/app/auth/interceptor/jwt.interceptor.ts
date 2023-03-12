@@ -3,7 +3,8 @@ import {
     HttpRequest,
     HttpHandler,
     HttpEvent,
-    HTTP_INTERCEPTORS
+    HTTP_INTERCEPTORS,
+    HttpParams
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
@@ -24,6 +25,7 @@ export class JwtInterceptor implements HttpInterceptor {
                 setHeaders: {
                     "Authorization": `Bearer ${currentUser.access_token}`
                 },
+                params: new HttpParams().set("userId", currentUser.userId)
                 // withCredentials: true
             });
             // console.log("cloned request", request);

@@ -19,24 +19,24 @@ export class NotificationService {
         this.backendHost = config.BACKEND_HOST;
     }
 
-    newUnread(userId: number, notif: NotificationUnread) {
+    newUnread(notif: NotificationUnread) {
         // save the new notification into the db
         // then sent it to the observers
-        this.insertNewNotification(userId, notif.user_id, notif.originated_from, notif.chatroom_id, notif.type, notif.content).subscribe(notif => {
+        this.insertNewNotification(notif.user_id, notif.originated_from, notif.chatroom_id, notif.type, notif.content).subscribe(notif => {
             this.unreadNotificationSource.next(notif);
         });
     }
 
-    getAllNotificationsForUser(userId: number) {
-        return this.http.get<Notification[]>(`${this.backendHost}/api/user/notifications?user_id=${userId}`);
+    getAllNotificationsForUser() {
+        return this.http.get<Notification[]>(`${this.backendHost}/api/user/notifications`);
     }
 
-    insertNewNotification(userId: number, forUser: number, originatedFrom: number, chatroomId: number, type: string, content: string) {
-        return this.http.post<Notification>(`${this.backendHost}/api/user/notifications/new?user_id=${userId}`, { userId: forUser, originatedFrom: originatedFrom, chatroomId: chatroomId, type: type, content: content });
+    insertNewNotification(forUser: number, originatedFrom: number, chatroomId: number, type: string, content: string) {
+        return this.http.post<Notification>(`${this.backendHost}/api/user/notifications/new`, { userId: forUser, originatedFrom: originatedFrom, chatroomId: chatroomId, type: type, content: content });
     }
 
-    deleteNotification(userId: number, notificationId: number) {
-        return this.http.post(`${this.backendHost}/api/user/notifications/delete?user_id=${userId}`, { notificationId: notificationId });
+    deleteNotification(notificationId: number) {
+        return this.http.post(`${this.backendHost}/api/user/notifications/delete`, { notificationId: notificationId });
     }
 
 }

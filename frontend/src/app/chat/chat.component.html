@@ -58,7 +58,7 @@
         class="form-element mb-0 border-t-2 border-gray-700 h-full">
         <input id="messageInput" required formControlName="messageInput" (paste)="onPaste($event)"
             class="bg-transparent w-[75%] h-full px-2 placeholder:text-violet-200 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden border-r-2 border-gray-700"
-            placeholder="Write your message..." />
+            placeholder="Write your message..." autofocus />
         <button type="button" id="emotesButton" class="w-[7.5%] h-full text-yellow-300" (click)="onEmoteMenu()">
             <i class="fa fa-solid fa-face-grin"></i>
             <i class="fa fa-solid fa-face-kiss"></i>

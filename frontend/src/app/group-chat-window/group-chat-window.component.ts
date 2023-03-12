@@ -61,7 +61,7 @@ export class GroupChatWindowComponent implements OnInit {
         for (let user of this.selectedUsers) {
             groupChatParticipantUserIds.push(user.user_id);
         }
-        this.userService.createChatroom(this.userService.currentUser.userId, groupChatParticipantUserIds, true, groupChatName).subscribe(chatroom => {
+        this.userService.createChatroom(groupChatParticipantUserIds, true, groupChatName).subscribe(chatroom => {
             this.closeMenu();
             this.wsService.createChatroom(chatroom, groupChatParticipantUserIds);
             this.groupChatCreatedEvent.emit(chatroom);
