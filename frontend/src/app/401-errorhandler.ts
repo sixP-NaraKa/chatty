@@ -16,7 +16,7 @@ export class UnauthorizedErroHandler implements ErrorHandler {
 
     handleError(error: any): void {
         console.error(error);
-        this.toastrService.error(error.error ?? error.message, "Error occurred");
+        this.toastrService.error(error.error?.error ?? error.message, "Error occurred");
         if (error instanceof HttpErrorResponse && error.status === 401) {
             this.ngZone.run(() => {
                 window.alert("Unauthorized access. Please login again.");
