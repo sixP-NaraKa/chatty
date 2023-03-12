@@ -47,12 +47,12 @@ export class VoiceChatComponent implements AfterViewInit {
         this.wsService.getVoiceChatRequest().subscribe(async msg => {
             switch (msg.type) {
                 case "request":
-                    this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroomId).subscribe(room => {
+                    this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(msg.chatroomId).subscribe(room => {
                         this.showNotificationOfVoiceChatRequest(room);
                         this.playRingtone(true);
                         // save a call notification event for the current user,
                         // regardless if they accepted, declined or ignored the call request
-                        this.notificationService.newUnread(this.userService.currentUser.userId, {
+                        this.notificationService.newUnread({
                             notification_id: -1, // noop
                             user_id: this.userService.currentUser.userId,
                             originated_from: msg.userId,
@@ -68,7 +68,7 @@ export class VoiceChatComponent implements AfterViewInit {
                     this.stopRingtone();
                     this.callRequestInProgress = false;
                     await this.callService.call(msg.chatroomId, true); // here we are the initiator/caller
-                    this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroomId).subscribe(async room => {
+                    this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(msg.chatroomId).subscribe(async room => {
                         this.inCallWithChatroom = room;
                         this.isInCall = true;
                     });

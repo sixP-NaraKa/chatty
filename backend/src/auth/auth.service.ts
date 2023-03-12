@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service.js';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { users } from '@prisma/client';
 import { User } from '../../../shared/types/db-dtos.js';
 import { UserAlreadyExistsError } from '../errors.js';
 import { jwtConstants } from './constants.js';
@@ -33,7 +32,7 @@ export class AuthService {
         throw new UserAlreadyExistsError("A user with this username already exists.");
     }
 
-    async login(user: users) {
+    async login(user: User) {
         const payload = { username: user.display_name, sub: user.user_id };
         return {
             access_token: this.jwtService.sign(payload),

@@ -38,7 +38,7 @@ export class ChatTabsComponent implements AfterContentInit {
     }
 
     ngAfterContentInit() {
-        this.userService.getChatroomsForUserWithParticipantsExceptSelf(this.currentUser.userId).subscribe(chats => {
+        this.userService.getChatroomsForUserWithParticipantsExceptSelf().subscribe(chats => {
 
             // create temporary array to not trigger angulars *ngFor directive during processing
             let tempArray = new Array<ChatRoomWithParticipantsExceptSelf>();
@@ -59,7 +59,7 @@ export class ChatTabsComponent implements AfterContentInit {
                     return;
                 }
 
-                this.userService.getChatroomMessagesCount(chat.chatroom_id, this.currentUser.userId).subscribe(amount => {
+                this.userService.getChatroomMessagesCount(chat.chatroom_id).subscribe(amount => {
                     if (amount >= 1) {
                         tempArray.splice(index, 0, chat);
                     }
@@ -95,7 +95,6 @@ export class ChatTabsComponent implements AfterContentInit {
         let idxOf = this.newUnreadMessagesChatroomIds.indexOf(this.selectedChatId);
         if (idxOf !== -1) {
             this.newUnreadMessagesChatroomIds.splice(idxOf, 1);
-            console.log("new unread messages chatrooms", this.newUnreadMessagesChatroomIds, "idx", idxOf);
         }
         this.loadChat.emit(chat);
     }
@@ -107,11 +106,11 @@ export class ChatTabsComponent implements AfterContentInit {
      * @param user the user which has been selected to start a chat with
      */
     userSelection(user: User) {
-        this.userService.getSingleChatroomForUserWithUserIdAndParticipantUserId(this.currentUser.userId, user.user_id)
+        this.userService.getSingleChatroomForUserWithUserIdAndParticipantUserId(user.user_id)
             .subscribe(room => {
                 if (!room) {
                     // make API call to create a new chatroom with the two participants
-                    this.userService.createChatroom(this.currentUser.userId, user.user_id, false).subscribe(room => {
+                    this.userService.createChatroom(user.user_id, false).subscribe(room => {
                         this.chatrooms.push(room);
                         this.notifyLoadChat(room);
                         this.wsService.createChatroom(room, [user.user_id]);
@@ -138,18 +137,13 @@ export class ChatTabsComponent implements AfterContentInit {
         // and if this chat is not yet part of our locally stored list, show them in the UI.
         // Note for 1on1 chats: we do not need to fetch here the chat from the db or add it to the list,
         // since we will get the latest info anyway upon receiving chat messages and then opening the chat
-        this.wsService.getNewChatroom().subscribe(([chatroom, participantUserIds]) => {
-            console.log("new chatroom", chatroom, "user ids to join", participantUserIds);
-            if (participantUserIds.includes(this.userService.currentUser.userId)) {
-                this.wsService.joinChatroom(chatroom.chatroom_id);
+        this.wsService.getNewChatroom().subscribe((chatroom) => {
+            this.wsService.joinChatroom(chatroom.chatroom_id);
 
-                // if the chatroom is a group chat,
-                // fetch the chatroom from the db, and add it to the list of chats
-                if (chatroom.chatrooms.isgroup) {
-                    this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.currentUser.userId, chatroom.chatroom_id).subscribe(
-                        cr => this.chatrooms.push(cr)
-                    )
-                }
+            if (chatroom.chatrooms.isgroup) {
+                this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(chatroom.chatroom_id).subscribe(
+                    cr => this.chatrooms.push(cr)
+                )
             }
         });
     }
@@ -157,17 +151,13 @@ export class ChatTabsComponent implements AfterContentInit {
     /**
      * Listens for chatrooms (groups) to leave, if the user has been kicked by the creator.
      * As of now, if the group chat from which the user was removed is currently open, they will still leave the chatroom
-     * and the websocket room, but in the UI the room is still there,
+     * and the websocket room (this happens in the backend directly), but in the UI the room is still there,
      * but not otherwise interactable (e.g. sending/receicing messages will not work).
-     * 
-     * Additionally, we do not care as a user if someone else has been removed,
-     * as in this component we do not use the user information whatsoever.
      */
     listenForRemoveChatroomAndRemoveChatFromList() {
-        this.wsService.listenForRemoveChatroom().subscribe(([userId, chatroomId]) => {
+        this.wsService.listenForRemoveChatroom().subscribe((chatroomId) => {
             const filteredChatrooms = this.chatrooms.filter(chat => chat.chatroom_id === chatroomId);
-            if (filteredChatrooms.length !== 0 && userId === this.currentUser.userId) {
-                this.wsService.leaveChatroom(chatroomId);
+            if (filteredChatrooms.length !== 0) {
                 const idxOf = this.chatrooms.indexOf(filteredChatrooms[0]);
                 this.chatrooms.splice(idxOf, 1);
             }
@@ -182,7 +172,7 @@ export class ChatTabsComponent implements AfterContentInit {
             const chatroomAlreadyShown = this.chatrooms.some(chatroom => chatroom.chatroom_id === msg.chatroom_id);
             if (!chatroomAlreadyShown) {
                 // fetch the chatroom from the API and add it to the list
-                this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(this.userService.currentUser.userId, msg.chatroom_id)
+                this.userService.getSingleChatroomForUserWithParticipantsExceptSelf(msg.chatroom_id)
                     .subscribe(chatroom => {
                         this.chatrooms.push(chatroom);
                     });
@@ -216,7 +206,6 @@ export class ChatTabsComponent implements AfterContentInit {
             // this will save it into the db and show it in the UI
             this.emitNewUnreadNotification(chatroomIdFromNotification, originatedFromUserId, content);
 
-            console.log("playing audio...");
             // play sound indicating a new message or reaction
             // Note - not needed anymore: reset time to 0, as sometimes the audio does not get played additional times otherwise
             //                            also, this makes the audio play from the beginning
@@ -237,7 +226,7 @@ export class ChatTabsComponent implements AfterContentInit {
      */
     emitNewUnreadNotification(chatroomId: number, userId: number, content: { type: "message" | "reaction" | "call", data: string }) {
         // add unread message to notificaion summary list (e.g. notify component)
-        this.notificationService.newUnread(this.currentUser.userId, {
+        this.notificationService.newUnread({
             notification_id: -1, // noop
             user_id: this.currentUser.userId,
             originated_from: userId,

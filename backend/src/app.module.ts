@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { WebsocketModule } from './websocket/websocket.module.js';
 import { VerifyUserMiddleware } from './verify-user.middleware.js';
+import { AuthController } from './controllers/auth.controller.js';
 
 @Module({
     imports: [
@@ -15,7 +16,7 @@ import { VerifyUserMiddleware } from './verify-user.middleware.js';
         UsersModule,
         WebsocketModule,
     ],
-    controllers: [AppController],
+    controllers: [AppController, AuthController],
     providers: [AppService, PrismaService],
 })
 export class AppModule implements NestModule {

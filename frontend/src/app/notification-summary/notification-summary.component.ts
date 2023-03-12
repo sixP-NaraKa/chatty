@@ -23,7 +23,7 @@ export class NotificationSummaryComponent implements OnInit {
 
     constructor(private userService: UserService, private notificationService: NotificationService) {
         // get all notifications which were previously saved upon start
-        this.notificationService.getAllNotificationsForUser(this.userService.currentUser.userId).subscribe(notifs => {
+        this.notificationService.getAllNotificationsForUser().subscribe(notifs => {
             this.unreadNotifications = this.unreadNotifications.concat(notifs);
             this.notificationCounter = this.unreadNotifications.length;
             this.notificationCounterEvent.emit(this.notificationCounter);
@@ -45,7 +45,7 @@ export class NotificationSummaryComponent implements OnInit {
     }
 
     onNotificationDelete(notif: Notification) {
-        this.notificationService.deleteNotification(this.userService.currentUser.userId, notif.notification_id).subscribe(event => {
+        this.notificationService.deleteNotification(notif.notification_id).subscribe(event => {
             const idxOf = this.unreadNotifications.indexOf(notif);
             this.unreadNotifications.splice(idxOf, 1);
             this.notificationCounter--;

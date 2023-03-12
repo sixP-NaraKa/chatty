@@ -31,7 +31,7 @@
                         <div *ngIf="chatroom.chatrooms.isgroup">
                             <button type="button" (click)="showUsersForGroupChat()"
                                 class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden hover:bg-violet-400">
-                                {{this.groupChatParticipants.length === 0 ? "Show Users" : "Hide Users"}}
+                                {{this.hideDropdown ? "Show Users" : "Hide Users"}}
                             </button>
                             <app-group-chat-users [hideDropdown]="hideDropdown" [groupChatUsers]="groupChatParticipants"
                                 [groupChatCreatedBy]="chatroom.chatrooms.created_by"

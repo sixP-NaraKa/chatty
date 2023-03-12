@@ -1,5 +1,6 @@
 <div class="px-4 pb-8 clear-both mb-4">
-    <fieldset class="register-fieldset text-left text-xl max-w-3xl min-w-max h-[550px] mx-auto mt-12 px-2 border border-violet-200 rounded-2xl">
+    <fieldset
+        class="register-fieldset text-left text-xl max-w-3xl min-w-max h-[550px] mx-auto mt-12 px-2 border border-violet-200 rounded-2xl">
         <legend [align]="'center'" class="text-2xl px-4">Register to chatty</legend>
 
         <form ngNativeValidate [formGroup]="registrationFormGroup" (ngSubmit)="onRegistrationSubmit()"
@@ -23,9 +24,10 @@
                 placeholder="Repeat password..." name="repeat-password"
                 class="register-input form-control w-64 sm:w-1/2 h-8 sm:h-12 px-2 rounded bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden" />
             <button type="submit"
-                class="form-control h-10 w-fit my-8 px-2 bg-violet-200 text-black rounded disabled:bg-gray-500" autocomplete="off" [disabled]="!arePasswordsEqualAndUsernameSupplied()">Register</button>
+                class="form-control h-10 w-fit my-8 px-2 bg-violet-200 text-black rounded disabled:bg-gray-500"
+                autocomplete="off" [disabled]="!arePasswordsEqualAndUsernameSupplied()">Register</button>
 
-            <br/>
+            <br />
             <div class="absolute bottom-0 right-0 pb-2 text-sm">
                 Already have an account?
                 <button type="button" routerLink="/login" class="text-blue-300"><b>Login!</b></button>

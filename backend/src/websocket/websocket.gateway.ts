@@ -4,6 +4,8 @@ import {
     SubscribeMessage,
     OnGatewayConnection,
     OnGatewayDisconnect,
+    MessageBody,
+    ConnectedSocket,
 } from '@nestjs/websockets';
 import { UsersService } from '../users/users.service.js';
 import { AuthService } from '../auth/auth.service.js';
@@ -26,6 +28,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     numConnections = 0;
 
     userIdsConnected = new Array<number>();
+    connectedClients = new Map<number, any>();
 
     constructor(private authService: AuthService, private userService: UsersService) { }
 
@@ -55,6 +58,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         // notify users of login, to display corresponding statuses
         this.userIdsConnected.push(dbUser.user_id);
+        this.connectedClients.set(dbUser.user_id, client);
         client.broadcast.emit("changed-availabilities", this.userIdsConnected);
         // send also response to sender, so they get the initial statuses
         // this could be done before adding to the local list, but it does not matter too much
@@ -68,6 +72,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const jwtUser = await this.authService.verifyToken(client.handshake.auth.token);
         const idxOf = this.userIdsConnected.indexOf(jwtUser.sub);
         this.userIdsConnected.splice(idxOf, 1);
+        this.connectedClients.delete(jwtUser.sub);
         console.log(this.userIdsConnected);
         client.broadcast.emit("changed-availabilities", this.userIdsConnected);
     }
@@ -101,7 +106,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage("remove-user:chatroom")
     async onRemoveUserFromChatroom(client: any, userIdAndChatroomId: number[]) {
         const [userId, chatroomId] = userIdAndChatroomId;
-        client.broadcast.to(chatroomId).emit("removed-from:chatroom", [userId, chatroomId]);
+        const participantClient = this.connectedClients.has(userId) ? this.connectedClients.get(userId) : undefined;
+        if (participantClient !== undefined) {
+            this.onChatroomLeave(participantClient, chatroomId);
+            client.to(participantClient.id).emit("removed-from:chatroom", chatroomId);
+        }
     }
 
     /**
@@ -110,12 +119,20 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     * will be broadcasted and only the responsible people will further process the event.
     * 
     * @param client the client which send the event
-    * @param chatroom the chatroom to broadcast
-    * @param participantUserIds the userId to broadcast (only responsible people will process this further)
+    * @param chatroom the chatroom
+    * @param participantUserIds the user IDs of the participants
     */
     @SubscribeMessage("create:chatroom")
-    async onCreateChatroom(client: any, chatroom: ChatRoomWithParticipantsExceptSelf, participantUserIds: number[]) {
-        client.broadcast.emit("new:chatroom", chatroom, participantUserIds);
+    async onCreateChatroom(
+        @ConnectedSocket() client: any,
+        @MessageBody("chatroom") chatroom: ChatRoomWithParticipantsExceptSelf,
+        @MessageBody("userIds") participantUserIds: number[]) {
+        for (const userId of participantUserIds) {
+            if (this.connectedClients.has(userId)) {
+                const clientId = this.connectedClients.get(userId).id;
+                client.to(clientId).emit("new:chatroom", chatroom);
+            }
+        }
     }
 
     /* WebRTC */
