@@ -35,13 +35,13 @@ export class AuthService {
     async login(user: User) {
         const payload = { username: user.display_name, sub: user.user_id };
         return {
-            access_token: this.jwtService.sign(payload),
+            access_token: this.jwtService.sign(payload, { secret: jwtConstants.secret ?? process.env.JWT_SECRET }),
             username: user.display_name,
             userId: user.user_id
         };
     }
 
     async verifyToken(token: string): Promise<{ username: string, sub: number, iat: number, exp: number }> {
-        return this.jwtService.verify(token, { secret: jwtConstants.secret });
+        return this.jwtService.verify(token, { secret: jwtConstants.secret ?? process.env.JWT_SECRET });
     }
 }
