@@ -44,11 +44,11 @@ export class ChatPageComponent implements OnInit {
         this.settingsService.currentUserSettingsSubject$.subscribe((settings) => {
             this.applyFilterSettings(settings);
         });
+
+        // this.settingsService.loadUserSettings();
     }
 
-    ngOnInit() {
-        this.settingsService.loadUserSettings();
-    }
+    ngOnInit() {}
 
     /**
      * Log out the user. Catches the "logoutOutEvent(...)" event from the app-header component to do some further "cleanup".

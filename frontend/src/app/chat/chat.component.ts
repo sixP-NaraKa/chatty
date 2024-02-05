@@ -279,8 +279,8 @@ export class ChatComponent implements OnInit {
         return `
                 ${!isMessageFromCurrentUser ? `<b class="text-xs text-gray-400">${message.users.display_name}</b>` : ''}
                 <b title="Posted at: ${msgDate}" class="text-xs text-gray-400">${msgDate
-                .toISOString()
-                .substr(11, 5)}</b>
+            .toISOString()
+            .substr(11, 5)}</b>
                 <div id="messageEmotesContainer" class="h-fit text-xs flex gap-x-2">${emotesHTML}</div>
                 `;
     }
