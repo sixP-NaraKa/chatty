@@ -61,7 +61,9 @@ html,
     }
 
     /* special firefox scrollbar styles */
-    scrollbar-width: thin;
+    // Chrome/Edge are supporting this since newer versions now too, but on Edge (only tested it there) its not actually really working all together
+    // with the other used stylings here, etc.
+    // scrollbar-width: thin;
     scrollbar-color: rgb(112, 125, 151);
     scrollbar-track-color: rgb(26, 32, 44);
 }

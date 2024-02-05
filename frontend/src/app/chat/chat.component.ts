@@ -103,6 +103,10 @@ export class ChatComponent implements OnInit {
 
     applyFontSizeSettings(usrSetts: Settings) {
         let chatWindowElement = document.getElementById('chatWindowDiv') as HTMLDivElement;
+        if (chatWindowElement === null || chatWindowElement === undefined) {
+            return;
+        }
+
         if (usrSetts.font_size === 'default') {
             chatWindowElement.classList.add('text-xs', 'md:text-base');
             chatWindowElement.classList.remove('text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl');
@@ -275,8 +279,8 @@ export class ChatComponent implements OnInit {
         return `
                 ${!isMessageFromCurrentUser ? `<b class="text-xs text-gray-400">${message.users.display_name}</b>` : ''}
                 <b title="Posted at: ${msgDate}" class="text-xs text-gray-400">${msgDate
-                .toISOString()
-                .substr(11, 5)}</b>
+            .toISOString()
+            .substr(11, 5)}</b>
                 <div id="messageEmotesContainer" class="h-fit text-xs flex gap-x-2">${emotesHTML}</div>
                 `;
     }
