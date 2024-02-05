@@ -1,12 +1,20 @@
-<div class="settings-menu-blur z-50 absolute top-0 left-0 flex items-center h-screen w-screen"
-    [class.hidden]="shouldShowMenu === false" [class.flex]="shouldShowMenu === true">
+<div
+    class="settings-menu-blur z-50 absolute top-0 left-0 flex items-center h-screen w-screen"
+    [class.hidden]="shouldShowMenu === false"
+    [class.flex]="shouldShowMenu === true"
+>
     <div
-        class="settings-menu-window relative items-center w-[50%] min-w-fit h-64 px-4 mx-auto border-2 border-gray-700">
+        class="settings-menu-window relative items-center w-[50%] min-w-fit h-64 px-4 mx-auto border-2 border-gray-700"
+    >
         <button type="button" class="absolute top-0 right-0 p-2 fa-solid fa-xmark" (click)="closeMenu()"></button>
         <p class="pt-8"></p>
 
-        <form [formGroup]="settingsMenuFormGroup" (ngSubmit)="onSubmit()" ngNativeValidate
-            class="flex flex-col items-center">
+        <form
+            [formGroup]="settingsMenuFormGroup"
+            (ngSubmit)="onSubmit()"
+            ngNativeValidate
+            class="flex flex-col items-center"
+        >
             <div>
                 <label for="filter">
                     <input formControlName="filterRadio" type="radio" name="filterRadio" value="filter" id="filter" />
@@ -14,21 +22,28 @@
                 </label>
 
                 <label for="nofilter" class="pl-4">
-                    <input formControlName="filterRadio" type="radio" name="filterRadio" value="nofilter"
-                        id="nofilter" />
+                    <input
+                        formControlName="filterRadio"
+                        type="radio"
+                        name="filterRadio"
+                        value="nofilter"
+                        id="nofilter"
+                    />
                     <span class="px-2">Do not filter empty chats</span>
                 </label>
             </div>
-            <hr class="my-4 border-violet-200 w-full">
+            <hr class="my-4 border-violet-200 w-full" />
             <div class="flex flex-col items-start">
-                <label>Change chat window text font-size:
+                <label
+                    >Change chat window text font-size:
                     <select formControlName="fontSize" class="text-black">
-                        <option *ngFor="let fontSize of availableFontSizes" value={{fontSize.value}}>
-                            {{fontSize.text}}
+                        <option *ngFor="let fontSize of availableFontSizes" value="{{ fontSize.value }}">
+                            {{ fontSize.text }}
                         </option>
                     </select>
                 </label>
-                <label>Embed YouTube Videos:
+                <label
+                    >Embed YouTube Videos:
                     <input formControlName="embedYouTubeVideos" type="checkbox" />
                 </label>
             </div>

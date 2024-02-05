@@ -1,31 +1,52 @@
 <div class="px-4 pb-8 clear-both mb-4">
     <fieldset
-        class="login-fieldset text-left text-xl max-w-3xl min-w-max h-[420px] mx-auto mt-12 px-2 border border-violet-200 rounded-2xl">
+        class="login-fieldset text-left text-xl max-w-3xl min-w-max h-[420px] mx-auto mt-12 px-2 border border-violet-200 rounded-2xl"
+    >
         <legend [align]="'center'" class="text-2xl px-4">Login to chatty</legend>
 
-        <form ngNativeValidate [formGroup]="loginFormGroup" (ngSubmit)="onLoginSubmit()"
-            class="relative flex flex-col items-center w-full h-full mb-0">
+        <form
+            ngNativeValidate
+            [formGroup]="loginFormGroup"
+            (ngSubmit)="onLoginSubmit()"
+            class="relative flex flex-col items-center w-full h-full mb-0"
+        >
             <label for="username" class="w-64 sm:w-1/2 pt-8 pb-1 text-lg">Username</label>
-            <input #username formControlName="usernameInput" required type="text" id="username"
-                placeholder="Enter username..." name="username"
-                class="login-input from-control w-64 sm:w-1/2 h-8 sm:h-12 px-2 rounded bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden" />
+            <input
+                #username
+                formControlName="usernameInput"
+                required
+                type="text"
+                id="username"
+                placeholder="Enter username..."
+                name="username"
+                class="login-input from-control w-64 sm:w-1/2 h-8 sm:h-12 px-2 rounded bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
+            />
 
             <p class="py-8"></p>
 
             <label for="password" class="w-64 sm:w-1/2 pt-2 pb-1 text-lg">Password</label>
-            <input #password formControlName="passwordInput" required type="password" id="password"
-                placeholder="Enter password..." name="password"
-                class="login-input form-control w-64 sm:w-1/2 h-8 sm:h-12 px-2 rounded bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden" />
-            <button type="submit"
-                class="form-control h-10 w-fit my-8 px-2 bg-violet-200 text-black rounded">Login</button>
+            <input
+                #password
+                formControlName="passwordInput"
+                required
+                type="password"
+                id="password"
+                placeholder="Enter password..."
+                name="password"
+                class="login-input form-control w-64 sm:w-1/2 h-8 sm:h-12 px-2 rounded bg-transparent focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden"
+            />
+            <button type="submit" class="form-control h-10 w-fit my-8 px-2 bg-violet-200 text-black rounded">
+                Login
+            </button>
 
             <br />
             <div class="absolute bottom-0 right-0 pb-2 text-sm">
                 Need an account?
-                <button type="button" routerLink="/register" class="text-blue-300"
-                    autocomplete="off"><b>Register!</b></button>
+                <button type="button" routerLink="/register" class="text-blue-300" autocomplete="off">
+                    <b>Register!</b>
+                </button>
             </div>
         </form>
-        <p *ngIf="loginErrorMessage" class="text-red-500 text-center">{{loginErrorMessage}}</p>
+        <p *ngIf="loginErrorMessage" class="text-red-500 text-center">{{ loginErrorMessage }}</p>
     </fieldset>
 </div>

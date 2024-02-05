@@ -8,10 +8,9 @@ import { WebsocketService } from '../services/websocket.service';
 @Component({
     selector: 'app-chat-page',
     templateUrl: './chat-page.component.html',
-    styleUrls: ['./chat-page.component.scss']
+    styleUrls: ['./chat-page.component.scss'],
 })
 export class ChatPageComponent implements OnInit {
-
     /**
      * Chatroom ID will be used to notify the app-chat component which chat to load.
      * @deprecated
@@ -29,7 +28,11 @@ export class ChatPageComponent implements OnInit {
     // current user
     currentUser: ApplicationUser;
 
-    constructor(private userService: UserService, private wsService: WebsocketService, private settingsService: UserSettingsService) {
+    constructor(
+        private userService: UserService,
+        private wsService: WebsocketService,
+        private settingsService: UserSettingsService
+    ) {
         this.currentUser = this.userService.currentUser;
 
         // (re)connect the websocket on page reload
@@ -38,26 +41,25 @@ export class ChatPageComponent implements OnInit {
         this.wsService.connect(this.currentUser);
 
         this.userSettings = null;
-        this.settingsService.currentUserSettingsSubject$.subscribe(settings => {
+        this.settingsService.currentUserSettingsSubject$.subscribe((settings) => {
             this.applyFilterSettings(settings);
         });
     }
 
-    ngOnInit() {
-    }
+    ngOnInit() { }
 
     /**
      * Log out the user. Catches the "logoutOutEvent(...)" event from the app-header component to do some further "cleanup".
      */
     logout() {
         // document.onclick = null; // otherwise "window" if used
-        document.removeAllListeners!("click");
+        document.removeAllListeners!('click');
     }
 
     /**
      * Catches the "loadChat(...)" event from the app-chat-tabs component
      * and passes it to the app-chat component to load messages for the given chat ID.
-     * 
+     *
      * @param chat the chat to pass to the app-chat component (we only take the ID at the moment)
      */
     displayChat(chat: ChatRoomWithParticipantsExceptSelf) {
@@ -83,7 +85,9 @@ export class ChatPageComponent implements OnInit {
         // page reload will, if it happened, repopulate the settings, etc.
         // TODO: either reload the page, or pass an event to the chat-tabs component, to reload the chat-tabs?
         if (shouldReload) {
-            window.alert("Filter changes will be applied after a page reload. Reloading page for the changes to take effect...");
+            window.alert(
+                'Filter changes will be applied after a page reload. Reloading page for the changes to take effect...'
+            );
             document.location.reload();
         }
     }
@@ -97,9 +101,8 @@ export class ChatPageComponent implements OnInit {
         if (this.groupChatParticipants.length === 0) {
             this.hideDropdown = !this.hideDropdown;
             this.groupChatParticipants = new Array<User>();
-            this.chatroom.chatrooms.participants.forEach(user => this.groupChatParticipants.push(user.users));
-        }
-        else {
+            this.chatroom.chatrooms.participants.forEach((user) => this.groupChatParticipants.push(user.users));
+        } else {
             this.hideDropdown = true;
             this.groupChatParticipants.length = 0;
         }
@@ -108,7 +111,7 @@ export class ChatPageComponent implements OnInit {
     /**
      * Catches the event from the group-chat-users component,
      * indicating that a user should be removed from the group chat.
-     * 
+     *
      * @param user the user to remove from the group chat
      */
     onRemoveParticipantFromGroupChat(user: User) {
@@ -118,24 +121,26 @@ export class ChatPageComponent implements OnInit {
         // + remove the chat from the chats list (only important if the user is logged in)
         this.wsService.removeUserFromChatroom(user.user_id, chatroomIdToRemoveParticipantFrom);
 
-        this.userService.removeUserFromGroupChat(user.user_id, chatroomIdToRemoveParticipantFrom).subscribe(
-            amountDeleted => {
+        this.userService
+            .removeUserFromGroupChat(user.user_id, chatroomIdToRemoveParticipantFrom)
+            .subscribe((amountDeleted) => {
                 if (amountDeleted > 0) {
                     // remove user from the locally stored chatroom (only important until a page reload is done)
-                    const userFromChatroom = this.chatroom.chatrooms.participants.filter(u => u.users.user_id === user.user_id);
+                    const userFromChatroom = this.chatroom.chatrooms.participants.filter(
+                        (u) => u.users.user_id === user.user_id
+                    );
                     if (userFromChatroom.length > 0) {
                         const idxOf = this.chatroom.chatrooms.participants.indexOf(userFromChatroom[0]);
                         this.chatroom.chatrooms.participants.splice(idxOf, 1);
                     }
                 }
-            }
-        )
+            });
     }
 
     /**
      * Catches the event emitted from the group-chat-users component,
      * indicating that a user should be added to the group chat.
-     * 
+     *
      * @param user the user to add to the group chat
      */
     onAddParticipantToGroupChat(user: User) {
@@ -146,7 +151,7 @@ export class ChatPageComponent implements OnInit {
         this.chatroom.chatrooms.participants.push({ users: user });
 
         // notify user via websocket(s), and store in db
-        this.userService.addUsersToGroupChat(user.user_id, chatroomIdToAddUsersTo).subscribe(_ => {
+        this.userService.addUsersToGroupChat(user.user_id, chatroomIdToAddUsersTo).subscribe((_) => {
             this.wsService.addUserToChatroom(this.chatroom, user.user_id);
         });
     }
@@ -155,5 +160,4 @@ export class ChatPageComponent implements OnInit {
     onNotificationCounterChange(count: number) {
         this.notificationCounter = count;
     }
-
 }

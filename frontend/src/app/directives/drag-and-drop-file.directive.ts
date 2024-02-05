@@ -1,14 +1,13 @@
 import { Directive, ElementRef, EventEmitter, HostBinding, HostListener, Output } from '@angular/core';
 
 @Directive({
-    selector: '[appDragAndDropFile]'
+    selector: '[appDragAndDropFile]',
 })
 export class DragAndDropFileDirective {
-
     @Output() onFileDrop = new EventEmitter<Array<File>>();
 
-    @HostBinding("class.dragAndDropArea") dragAndDropAreaEnabled = false;
-    @HostBinding("class.blurDuringDragAndDrop") dragAndDropAreaBlur = false;
+    @HostBinding('class.dragAndDropArea') dragAndDropAreaEnabled = false;
+    @HostBinding('class.blurDuringDragAndDrop') dragAndDropAreaBlur = false;
 
     chatWindow: HTMLDivElement;
 
@@ -16,27 +15,27 @@ export class DragAndDropFileDirective {
         this.chatWindow = elRef.nativeElement;
     }
 
-    @HostListener("dragover", ["$event"]) onDragOver(event: DragEvent) {
+    @HostListener('dragover', ['$event']) onDragOver(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
         // if (event.currentTarget === this.chatWindow) {
         this.dragAndDropAreaEnabled = true;
         this.dragAndDropAreaBlur = true;
-        console.log("dragover");
+        console.log('dragover');
         // }
     }
 
-    @HostListener("dragleave", ["$event"]) onDragLeave(event: DragEvent) {
+    @HostListener('dragleave', ['$event']) onDragLeave(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
         if (event.target === this.chatWindow) {
             this.dragAndDropAreaEnabled = false;
             this.dragAndDropAreaBlur = false;
-            console.log("dragleave");
+            console.log('dragleave');
         }
     }
 
-    @HostListener("drop", ["$event"]) onDrop(event: DragEvent) {
+    @HostListener('drop', ['$event']) onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
         this.dragAndDropAreaEnabled = false;
@@ -46,5 +45,4 @@ export class DragAndDropFileDirective {
             this.onFileDrop.emit(Array.from(files));
         }
     }
-
 }

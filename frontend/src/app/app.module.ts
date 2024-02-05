@@ -33,7 +33,7 @@ import { DragAndDropFileDirective } from './directives/drag-and-drop-file.direct
 import { ToastrModule, ToastNoAnimationModule } from 'ngx-toastr';
 import { EmbedPipe } from './pipes/embed.pipe';
 
-const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } }
+const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { autoConnect: false } };
 
 @NgModule({
     declarations: [
@@ -73,8 +73,8 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
             closeButton: true,
             tapToDismiss: true,
             progressBar: true,
-            positionClass: "toast-top-right",
-            onActivateTick: true
+            positionClass: 'toast-top-right',
+            onActivateTick: true,
         }),
     ],
     providers: [
@@ -83,6 +83,6 @@ const socketconfig: SocketIoConfig = { url: config.BACKEND_HOST, options: { auto
         { provide: ErrorHandler, useClass: UnauthorizedErroHandler },
         UrlifyPipe,
     ],
-    bootstrap: [AppComponent]
+    bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
