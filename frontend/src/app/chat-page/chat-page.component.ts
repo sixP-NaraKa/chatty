@@ -46,7 +46,9 @@ export class ChatPageComponent implements OnInit {
         });
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+        this.settingsService.loadUserSettings();
+    }
 
     /**
      * Log out the user. Catches the "logoutOutEvent(...)" event from the app-header component to do some further "cleanup".

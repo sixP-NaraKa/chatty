@@ -9,7 +9,9 @@ import { UserService } from './user.services';
 export class UserSettingsService {
     public currentUserSettingsSubject$: ReplaySubject<Settings> = new ReplaySubject<Settings>(1);
 
-    constructor(private userService: UserService) {
+    constructor(private userService: UserService) { }
+
+    public loadUserSettings(): void {
         this.userService.getUserSettings().subscribe((settings) => {
             this.currentUserSettingsSubject$.next(settings);
         });

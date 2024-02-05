@@ -103,6 +103,10 @@ export class ChatComponent implements OnInit {
 
     applyFontSizeSettings(usrSetts: Settings) {
         let chatWindowElement = document.getElementById('chatWindowDiv') as HTMLDivElement;
+        if (chatWindowElement === null || chatWindowElement === undefined) {
+            return;
+        }
+
         if (usrSetts.font_size === 'default') {
             chatWindowElement.classList.add('text-xs', 'md:text-base');
             chatWindowElement.classList.remove('text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl');
