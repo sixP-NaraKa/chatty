@@ -3,10 +3,12 @@
 <div id="voiceChatContainer" class="pt-2 pb-4">
     <div>
         <app-slider [slideFromLeft]="true" [showArrowIcons]="false">
-            <i class="sliderContentInButtonIcon fa-solid fa-bell"> {{notificationCounter}}</i>
-            <i class="sliderContentOutButtonIcon fa-solid fa-bell"> {{notificationCounter}}</i>
-            <app-notification-summary class="contentToSlide"
-                (notificationCounterEvent)="onNotificationCounterChange($event)"></app-notification-summary>
+            <i class="sliderContentInButtonIcon fa-solid fa-bell"> {{ notificationCounter }}</i>
+            <i class="sliderContentOutButtonIcon fa-solid fa-bell"> {{ notificationCounter }}</i>
+            <app-notification-summary
+                class="contentToSlide"
+                (notificationCounterEvent)="onNotificationCounterChange($event)"
+            ></app-notification-summary>
         </app-slider>
     </div>
     <app-voice-chat [setChatroom]="this.chatroom"></app-voice-chat>
@@ -14,7 +16,8 @@
 
 <div class="chat flex flex-auto flex-col sm:flex-row w-full h-[85vh] min-h-[480px] sm:space-x-6 p-4 pt-4">
     <div
-        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] min-h-[20%] sm:max-h-full overflow-y-auto text-xs md:text-base border-2 border-gray-700">
+        class="chat-tabs chat-scrollbar flex-auto min-w-[240px] min-h-[20%] sm:max-h-full overflow-y-auto text-xs md:text-base border-2 border-gray-700"
+    >
         <app-chat-tabs (loadChat)="displayChat($event)" [filterOutEmpty1on1Chats]="userSettings?.filter === 'filter'">
         </app-chat-tabs>
     </div>
@@ -22,21 +25,36 @@
         <div class="chat-content-header border-b-2 border-gray-700">
             <div id="chatHeader">
                 <div *ngIf="this.chatroom" class="flex flex-row justify-between h-full text-base">
-                    <p class="whitespace-nowrap text-ellipsis overflow-hidden px-2"
-                        title="{{chatroom.chatrooms.isgroup ? 'Chatting in: ' + chatroom.chatrooms.name : 'Chatting with: ' + chatroom.chatrooms.participants[0].users.display_name}}">
-                        {{chatroom.chatrooms.isgroup ? chatroom.chatrooms.name :
-                        chatroom.chatrooms.participants[0].users.display_name}}
+                    <p
+                        class="whitespace-nowrap text-ellipsis overflow-hidden px-2"
+                        title="{{
+                            chatroom.chatrooms.isgroup
+                                ? 'Chatting in: ' + chatroom.chatrooms.name
+                                : 'Chatting with: ' + chatroom.chatrooms.participants[0].users.display_name
+                        }}"
+                    >
+                        {{
+                            chatroom.chatrooms.isgroup
+                                ? chatroom.chatrooms.name
+                                : chatroom.chatrooms.participants[0].users.display_name
+                        }}
                     </p>
                     <div id="chatHeaderNavBarButtons">
                         <div *ngIf="chatroom.chatrooms.isgroup">
-                            <button type="button" (click)="showUsersForGroupChat()"
-                                class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden hover:bg-violet-400">
-                                {{this.hideDropdown ? "Show Users" : "Hide Users"}}
+                            <button
+                                type="button"
+                                (click)="showUsersForGroupChat()"
+                                class="h-full px-2 bg-violet-200 text-black whitespace-nowrap text-ellipsis overflow-hidden hover:bg-violet-400"
+                            >
+                                {{ this.hideDropdown ? "Show Users" : "Hide Users" }}
                             </button>
-                            <app-group-chat-users [hideDropdown]="hideDropdown" [groupChatUsers]="groupChatParticipants"
+                            <app-group-chat-users
+                                [hideDropdown]="hideDropdown"
+                                [groupChatUsers]="groupChatParticipants"
                                 [groupChatCreatedBy]="chatroom.chatrooms.created_by"
                                 (removeUserFromGroupChat)="onRemoveParticipantFromGroupChat($event)"
-                                (addUserToGroupChatEvent)="onAddParticipantToGroupChat($event)">
+                                (addUserToGroupChatEvent)="onAddParticipantToGroupChat($event)"
+                            >
                             </app-group-chat-users>
                         </div>
                     </div>

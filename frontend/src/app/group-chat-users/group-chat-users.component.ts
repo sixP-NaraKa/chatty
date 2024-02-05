@@ -5,10 +5,9 @@ import { UserService } from '../services/user.services';
 @Component({
     selector: 'app-group-chat-users',
     templateUrl: './group-chat-users.component.html',
-    styleUrls: ['./group-chat-users.component.scss']
+    styleUrls: ['./group-chat-users.component.scss'],
 })
 export class GroupChatUsersComponent implements AfterViewInit {
-
     users = new Array<User>();
     @Input() set groupChatUsers(users: Array<User>) {
         this.users = users;
@@ -31,12 +30,11 @@ export class GroupChatUsersComponent implements AfterViewInit {
         this.currentUserId = this.userService.currentUser.userId;
     }
 
-    ngAfterViewInit(): void {
-    }
+    ngAfterViewInit(): void {}
 
     /**
      * Onclick function to remove a user from the group chat.
-     * 
+     *
      * @param user the user to remove from the group chat
      */
     onRemoveParticipant(user: User) {
@@ -46,11 +44,10 @@ export class GroupChatUsersComponent implements AfterViewInit {
     }
 
     onUserSelection(user: User) {
-        if (this.users.some(u => u.user_id === user.user_id)) {
+        if (this.users.some((u) => u.user_id === user.user_id)) {
             return;
         }
         // this.users.push(user); // no need to push here, as we do that already in the chat-page component (we would do it twice therefore)
         this.addUserToGroupChatEvent.emit(user);
     }
-
 }

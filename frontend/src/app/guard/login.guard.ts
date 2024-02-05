@@ -3,15 +3,14 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 import { UserService } from '../services/user.services';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class LoginGuard implements CanActivate {
-
-    constructor(private router: Router, private userService: UserService) { }
+    constructor(private router: Router, private userService: UserService) {}
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
         if (this.userService.isLoggedIn()) {
-            this.router.navigate(["/chat"]);
+            this.router.navigate(['/chat']);
             return false;
         }
         return true;

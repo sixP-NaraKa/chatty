@@ -1,18 +1,30 @@
 <header class="min-w-[240px] h-8 pt-1 border-b border-violet-200">
     <div class="px-4">
         <div class="flex flex-auto justify-between space-x-4">
-            <p class="pr-4 text-sm whitespace-pre">Logged in as:
-                <b class="text-violet-200">{{currentUser.username}}</b>
+            <p class="pr-4 text-sm whitespace-pre">
+                Logged in as:
+                <b class="text-violet-200">{{ currentUser.username }}</b>
             </p>
             <div class="flex space-x-4">
-                <button type="menu" title="Settings" class="h-6 fa-solid fa-gear text-violet-200 hover:text-violet-400"
-                    (click)="onMenuButtonClick()"></button>
+                <button
+                    type="menu"
+                    title="Settings"
+                    class="h-6 fa-solid fa-gear text-violet-200 hover:text-violet-400"
+                    (click)="onMenuButtonClick()"
+                ></button>
                 <!-- <app-settings-menu [shouldShowMenu]="showMenu"></app-settings-menu> -->
-                <button type="button" (click)="logout()" title="Logout"
-                    class="h-6 w-fit bg-violet-200 text-black rounded px-2 hover:bg-violet-400 fa-solid fa-arrow-right-from-bracket"></button>
+                <button
+                    type="button"
+                    (click)="logout()"
+                    title="Logout"
+                    class="h-6 w-fit bg-violet-200 text-black rounded px-2 hover:bg-violet-400 fa-solid fa-arrow-right-from-bracket"
+                ></button>
             </div>
         </div>
     </div>
 </header>
-<app-settings-menu [shouldShowMenu]="showMenu" (settingsMenuClosedEvent)="onSettingsMenuClosed()"
-    class="z-50"></app-settings-menu>
+<app-settings-menu
+    [shouldShowMenu]="showMenu"
+    (settingsMenuClosedEvent)="onSettingsMenuClosed()"
+    class="z-50"
+></app-settings-menu>

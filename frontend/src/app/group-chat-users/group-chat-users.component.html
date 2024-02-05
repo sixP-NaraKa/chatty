@@ -1,18 +1,28 @@
 <div class="absolute right-0 z-30 text-sm" [hidden]="hideDropdown">
     <div class="w-fit">
-        <ul 
-            class="group-chat-dropdown chat-scrollbar overflow-y-auto w-full max-h-32 px-2 pb-2 border border-t-2 border-r-0 border-violet-200 rounded-b-lg rounded-r-none">
+        <ul
+            class="group-chat-dropdown chat-scrollbar overflow-y-auto w-full max-h-32 px-2 pb-2 border border-t-2 border-r-0 border-violet-200 rounded-b-lg rounded-r-none"
+        >
             <div *ngIf="groupChatCreatedBy === currentUserId">
                 <app-user-search (userSelectionEvent)="onUserSelection($event)"></app-user-search>
-                <hr class="group-chat-hr mb-2">
+                <hr class="group-chat-hr mb-2" />
             </div>
             <div *ngFor="let user of users" class="group-chat-hr w-full flex flex-row justify-between space-x-2 py-1">
-                <li title="User: {{user.display_name}}" class="mr-2 hover:text-violet-200">
-                    {{user.display_name}}
+                <li title="User: {{ user.display_name }}" class="mr-2 hover:text-violet-200">
+                    {{ user.display_name }}
                 </li>
-                <i *ngIf="groupChatCreatedBy === user.user_id" class="fa-solid fa-star text-xs text-yellow-300 pt-0.5" title="Creator"></i>
-                <button *ngIf="groupChatCreatedBy === currentUserId" type="button" (click)="onRemoveParticipant(user)" title="Kick User: {{user.display_name}}"
-                    class="px-2 fa-solid fa-xmark text-red-300 border border-red-300 rounded-full hover:bg-red-900"></button>
+                <i
+                    *ngIf="groupChatCreatedBy === user.user_id"
+                    class="fa-solid fa-star text-xs text-yellow-300 pt-0.5"
+                    title="Creator"
+                ></i>
+                <button
+                    *ngIf="groupChatCreatedBy === currentUserId"
+                    type="button"
+                    (click)="onRemoveParticipant(user)"
+                    title="Kick User: {{ user.display_name }}"
+                    class="px-2 fa-solid fa-xmark text-red-300 border border-red-300 rounded-full hover:bg-red-900"
+                ></button>
             </div>
         </ul>
     </div>

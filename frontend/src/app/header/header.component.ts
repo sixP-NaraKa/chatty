@@ -6,10 +6,9 @@ import { UserService } from '../services/user.services';
 @Component({
     selector: 'app-header',
     templateUrl: './header.component.html',
-    styleUrls: ['./header.component.scss']
+    styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-
     @Output()
     logOutEvent = new EventEmitter<boolean>();
 
@@ -23,8 +22,7 @@ export class HeaderComponent implements OnInit {
         this.currentUser = this.userService.currentUser;
     }
 
-    ngOnInit(): void {
-    }
+    ngOnInit(): void {}
 
     /**
      * Logs out the user and emits the logout event to subscribed components for further processing if needed.

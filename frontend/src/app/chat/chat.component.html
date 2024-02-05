@@ -1,16 +1,30 @@
-<div class="chat-scrollbar z-50 text-left h-full overflow-y-auto" id="chatWindow" infiniteScroll [scrollWindow]="false"
-    [infiniteScrollThrottle]="500" [infiniteScrollUpDistance]="1" (scrolledUp)="onScrollUp()" appDragAndDropFile
-    (onFileDrop)="onFileDrop($event)">
+<div
+    class="chat-scrollbar z-50 text-left h-full overflow-y-auto"
+    id="chatWindow"
+    infiniteScroll
+    [scrollWindow]="false"
+    [infiniteScrollThrottle]="500"
+    [infiniteScrollUpDistance]="1"
+    (scrolledUp)="onScrollUp()"
+    appDragAndDropFile
+    (onFileDrop)="onFileDrop($event)"
+>
     <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-6 pt-2 px-2 sm:mb-4">
-        <p id="messageContainer" class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 py-1 rounded-lg"
+        <p
+            id="messageContainer"
+            class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 py-1 rounded-lg"
             [class.mr-auto]="message.user_id !== currentUser.userId"
             [class.ml-auto]="message.user_id === currentUser.userId"
             [class.chat-participant-message]="message.user_id !== currentUser.userId"
-            [class.bg-owndigo]="message.user_id === currentUser.userId">
+            [class.bg-owndigo]="message.user_id === currentUser.userId"
+        >
             <span class="messageHeader flex">
                 <span class="flex gap-4" [innerHTML]="populateMessageHeader(message)"></span>
-                <span *ngIf="message.user_id === currentUser.userId"
-                    class="deleteMessageSpan not-italic text-xs ml-auto" (click)="deleteMessage(message)">
+                <span
+                    *ngIf="message.user_id === currentUser.userId"
+                    class="deleteMessageSpan not-italic text-xs ml-auto"
+                    (click)="deleteMessage(message)"
+                >
                     <button class="deleteMessageButton fa-regular fa-trash-can text-red-400"></button>
                 </span>
             </span>
@@ -18,52 +32,88 @@
                 <span [innerHTML]="message.msg_content | urlify"></span>
                 <span *ngIf="embedYouTubeVideos">
                     <span *ngFor="let url of message.msg_content | embed">
-                        <iframe class="max-h-[120px] max-w-full sm:min-h-[240px] sm:min-w-full" [src]="url"
-                            allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
-                            allowfullscreen>
+                        <iframe
+                            class="max-h-[120px] max-w-full sm:min-h-[240px] sm:min-w-full"
+                            [src]="url"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen
+                        >
                         </iframe>
                     </span>
                 </span>
             </span>
             <ng-container *ngIf="message.isimage">
-                <ng-container *ngIf="(message | getimage | async | imageify | async) as srcUrl">
-                    <img [src]="srcUrl" alt="Loading image..." class="max-h-80 cursor-pointer"
-                        (click)="openImage($event)">
+                <ng-container *ngIf="message | getimage | async | imageify | async as srcUrl">
+                    <img
+                        [src]="srcUrl"
+                        alt="Loading image..."
+                        class="max-h-80 cursor-pointer"
+                        (click)="openImage($event)"
+                    />
                 </ng-container>
             </ng-container>
             <span *ngIf="message.isfile">
-                <a #fileDownload (click)="downloadFile(message)" [download]="message.msg_content"
-                    href="javascript:void(0)" class="text-blue-400 underline">{{message.msg_content}}<i
-                        class="pl-2 fa-solid fa-file"></i></a>
+                <a
+                    #fileDownload
+                    (click)="downloadFile(message)"
+                    [download]="message.msg_content"
+                    href="javascript:void(0)"
+                    class="text-blue-400 underline"
+                    >{{ message.msg_content }}<i class="pl-2 fa-solid fa-file"></i
+                ></a>
             </span>
         </p>
         <!-- or maybe put them all in one div with the same [class.] conditions and with an added [class.text-right]/[class.text-left] to the emotes container -->
         <!-- flex here on the parent container needed for the [class.] conditions to work -->
         <div id="emoteReactionsContainer" class="flex">
-            <div id="emoteReactionButtons" class="flex flex-row gap-x-4 px-2 rounded-lg"
+            <div
+                id="emoteReactionButtons"
+                class="flex flex-row gap-x-4 px-2 rounded-lg"
                 [class.mr-auto]="message.user_id !== currentUser.userId"
-                [class.ml-auto]="message.user_id === currentUser.userId">
-                <button *ngFor="let emote of preSelectedEmotes" title="{{emote.name}}"
-                    (click)="onEmoteReaction(message, emote)">
-                    {{emote.emote}}
+                [class.ml-auto]="message.user_id === currentUser.userId"
+            >
+                <button
+                    *ngFor="let emote of preSelectedEmotes"
+                    title="{{ emote.name }}"
+                    (click)="onEmoteReaction(message, emote)"
+                >
+                    {{ emote.emote }}
                 </button>
             </div>
         </div>
     </div>
+    <div [hidden]="true" id="scrollToLatest"></div>
 </div>
-<app-emote-select [showEmotesMenu]="showEmotesMenu" (emoteSelectedEvent)="onEmoteSelect($event)"
-    class="absolute bottom-0 right-0 w-full"></app-emote-select>
+<app-emote-select
+    [showEmotesMenu]="showEmotesMenu"
+    (emoteSelectedEvent)="onEmoteSelect($event)"
+    class="absolute bottom-0 right-0 w-full"
+></app-emote-select>
 <div *ngIf="this.chatroomId !== -1" class="absolute bottom-0 w-full h-fit text-xs md:text-base">
-    <form [formGroup]="formGroup" (ngSubmit)="sendMessage()" ngNativeValidate
-        class="form-element mb-0 border-t-2 border-gray-700 h-full">
-        <input id="messageInput" required formControlName="messageInput" (paste)="onPaste($event)"
+    <form
+        [formGroup]="formGroup"
+        (ngSubmit)="sendMessage()"
+        ngNativeValidate
+        class="form-element mb-0 border-t-2 border-gray-700 h-full"
+    >
+        <input
+            id="messageInput"
+            required
+            formControlName="messageInput"
+            (paste)="onPaste($event)"
             class="bg-transparent w-[75%] h-full px-2 placeholder:text-violet-200 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden border-r-2 border-gray-700"
-            placeholder="Write your message..." autofocus />
+            placeholder="Write your message..."
+            autofocus
+        />
         <button type="button" id="emotesButton" class="w-[7.5%] h-full text-yellow-300" (click)="onEmoteMenu()">
             <i class="fa fa-solid fa-face-grin"></i>
             <i class="fa fa-solid fa-face-kiss"></i>
         </button>
-        <button type="submit"
-            class="w-[17.5%] h-full border-l-2 border-gray-700 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-40 hover:bg-gray-600">Send</button>
+        <button
+            type="submit"
+            class="w-[17.5%] h-full border-l-2 border-gray-700 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-40 hover:bg-gray-600"
+        >
+            Send
+        </button>
     </form>
 </div>

@@ -8,10 +8,9 @@ import { UserService } from '../services/user.services';
     selector: 'app-notification-summary',
     templateUrl: './notification-summary.component.html',
     styleUrls: ['./notification-summary.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationSummaryComponent implements OnInit {
-
     unreadSubscription: Subscription;
 
     @Output()
@@ -23,29 +22,28 @@ export class NotificationSummaryComponent implements OnInit {
 
     constructor(private userService: UserService, private notificationService: NotificationService) {
         // get all notifications which were previously saved upon start
-        this.notificationService.getAllNotificationsForUser().subscribe(notifs => {
+        this.notificationService.getAllNotificationsForUser().subscribe((notifs) => {
             this.unreadNotifications = this.unreadNotifications.concat(notifs);
             this.notificationCounter = this.unreadNotifications.length;
             this.notificationCounterEvent.emit(this.notificationCounter);
         });
 
         // subscribe to the Observable to get new notifications during runtime
-        this.unreadSubscription = this.notificationService.unreadNotification$.subscribe(unreadNotif => {
+        this.unreadSubscription = this.notificationService.unreadNotification$.subscribe((unreadNotif) => {
             this.notificationCounter++;
             this.notificationCounterEvent.emit(this.notificationCounter);
             this.unreadNotifications.push(unreadNotif);
         });
     }
 
-    ngOnInit(): void {
-    }
+    ngOnInit(): void {}
 
     ngOnDestroy() {
         this.unreadSubscription.unsubscribe();
     }
 
     onNotificationDelete(notif: Notification) {
-        this.notificationService.deleteNotification(notif.notification_id).subscribe(event => {
+        this.notificationService.deleteNotification(notif.notification_id).subscribe((event) => {
             const idxOf = this.unreadNotifications.indexOf(notif);
             this.unreadNotifications.splice(idxOf, 1);
             this.notificationCounter--;
@@ -55,7 +53,7 @@ export class NotificationSummaryComponent implements OnInit {
 
     /**
      * Helper function to populate some of the notification content.
-     * 
+     *
      * @param notif the notification
      * @returns the innerHTML string
      */
@@ -64,7 +62,6 @@ export class NotificationSummaryComponent implements OnInit {
         const time = date.toISOString().substr(11, 5);
         return `
             <span>${notif.content} <i title="${date}">(on ${time})</i></span>
-        `
+        `;
     }
-
 }

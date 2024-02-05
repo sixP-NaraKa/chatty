@@ -3,12 +3,12 @@
     background-color: rgb(20, 24, 31);
 }
 
-#emotesButton>.fa+.fa,
-#emotesButton:hover>.fa {
+#emotesButton > .fa + .fa,
+#emotesButton:hover > .fa {
     display: none;
 }
 
-#emotesButton:hover>.fa+.fa {
+#emotesButton:hover > .fa + .fa {
     display: inherit;
 }
 

@@ -9,30 +9,34 @@ import { RegistrationFormComponent } from './registration-form/registration-form
 
 const routes: Routes = [
     {
-        path: "login", component: LoginFormComponent,
-        canActivate: [LoginGuard]
+        path: 'login',
+        component: LoginFormComponent,
+        canActivate: [LoginGuard],
     },
     {
-        path: "register", component: RegistrationFormComponent,
-        canActivate: [LoginGuard]
+        path: 'register',
+        component: RegistrationFormComponent,
+        canActivate: [LoginGuard],
     },
     {
-        path: "", component: ChatPageComponent,
+        path: '',
+        component: ChatPageComponent,
         canActivate: [AuthGuard],
         children: [
-            ...["chat", "chats"].map(path => ({
+            ...['chat', 'chats'].map((path) => ({
                 path,
-                component: ChatPageComponent
-            }))
-        ]
+                component: ChatPageComponent,
+            })),
+        ],
     },
     {
-        path: "**", redirectTo: "chat",
-    }
+        path: '**',
+        redirectTo: 'chat',
+    },
 ];
 
 @NgModule({
     imports: [RouterModule.forRoot(routes)],
-    exports: [RouterModule]
+    exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

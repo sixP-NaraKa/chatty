@@ -7,10 +7,9 @@ import { UserService } from '../services/user.services';
 @Component({
     selector: 'app-settings-menu',
     templateUrl: './settings-menu.component.html',
-    styleUrls: ['./settings-menu.component.scss']
+    styleUrls: ['./settings-menu.component.scss'],
 })
 export class SettingsMenuComponent implements OnInit {
-
     userSettings!: Settings;
 
     @Input()
@@ -21,7 +20,7 @@ export class SettingsMenuComponent implements OnInit {
 
     /**
      * @deprecated
-    */
+     */
     @Output()
     applySettingsEvent = new EventEmitter<Settings>();
 
@@ -32,16 +31,16 @@ export class SettingsMenuComponent implements OnInit {
     });
 
     availableFontSizes = [
-        { value: "default", text: "default" },
-        { value: "text-sm", text: "text-sm (14px)" },
-        { value: "text-base", text: "text-base (16px)" },
-        { value: "text-lg", text: "text-lg (18px)" },
-        { value: "text-xl", text: "text-xl (20px)" },
-        { value: "text-2xl", text: "text-2xl (22px)" },
+        { value: 'default', text: 'default' },
+        { value: 'text-sm', text: 'text-sm (14px)' },
+        { value: 'text-base', text: 'text-base (16px)' },
+        { value: 'text-lg', text: 'text-lg (18px)' },
+        { value: 'text-xl', text: 'text-xl (20px)' },
+        { value: 'text-2xl', text: 'text-2xl (22px)' },
     ];
 
     constructor(private userService: UserService, private settingsService: UserSettingsService) {
-        this.settingsService.currentUserSettingsSubject$.subscribe(stts => {
+        this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
             if (stts == null) return;
             this.userSettings = stts;
             // for now, as a workaround, simply overwrite the existing FormGroup to the correct one
@@ -53,8 +52,7 @@ export class SettingsMenuComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {
-    }
+    ngOnInit(): void {}
 
     /**
      * Close the settings menu window.
@@ -78,5 +76,4 @@ export class SettingsMenuComponent implements OnInit {
         this.applySettingsEvent.emit(this.userSettings);
         this.settingsService.currentUserSettingsSubject$.next(this.userSettings);
     }
-
 }

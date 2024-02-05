@@ -7,10 +7,9 @@ import { WebsocketService } from '../services/websocket.service';
 @Component({
     selector: 'app-group-chat-window',
     templateUrl: './group-chat-window.component.html',
-    styleUrls: ['./group-chat-window.component.scss']
+    styleUrls: ['./group-chat-window.component.scss'],
 })
 export class GroupChatWindowComponent implements OnInit {
-
     @Input()
     shouldShowWindow: boolean = false;
 
@@ -20,16 +19,15 @@ export class GroupChatWindowComponent implements OnInit {
     selectedUsers = new Array<User>();
 
     formGroup = new FormGroup({
-        groupChatName: new FormControl("", Validators.required),
+        groupChatName: new FormControl('', Validators.required),
     });
 
     @Output()
     groupChatCreatedEvent = new EventEmitter<ChatRoomWithParticipantsExceptSelf>();
 
-    constructor(private userService: UserService, private wsService: WebsocketService) { }
+    constructor(private userService: UserService, private wsService: WebsocketService) {}
 
-    ngOnInit(): void {
-    }
+    ngOnInit(): void {}
 
     /**
      * Close the group chat window.
@@ -45,7 +43,7 @@ export class GroupChatWindowComponent implements OnInit {
     }
 
     userSelection(user: User) {
-        if (!this.selectedUsers.some(u => user.user_id === u.user_id)) {
+        if (!this.selectedUsers.some((u) => user.user_id === u.user_id)) {
             this.selectedUsers.push(user);
         }
     }
@@ -61,11 +59,10 @@ export class GroupChatWindowComponent implements OnInit {
         for (let user of this.selectedUsers) {
             groupChatParticipantUserIds.push(user.user_id);
         }
-        this.userService.createChatroom(groupChatParticipantUserIds, true, groupChatName).subscribe(chatroom => {
+        this.userService.createChatroom(groupChatParticipantUserIds, true, groupChatName).subscribe((chatroom) => {
             this.closeMenu();
             this.wsService.createChatroom(chatroom, groupChatParticipantUserIds);
             this.groupChatCreatedEvent.emit(chatroom);
         });
     }
-
 }
