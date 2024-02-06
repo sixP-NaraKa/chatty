@@ -6,6 +6,7 @@ import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 import { UserSettingsService } from '../services/user-settings.service';
 import { ToastrService } from 'ngx-toastr';
+import { SourceMapGenerator } from '@angular/compiler/src/output/source_map';
 
 @Component({
     selector: 'app-chat',
@@ -158,9 +159,9 @@ export class ChatComponent implements OnInit {
             if (oldCursor === -1) {
                 const scrollToElement = document.getElementById('scrollToLatest');
                 if (scrollToElement !== null) {
-                    console.log('scrolling into view');
-                    scrollToElement.scrollIntoView({ behavior: 'smooth' });
-                    console.log('scrolled into view');
+                    setTimeout(function () {
+                        scrollToElement.scrollIntoView({ behavior: 'smooth' });
+                    }, 1);
                 } else {
                     this.scrollToLatestMessage();
                 }
