@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Emote, ChatMessageWithUser, MessageReaction, Settings } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
@@ -6,18 +6,19 @@ import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 import { UserSettingsService } from '../services/user-settings.service';
 import { ToastrService } from 'ngx-toastr';
-import { SourceMapGenerator } from '@angular/compiler/src/output/source_map';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.scss'],
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
     currentUser: ApplicationUser;
 
     chatroomId: number = -1;
     @Input() set setChatroom(chatroomId: number) {
+        console.log('setter in chat');
         this.chatroomId = chatroomId;
         // re-autofocus the message input box upon chat loads
         // revisit once the overall HTML structure has been reworked/restructured
@@ -61,6 +62,8 @@ export class ChatComponent implements OnInit {
 
     embedYouTubeVideos: boolean | undefined = undefined;
 
+    currentUserSettingsSubscription: Subscription | null = null;
+
     constructor(
         private userService: UserService,
         private wsService: WebsocketService,
@@ -96,10 +99,15 @@ export class ChatComponent implements OnInit {
             }
         });
 
-        this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
+        this.currentUserSettingsSubscription = this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
+            console.log('applying chat settings', stts);
             this.applyFontSizeSettings(stts);
             this.embedYouTubeVideoSettings(stts);
         });
+    }
+
+    ngOnDestroy(): void {
+        this.currentUserSettingsSubscription?.unsubscribe();
     }
 
     applyFontSizeSettings(usrSetts: Settings) {

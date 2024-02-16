@@ -1,15 +1,16 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Settings } from '../../../../shared/types/db-dtos';
 import { UserSettingsService } from '../services/user-settings.service';
 import { UserService } from '../services/user.services';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-settings-menu',
     templateUrl: './settings-menu.component.html',
     styleUrls: ['./settings-menu.component.scss'],
 })
-export class SettingsMenuComponent implements OnInit {
+export class SettingsMenuComponent implements OnInit, OnDestroy {
     userSettings!: Settings;
 
     @Input()
@@ -39,8 +40,10 @@ export class SettingsMenuComponent implements OnInit {
         { value: 'text-2xl', text: 'text-2xl (22px)' },
     ];
 
+    currentUserSettingsSubscription: Subscription;
+
     constructor(private userService: UserService, private settingsService: UserSettingsService) {
-        this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
+        this.currentUserSettingsSubscription = this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
             if (stts == null) return;
             this.userSettings = stts;
             // for now, as a workaround, simply overwrite the existing FormGroup to the correct one
@@ -53,6 +56,10 @@ export class SettingsMenuComponent implements OnInit {
     }
 
     ngOnInit(): void {}
+
+    ngOnDestroy(): void {
+        this.currentUserSettingsSubscription.unsubscribe();
+    }
 
     /**
      * Close the settings menu window.

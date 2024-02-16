@@ -16,4 +16,9 @@ export class UserSettingsService {
             this.currentUserSettingsSubject$.next(settings);
         });
     }
+
+    public clearUserSettings() {
+        this.currentUserSettingsSubject$.complete();
+        this.currentUserSettingsSubject$ = new ReplaySubject<Settings>(1);
+    }
 }

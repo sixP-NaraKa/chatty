@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ChatRoomWithParticipantsExceptSelf, Settings, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserSettingsService } from '../services/user-settings.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-chat-page',
     templateUrl: './chat-page.component.html',
     styleUrls: ['./chat-page.component.scss'],
 })
-export class ChatPageComponent implements OnInit {
+export class ChatPageComponent implements OnInit, OnDestroy {
     /**
      * Chatroom ID will be used to notify the app-chat component which chat to load.
      * @deprecated
@@ -28,6 +29,8 @@ export class ChatPageComponent implements OnInit {
     // current user
     currentUser: ApplicationUser;
 
+    currentUserSettingsSubscription: Subscription;
+
     constructor(
         private userService: UserService,
         private wsService: WebsocketService,
@@ -41,14 +44,20 @@ export class ChatPageComponent implements OnInit {
         this.wsService.connect(this.currentUser);
 
         this.userSettings = null;
-        this.settingsService.currentUserSettingsSubject$.subscribe((settings) => {
-            this.applyFilterSettings(settings);
-        });
-
-        // this.settingsService.loadUserSettings();
+        this.settingsService.loadUserSettings();
+        this.currentUserSettingsSubscription = this.settingsService.currentUserSettingsSubject$.subscribe(
+            (settings) => {
+                this.applyFilterSettings(settings);
+            }
+        );
     }
 
     ngOnInit() {}
+
+    ngOnDestroy() {
+        this.currentUserSettingsSubscription.unsubscribe();
+        this.settingsService.clearUserSettings();
+    }
 
     /**
      * Log out the user. Catches the "logoutOutEvent(...)" event from the app-header component to do some further "cleanup".
