@@ -10,18 +10,12 @@ import { VerifyUserMiddleware } from './verify-user.middleware.js';
 import { AuthController } from './controllers/auth.controller.js';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot(),
-        AuthModule,
-        UsersModule,
-        WebsocketModule,
-    ],
+    imports: [ConfigModule.forRoot(), AuthModule, UsersModule, WebsocketModule],
     controllers: [AppController, AuthController],
     providers: [AppService, PrismaService],
 })
 export class AppModule implements NestModule {
-
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(VerifyUserMiddleware).forRoutes("/api");
+        consumer.apply(VerifyUserMiddleware).forRoutes('/api');
     }
 }

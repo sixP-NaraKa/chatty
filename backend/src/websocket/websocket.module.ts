@@ -7,6 +7,6 @@ import { UsersService } from '../users/users.service.js';
 import { SocketGateway } from './websocket.gateway.js';
 
 @Module({
-    providers: [SocketGateway, AuthService, UsersService, JwtService, PrismaService]
+    providers: [SocketGateway, AuthService, UsersService, JwtService, PrismaService],
 })
-export class WebsocketModule { }
+export class WebsocketModule {}

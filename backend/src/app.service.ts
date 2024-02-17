@@ -1,12 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service.js';
-import { User, ChatRoomWithParticipantsExceptSelf, ChatroomWithMessages, ChatMessageWithUser, MessageReaction, Notification, Emote } from '../../shared/types/db-dtos.js';
-
+import {
+    User,
+    ChatRoomWithParticipantsExceptSelf,
+    ChatroomWithMessages,
+    ChatMessageWithUser,
+    MessageReaction,
+    Notification,
+    Emote,
+} from '../../shared/types/db-dtos.js';
 
 const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
     return {
         where: {
-            user_id: userId
+            user_id: userId,
         },
         include: {
             users: false,
@@ -14,19 +21,19 @@ const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
                 include: {
                     participants: {
                         select: {
-                            users: includeUser()
+                            users: includeUser(),
                         },
                         where: {
                             NOT: {
-                                user_id: userId
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+                                user_id: userId,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    };
+};
 
 const includeUser = () => {
     return {
@@ -34,21 +41,19 @@ const includeUser = () => {
             user_id: true,
             display_name: true,
             creation_date: true,
-            password: false
-        }
-    }
-}
-
+            password: false,
+        },
+    };
+};
 
 @Injectable()
 export class AppService {
-
-    constructor(private prismaService: PrismaService) { }
+    constructor(private prismaService: PrismaService) {}
 
     /**
      * Get all registered Users.
      * Used for the user-search component.
-     * 
+     *
      * @returns @see Promise<User[]>: a User[] of all registered users
      */
     async getAllUsers(): Promise<User[]> {
@@ -57,14 +62,14 @@ export class AppService {
 
     /**
      * Get all chatrooms for a given user.
-     * 
+     *
      * @param userId userId of the requester
      * @returns a @see ChatRoomWithParticipantsExceptSelf[] Array
      */
     async getChatroomsForUserWithParticipantsExceptSelf(userId: number): Promise<ChatRoomWithParticipantsExceptSelf[]> {
         return await this.prismaService.participants.findMany({
             where: {
-                user_id: userId
+                user_id: userId,
             },
             // include: includeChatroomWithParticipantsExceptSelf(userId).include
             include: {
@@ -73,79 +78,86 @@ export class AppService {
                     include: {
                         participants: {
                             select: {
-                                users: includeUser()
+                                users: includeUser(),
                             },
                             where: {
                                 NOT: {
-                                    user_id: userId
-                                }
-                            }
+                                    user_id: userId,
+                                },
+                            },
                         },
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
     }
 
     /**
-     * 
+     *
      * @param userId userId of the requester
      * @param chatroomId chatroomId of the chat to fetch
      * @returns a @see ChatRoomWithParticipantsExceptSelf chat
      */
-    async getSingleChatroomForUserWithParticipantsExceptSelf(userId: number, chatroomId: number): Promise<ChatRoomWithParticipantsExceptSelf> {
+    async getSingleChatroomForUserWithParticipantsExceptSelf(
+        userId: number,
+        chatroomId: number
+    ): Promise<ChatRoomWithParticipantsExceptSelf> {
         return await this.prismaService.participants.findFirst({
             where: {
                 user_id: userId,
                 AND: {
                     chatrooms: {
-                        chatroom_id: chatroomId
-                    }
-                }
+                        chatroom_id: chatroomId,
+                    },
+                },
             },
-            include: includeChatroomWithParticipantsExceptSelf(userId).include
+            include: includeChatroomWithParticipantsExceptSelf(userId).include,
         });
     }
 
     /**
      * Get a single (or none) chatroom for the given userId and its participant.
      * This is used to lookup if a chatroom already exists between users.
-     * 
+     *
      * @param userId userId of the requester
      * @param participantUserId userId of the participant of the 1on1 chat
      * @returns a @see ChatRoomWithParticipantsExceptSelf chat
      */
-    async getSingleChatroomForUserWithParticipantUserId(userId: number, participantUserId: number): Promise<ChatRoomWithParticipantsExceptSelf> {
+    async getSingleChatroomForUserWithParticipantUserId(
+        userId: number,
+        participantUserId: number
+    ): Promise<ChatRoomWithParticipantsExceptSelf> {
         return await this.prismaService.participants.findFirst({
             where: {
                 user_id: userId,
                 AND: {
                     chatrooms: {
                         participants: {
-                            some: { // "none: ..." = all chats (if "findMany") where the participant has NOT the given participantUserId
+                            some: {
+                                // "none: ..." = all chats (if "findMany") where the participant has NOT the given participantUserId
                                 users: {
-                                    user_id: participantUserId
-                                }
-                            }
+                                    user_id: participantUserId,
+                                },
+                            },
                         },
-                        isgroup: false
-                    }
+                        isgroup: false,
+                    },
                 },
             },
-            include: includeChatroomWithParticipantsExceptSelf(userId).include
+            include: includeChatroomWithParticipantsExceptSelf(userId).include,
         });
     }
 
     /** @deprecated
      * Get the given chatroom and all its chat messages.
-     * 
+     *
      * @param chatroomId chatroomId to fetch messages for
      * @returns a @see ChatroomWithMessages
      */
     async getAllMessagesForChatroom(chatroomId: number): Promise<ChatroomWithMessages> {
         return await this.prismaService.chatrooms.findUnique({
             where: {
-                chatroom_id: chatroomId
+                chatroom_id: chatroomId,
             },
             include: {
                 participants: true,
@@ -159,59 +171,61 @@ export class AppService {
                                 emote_id: true,
                                 user_id: true,
                                 emote: true,
-                                users: includeUser()
-                            } // or as seen below, simply "include: { emote: true }" also works
-                        }
+                                users: includeUser(),
+                            }, // or as seen below, simply "include: { emote: true }" also works
+                        },
                     },
                     orderBy: {
-                        posted_at: "asc" // or msg_id, or leave out
-                    }
-                }
+                        posted_at: 'asc', // or msg_id, or leave out
+                    },
+                },
             },
         });
     }
 
     /**
      * Get all chat messages by a chatroom ID as a cursor-based pagination.
-     * 
+     *
      * @param chatroomId chatroom to fetch messages for
      * @param oldCursor cursor (ID of )
-     * @returns up to 10 items of @see ChatMessageWithUser and the ID of the oldest message to be used as the next "oldCursor" 
+     * @returns up to 10 items of @see ChatMessageWithUser and the ID of the oldest message to be used as the next "oldCursor"
      */
-    async getAllChatMessagesByChatroomId(chatroomId: number, oldCursor: number): Promise<[ChatMessageWithUser[], number]> {
+    async getAllChatMessagesByChatroomId(
+        chatroomId: number,
+        oldCursor: number
+    ): Promise<[ChatMessageWithUser[], number]> {
         let cursorPagination: any;
         if (oldCursor === -1) {
             cursorPagination = {
                 take: -10,
             };
-        }
-        else {
+        } else {
             cursorPagination = {
                 take: -10,
                 skip: 1,
                 cursor: {
-                    msg_id: oldCursor
-                }
+                    msg_id: oldCursor,
+                },
             };
         }
 
         const queryResults = await this.prismaService.chat_messages.findMany({
             ...cursorPagination,
             where: {
-                chatroom_id: chatroomId
+                chatroom_id: chatroomId,
             },
             orderBy: {
-                posted_at: "asc"
+                posted_at: 'asc',
             },
             include: {
                 users: includeUser(),
                 reactions: {
                     include: {
                         emote: true,
-                        users: includeUser()
-                    }
-                }
-            }
+                        users: includeUser(),
+                    },
+                },
+            },
         });
 
         if (queryResults.length == 0) {
@@ -223,29 +237,34 @@ export class AppService {
 
     /**
      * Returns the number of chat messages for a given chat.
-     * 
+     *
      * @param chatroomId the chatroom to count messages for
      * @returns how many chat messages there are
      */
     async getChatroomMessagesCount(chatroomId: number): Promise<number> {
         return await this.prismaService.chat_messages.count({
             where: {
-                chatroom_id: chatroomId
-            }
+                chatroom_id: chatroomId,
+            },
         });
     }
 
     /**
      * Create a new chatroom (1on1 or group chat) with its participants.
-     * 
+     *
      * @param userId userId of the requester
      * @param participantUserIds userIds of the participants
-     * @returns 
+     * @returns
      */
-    async createChatroomWithParticipants(userId: number, participantUserIds: number[], isgroup: boolean = false, groupChatName?: string | null) {
+    async createChatroomWithParticipants(
+        userId: number,
+        participantUserIds: number[],
+        isgroup: boolean = false,
+        groupChatName?: string | null
+    ) {
         const data = [{ user_id: userId }]; // add user which created this chatroom
         for (let num of participantUserIds) {
-            data.push({ user_id: num })
+            data.push({ user_id: num });
         }
         const { chatroom_id } = await this.prismaService.chatrooms.create({
             data: {
@@ -254,38 +273,39 @@ export class AppService {
                 created_by: userId,
                 participants: {
                     createMany: {
-                        data: data
-                    }
-                }
+                        data: data,
+                    },
+                },
             },
             select: {
-                chatroom_id: true
-            }
+                chatroom_id: true,
+            },
         });
         return await this.prismaService.participants.findFirst({
             where: {
                 user_id: userId,
                 AND: {
                     chatrooms: {
-                        chatroom_id: chatroom_id
-                    }
-                }
+                        chatroom_id: chatroom_id,
+                    },
+                },
             },
-            include: includeChatroomWithParticipantsExceptSelf(userId).include
+            include: includeChatroomWithParticipantsExceptSelf(userId).include,
         });
     }
 
     async removeUserFromGroupChat(userId: number, chatroomId: number): Promise<number> {
-        return await this.prismaService.$executeRaw`DELETE FROM participants WHERE user_id=${userId} AND chatroom_id=${chatroomId};`
+        return await this.prismaService
+            .$executeRaw`DELETE FROM participants WHERE user_id=${userId} AND chatroom_id=${chatroomId};`;
     }
 
     async addUsersToGroupChat(userIds: number[], chatroomId: number) {
         const data = [];
         for (let num of userIds) {
-            data.push({ user_id: num, chatroom_id: chatroomId })
+            data.push({ user_id: num, chatroom_id: chatroomId });
         }
         await this.prismaService.participants.createMany({
-            data: data
+            data: data,
         });
     }
 
@@ -295,120 +315,130 @@ export class AppService {
                 user_id: userId,
                 AND: {
                     chatrooms: {
-                        chatroom_id: chatroomId
-                    }
-                }
-            }
+                        chatroom_id: chatroomId,
+                    },
+                },
+            },
         });
         return participant.user_id === userId && participant.chatroom_id === chatroomId;
     }
 
     /**
      * Insert a new image chat message record.
-     * 
+     *
      * @param message message content
      * @param userId userId of the user who wrote the message
      * @param chatroomId the chatroomId in which the message was written
      * @param isimage if the message is an image, defaults to false
      * @returns a @see ChatMessageWithUser
      */
-    async insertMessage(message: string, userId: number, chatroomId: number, isimage: boolean = false): Promise<ChatMessageWithUser> {
+    async insertMessage(
+        message: string,
+        userId: number,
+        chatroomId: number,
+        isimage: boolean = false
+    ): Promise<ChatMessageWithUser> {
         return this.prismaService.chat_messages.create({
             data: {
                 msg_content: message,
                 user_id: userId,
                 chatroom_id: chatroomId,
-                isimage: isimage
+                isimage: isimage,
             },
             include: {
                 users: includeUser(),
                 reactions: {
                     include: {
                         emote: true,
-                        users: includeUser()
-                    }
-                }
-            }
+                        users: includeUser(),
+                    },
+                },
+            },
         });
     }
 
     /**
      * Insert a new file chat message record.
-     * 
+     *
      * @param fileName file name (as the message content)
      * @param fileId file ID
      * @param userId userId of the user who wrote the message
      * @param chatroomId the chatroomId in which the message was written
      * @returns a @see ChatMessageWithUser
      */
-    async insertFileMessage(fileName: string, fileId: string, userId: number, chatroomId: number): Promise<ChatMessageWithUser> {
+    async insertFileMessage(
+        fileName: string,
+        fileId: string,
+        userId: number,
+        chatroomId: number
+    ): Promise<ChatMessageWithUser> {
         return this.prismaService.chat_messages.create({
             data: {
                 msg_content: fileName,
                 user_id: userId,
                 chatroom_id: chatroomId,
                 isfile: true,
-                file_uuid: fileId
+                file_uuid: fileId,
             },
             include: {
                 users: includeUser(),
                 reactions: {
                     include: {
                         emote: true,
-                        users: includeUser()
-                    }
-                }
-            }
+                        users: includeUser(),
+                    },
+                },
+            },
         });
     }
 
     /**
      * Get the message by its ID.
-     * 
+     *
      * @param messageId the message to get
      * @returns @see ChatMessageWithUser
      */
     async getMessageById(messageId: number): Promise<ChatMessageWithUser | undefined> {
         return this.prismaService.chat_messages.findUnique({
             where: {
-                msg_id: messageId
+                msg_id: messageId,
             },
             include: {
                 users: {
                     select: {
                         user_id: true,
                         display_name: true,
-                        creation_date: true
-                    }
+                        creation_date: true,
+                    },
                 },
                 reactions: {
                     include: {
                         emote: true,
-                        users: includeUser()
-                    }
-                }
-            }
-        })
+                        users: includeUser(),
+                    },
+                },
+            },
+        });
     }
 
     /**
      * Delete a chat message and its related reactions.
-     * 
+     *
      * @param messageId the message to delete
      * @returns if the message has been deleted
      */
     async deleteMessage(messageId: number): Promise<boolean> {
         const message = await this.prismaService.chat_messages.delete({
             where: {
-                msg_id: messageId
-            }
+                msg_id: messageId,
+            },
         });
         return message !== null || message !== undefined ? true : false;
     }
 
     /**
      * Insert a new chat message reaction.
-     * 
+     *
      * @param messageId the message ID on which the reaction was made on
      * @param emoteId the ID of the emote used
      * @returns a MessageReaction
@@ -418,12 +448,12 @@ export class AppService {
             data: {
                 msg_id: messageId,
                 emote_id: emoteId,
-                user_id: userId
+                user_id: userId,
             },
             include: {
                 emote: true,
-                users: includeUser()
-            }
+                users: includeUser(),
+            },
         });
     }
 
@@ -436,28 +466,28 @@ export class AppService {
 
     /**
      * Fetch all notifications which belong to the given user.
-     * 
+     *
      * @param userId user for which to fetch notifications
      * @returns a Notification[]
      */
     async getAllNotificationsForUser(userId: number): Promise<Notification[]> {
         return this.prismaService.notifications.findMany({
             where: {
-                user_id: userId
+                user_id: userId,
             },
             include: {
                 users: includeUser(),
                 originated_from_user: includeUser(),
-                chatrooms: true
+                chatrooms: true,
             },
             orderBy: {
-                date: "asc"
-            }
+                date: 'asc',
+            },
         });
     }
 
     /**
-     * 
+     *
      * @param userId user ID (current logged in user)
      * @param originatedFrom user ID of who triggered the notification
      * @param chatroomId chatroom ID in which the notification happened
@@ -465,34 +495,39 @@ export class AppService {
      * @param content the content of the notification
      * @returns a Notification
      */
-    async insertNewNotification(userId: number, originatedFrom: number, chatroomId: number, type: string, content: string): Promise<Notification> {
+    async insertNewNotification(
+        userId: number,
+        originatedFrom: number,
+        chatroomId: number,
+        type: string,
+        content: string
+    ): Promise<Notification> {
         return this.prismaService.notifications.create({
             data: {
                 user_id: userId,
                 originated_from: originatedFrom,
                 chatroom_id: chatroomId,
                 type: type,
-                content: content
+                content: content,
             },
             include: {
                 users: includeUser(),
                 originated_from_user: includeUser(),
-                chatrooms: true
-            }
+                chatrooms: true,
+            },
         });
     }
 
     /**
      * Deletes a notification.
-     * 
+     *
      * @param notificationId the notification to delete
      */
     async deleteNotification(notificationId: number) {
         return this.prismaService.notifications.delete({
             where: {
-                notification_id: notificationId
-            }
+                notification_id: notificationId,
+            },
         });
     }
-
 }
