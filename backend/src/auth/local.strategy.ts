@@ -6,20 +6,15 @@ import { User } from '../../../shared/types/db-dtos.js';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
+  constructor(private authService: AuthService) {
+    super();
+  }
 
-    constructor(private authService: AuthService) {
-        super();
+  async validate(username: string, password: string): Promise<User> {
+    const user = await this.authService.validateUser(username, password);
+    if (!user) {
+      throw new UnauthorizedException();
     }
-
-    async validate(username: string, password: string): Promise<User> {
-        // console.log("validate => username, password", username, password);
-        const user = await this.authService.validateUser(username, password);
-        if (!user) {
-            throw new UnauthorizedException();
-        }
-        // console.log("validated user", user);
-        return user;
-    }
-
-
+    return user;
+  }
 }

@@ -18,7 +18,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     chatroomId: number = -1;
     @Input() set setChatroom(chatroomId: number) {
-        console.log('setter in chat');
         this.chatroomId = chatroomId;
         // re-autofocus the message input box upon chat loads
         // revisit once the overall HTML structure has been reworked/restructured
@@ -100,7 +99,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
 
         this.currentUserSettingsSubscription = this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
-            console.log('applying chat settings', stts);
             this.applyFontSizeSettings(stts);
             this.embedYouTubeVideoSettings(stts);
         });
@@ -403,13 +401,11 @@ export class ChatComponent implements OnInit, OnDestroy {
      */
     async onFileDrop(files: Array<File>) {
         for (let file of files) {
-            console.log('file to download', file);
             if (file.size === 0) {
                 this.toastrService.error('File is either empty or a folder.', 'Invalid Upload');
             } else if (file.size < 20 * 1024 * 1024) {
                 const blob = file.slice(0, 16);
                 this.userService.validateFileType(blob).subscribe(([isValid, result]) => {
-                    console.log(isValid, result, typeof result);
                     if (!isValid) {
                         // check if the result is null and the file.name has extension ".txt"
                         // if that is the case, we will treat the file as valid

@@ -21,7 +21,6 @@ export class DragAndDropFileDirective {
         // if (event.currentTarget === this.chatWindow) {
         this.dragAndDropAreaEnabled = true;
         this.dragAndDropAreaBlur = true;
-        console.log('dragover');
         // }
     }
 
@@ -31,7 +30,6 @@ export class DragAndDropFileDirective {
         if (event.target === this.chatWindow) {
             this.dragAndDropAreaEnabled = false;
             this.dragAndDropAreaBlur = false;
-            console.log('dragleave');
         }
     }
 

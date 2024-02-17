@@ -85,7 +85,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
 
     applyFilterSettings(usrSetts: Settings) {
-        // console.log("passed usersettings", usrSetts, "this.userSettings", this.userSettings);
         let shouldReload: boolean = false;
 
         if (this.userSettings !== null && this.userSettings.filter !== usrSetts.filter) {

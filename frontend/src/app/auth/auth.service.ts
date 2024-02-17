@@ -42,7 +42,6 @@ export class AuthService {
             )
             .pipe(
                 map((user) => {
-                    // console.log("user obj =>", user);
                     if (user && user.access_token) {
                         localStorage.setItem('chatty-current-user', JSON.stringify(user)); // TODO: would rather not do this here, but for now no other "easy" way to store needed user info
                         this.currentUserSubject.next(user);

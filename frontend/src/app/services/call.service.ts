@@ -20,13 +20,11 @@ export class CallService {
     constructor(private wsService: WebsocketService, private userService: UserService) {}
 
     public async call(chatroomId: number, isCaller: boolean) {
-        console.log('PEER CONNECTION in call()', this.peerConnection, isCaller);
         this.chatroomId = chatroomId;
         await this.createPeerConnection();
 
         // only audio offer option
         if (isCaller) {
-            console.log('creating offer');
             const offer = await this.peerConnection.createOffer(offerOptions);
             await this.peerConnection.setLocalDescription(offer);
 
@@ -88,21 +86,17 @@ export class CallService {
         //     ]
         // });
 
-        console.log('creating peer connection 1');
         this.peerConnection = new RTCPeerConnection();
 
         if (!this.localStream) {
-            console.log('getting user media');
             await this.getSelectedAudioMediaDevice();
         }
         this.localStream.getTracks().forEach((track) => this.peerConnection.addTrack(track, this.localStream));
 
-        console.log('adding event listeners 5');
         this.peerConnection.addEventListener('icecandidate', this.handleIceCandidateEvent);
         this.peerConnection.addEventListener('iceconnectionstatechange', this.handleIceConnectionStateChangeEvent);
         this.peerConnection.addEventListener('signalingstatechange', this.handleSignallingStateChangeEvent);
         this.peerConnection.addEventListener('track', this.handleTrackEvent);
-        console.log('done 6');
     }
 
     private handleIceCandidateEvent = (event: RTCPeerConnectionIceEvent) => {
@@ -135,14 +129,12 @@ export class CallService {
     };
 
     private handleTrackEvent = (event: RTCTrackEvent) => {
-        console.log('track event', event, event.streams, this.userService.currentUser.userId);
         const remoteAudioElement = document.getElementById('audioPlaybackElement') as HTMLAudioElement;
         remoteAudioElement.srcObject = event.streams[0];
     };
 
     public async addIncomingMessageHandler() {
         this.wsService.getVoiceChatMessage().subscribe(async (msg) => {
-            console.log(msg);
             switch (msg.type) {
                 case 'offer':
                     await this.handleOfferMessage(msg);
@@ -163,9 +155,7 @@ export class CallService {
     }
 
     private async handleOfferMessage(msg: any) {
-        console.log('PEER CONNECTION in handleOfferMessage()', this.peerConnection);
         if (!this.peerConnection) {
-            console.log('offer received, creating peer connection');
             // await this.createPeerConnection();
             await this.call(msg.chatroomId, false);
         }
@@ -183,7 +173,6 @@ export class CallService {
     }
 
     private async handleAnswerMessage(desc: RTCSessionDescriptionInit) {
-        console.log('answer received', desc);
         await this.peerConnection.setRemoteDescription(desc);
     }
 
@@ -199,7 +188,6 @@ export class CallService {
     }
 
     public async getSelectedAudioMediaDevice() {
-        console.log('fetching user media 2');
         // get the selected audio device from the select element
         let constraints;
         const element = document.getElementById('audioDeviceSelectElement') as HTMLSelectElement;
@@ -239,6 +227,5 @@ export class CallService {
         } catch (e) {
             return e;
         }
-        console.log('done fetching user media 3');
     }
 }

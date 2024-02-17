@@ -69,7 +69,6 @@ export class VoiceChatComponent implements AfterViewInit {
                         });
                     break;
                 case 'accept':
-                    console.log('accept', this.isInCall);
                     this.stopRingtone();
                     this.callRequestInProgress = false;
                     await this.callService.call(msg.chatroomId, true); // here we are the initiator/caller
@@ -81,18 +80,15 @@ export class VoiceChatComponent implements AfterViewInit {
                         });
                     break;
                 case 'decline':
-                    console.log('switch: call declined, noop (atm)');
                     this.callRequestInProgress = false;
                     break;
                 case 'hangup': // just to get the hangup event here as well, to handle some UI stuff
-                    console.log(msg);
                     if (this.isInCall) {
                         this.isInCall = false;
                         this.callService.hangup(msg.chatroomId);
                     }
                     break;
                 default: // e.g case: "ignored", etc. => see websocket backend implementation (might be reworked, so to cover all cases)
-                    console.log('call has been ignored, enabling calling functionality');
                     this.callRequestInProgress = false;
                     break;
             }
@@ -167,7 +163,6 @@ export class VoiceChatComponent implements AfterViewInit {
     }
 
     async onAcceptCall(divId: string, chatroomId: number) {
-        console.log('call accepted, notifying the user who send the request and creating peer connection and the like');
         this.stopRingtone();
         this.inCallWithChatroom = this.notifsCurrentlyActiveMap.get(divId) as any;
         this.isInCall = true;
@@ -183,7 +178,6 @@ export class VoiceChatComponent implements AfterViewInit {
     }
 
     onDeclineCall(divId: string, chatroomId: number) {
-        console.log('call declined');
         this.stopRingtone();
         this.removeNotification(divId, chatroomId);
         this.wsService.sendVoiceChatRequest({
@@ -223,7 +217,6 @@ export class VoiceChatComponent implements AfterViewInit {
             // filter only for audio devices
             // if any where found, they will be shown as <option> tags inside of the <select> box
             this.audioDevices = devices.filter((device) => device.kind === 'audioinput');
-            console.log(this.audioDevices);
             if (this.audioDevices.length === 0) {
                 window.alert('No microphone found. Please plug in a microphone device.');
                 return;
