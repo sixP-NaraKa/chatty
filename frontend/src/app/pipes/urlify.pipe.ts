@@ -27,7 +27,7 @@ export class UrlifyPipe implements PipeTransform {
         });
     }
 
-    replaceWhenMatched(msg: string, callbackWhenMatched: (match: string) => string): string {
+    private replaceWhenMatched(msg: string, callbackWhenMatched: (match: string) => string): string {
         return msg.replace(new RegExp(this.urlRegex, 'g'), (match) => callbackWhenMatched(match));
     }
 
