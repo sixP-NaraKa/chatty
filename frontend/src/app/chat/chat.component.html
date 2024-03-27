@@ -91,7 +91,7 @@
     (emoteSelectedEvent)="onEmoteSelect($event)"
     class="absolute bottom-0 right-0 w-full"
 ></app-emote-select>
-<div *ngIf="this.chatroomId !== -1" class="absolute bottom-0 w-full h-fit text-xs md:text-base">
+<div class="absolute bottom-0 w-full h-fit text-xs md:text-base">
     <form
         [formGroup]="formGroup"
         (ngSubmit)="sendMessage()"
@@ -99,6 +99,7 @@
         class="form-element mb-0 border-t-2 border-gray-700 h-full"
     >
         <input
+            #messageInput
             id="messageInput"
             required
             formControlName="messageInput"

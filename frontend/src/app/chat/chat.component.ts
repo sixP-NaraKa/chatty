@@ -14,18 +14,15 @@ import { WebsocketService } from '../services/websocket.service';
     styleUrls: ['./chat.component.scss'],
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
-    @ViewChild('chatWindow', { static: false, read: ElementRef }) chatWindowElement: ElementRef | undefined;
+    @ViewChild('chatWindow', { read: ElementRef }) chatWindowElement: ElementRef | undefined;
+    @ViewChild('messageInput', { read: ElementRef }) messageInputElement: ElementRef | undefined;
     currentUser: ApplicationUser;
 
     chatroomId: number = -1;
     @Input() set setChatroom(chatroomId: number) {
         this.chatroomId = chatroomId;
         // re-autofocus the message input box upon chat loads
-        // revisit once the overall HTML structure has been reworked/restructured
-        const input = document.getElementById('messageInput') as HTMLInputElement;
-        if (input !== null) {
-            input.focus();
-        }
+        this.messageInputElement?.nativeElement?.focus();
         this.displayChat(this.chatroomId);
     }
 
@@ -229,7 +226,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private messageSubscribeCallback(msg: ChatMessageWithUser) {
-        if (!msg.isimage || !msg.isfile) this.formGroup.reset();
+        if (!msg.isimage && !msg.isfile) this.formGroup.reset();
         this.chatroomMessages.push(msg);
 
         // emit msg via websocket
@@ -254,9 +251,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         this.formGroup.setValue({
             messageInput: this.formGroup.value.messageInput + emote.emote,
         });
-        document.getElementById('messageInput')?.focus();
-        // ^ or use @ViewChield("messageInput") (#HashTagOnElement)
-        // and then this.element.nativeElement.focus()
+        this.messageInputElement?.nativeElement?.focus();
     }
 
     /**
