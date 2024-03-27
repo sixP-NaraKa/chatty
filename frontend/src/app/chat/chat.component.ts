@@ -1,19 +1,20 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Emote, ChatMessageWithUser, MessageReaction, Settings } from '../../../../shared/types/db-dtos';
-import { ApplicationUser } from '../auth/auth.service';
-import { UserService } from '../services/user.services';
-import { WebsocketService } from '../services/websocket.service';
-import { UserSettingsService } from '../services/user-settings.service';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
+import { ChatMessageWithUser, Emote, MessageReaction, Settings } from '../../../../shared/types/db-dtos';
+import { ApplicationUser } from '../auth/auth.service';
+import { UserSettingsService } from '../services/user-settings.service';
+import { UserService } from '../services/user.services';
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.scss'],
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
+    @ViewChild('chatWindow', { static: false, read: ElementRef }) chatWindowElement: ElementRef | undefined;
     currentUser: ApplicationUser;
 
     chatroomId: number = -1;
@@ -29,7 +30,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
     chatroomMessages = new Array<ChatMessageWithUser>();
-    cursor: number = -1;
+    private cursor: number = -1;
 
     preSelectedEmotes: Emote[] = [
         {
@@ -62,6 +63,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     embedYouTubeVideos: boolean | undefined = undefined;
 
     currentUserSettingsSubscription: Subscription | null = null;
+    currentUserSettingsSubscriptionEmbedFilter: Subscription | null = null;
 
     constructor(
         private userService: UserService,
@@ -98,18 +100,28 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.currentUserSettingsSubscription = this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
-            this.applyFontSizeSettings(stts);
-            this.embedYouTubeVideoSettings(stts);
-        });
+        // YouTube embed setting done here, because in the ngAfterViewInit it causes the expression change after it was checked error
+        this.currentUserSettingsSubscriptionEmbedFilter = this.settingsService.currentUserSettingsSubject$.subscribe(
+            (stts) => {
+                this.embedYouTubeVideoSettings(stts);
+            }
+        );
     }
 
     ngOnDestroy(): void {
         this.currentUserSettingsSubscription?.unsubscribe();
+        this.currentUserSettingsSubscriptionEmbedFilter?.unsubscribe();
     }
 
-    applyFontSizeSettings(usrSetts: Settings) {
-        let chatWindowElement = document.getElementById('chatWindowDiv') as HTMLDivElement;
+    ngAfterViewInit(): void {
+        // this takes care of the font size changes
+        this.currentUserSettingsSubscription = this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
+            this.applyFontSizeSettings(stts);
+        });
+    }
+
+    private applyFontSizeSettings(usrSetts: Settings) {
+        let chatWindowElement = this.chatWindowElement?.nativeElement as HTMLDivElement;
         if (chatWindowElement === null || chatWindowElement === undefined) {
             return;
         }
@@ -131,7 +143,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         }
     }
 
-    embedYouTubeVideoSettings(usrSetts: Settings) {
+    private embedYouTubeVideoSettings(usrSetts: Settings) {
         this.embedYouTubeVideos = usrSetts.embed_yt_videos;
     }
 
@@ -140,7 +152,7 @@ export class ChatComponent implements OnInit, OnDestroy {
      *
      * @param chatroomIdToLoad chat to load messages from
      */
-    displayChat(chatroomIdToLoad: number) {
+    private displayChat(chatroomIdToLoad: number) {
         this.showEmotesMenu = false;
         if (chatroomIdToLoad !== -1) {
             // create new instance here, in case any errors might happen during chatroom navigation or whatnot
@@ -155,7 +167,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     /**
      * Fetches and displays the (next) chat messages in the UI.
      */
-    fetchAndDisplayChatMessages(chatroomIdToLoad: number, oldCursor: number) {
+    private fetchAndDisplayChatMessages(chatroomIdToLoad: number, oldCursor: number) {
         return this.userService.getChatroomMessages(chatroomIdToLoad, oldCursor).subscribe((chatroomData) => {
             const [chat_messages, cursor] = chatroomData;
             this.chatroomMessages.unshift(...chat_messages);
@@ -208,7 +220,7 @@ export class ChatComponent implements OnInit, OnDestroy {
      *
      * @param image image to send
      */
-    sendImageMessage(image: File) {
+    private sendImageMessage(image: File) {
         if (this.chatroomId !== -1) {
             this.userService
                 .sendImageMessage(this.chatroomId, image)
@@ -312,7 +324,7 @@ export class ChatComponent implements OnInit, OnDestroy {
      *
      * @param reaction the reaction to add to the message
      */
-    addEmoteReactionToMessage(reaction: MessageReaction) {
+    private addEmoteReactionToMessage(reaction: MessageReaction) {
         const [msg, ..._] = this.chatroomMessages.filter((msg) => msg.msg_id === reaction.msg_id); // there will only ever be one filtered message here
         msg.reactions.push(reaction); // show the reaction for the current user (locally)
     }
@@ -324,7 +336,7 @@ export class ChatComponent implements OnInit, OnDestroy {
      *
      * This is also available via a pipe, made for the "lazy loaded" image messages.
      */
-    scrollToLatestMessage(ms: number = 100) {
+    private scrollToLatestMessage(ms: number = 100) {
         setTimeout(function () {
             const lastMessageDiv = Array.from(document.getElementsByClassName('chat-message-div')).pop();
             lastMessageDiv?.scrollIntoView({ behavior: 'smooth' });

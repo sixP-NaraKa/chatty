@@ -1,4 +1,5 @@
 <div
+    #chatWindow
     class="chat-scrollbar z-50 text-left h-full overflow-y-auto"
     id="chatWindow"
     infiniteScroll
@@ -9,6 +10,7 @@
     appDragAndDropFile
     (onFileDrop)="onFileDrop($event)"
 >
+    <div id="chatWindowWrapper" class="chat-window-wrapper"></div>
     <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-6 pt-2 px-2 sm:mb-4">
         <p
             id="messageContainer"
