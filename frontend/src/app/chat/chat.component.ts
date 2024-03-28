@@ -340,10 +340,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
     onPaste(event: ClipboardEvent | any) {
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        let blob: File;
         for (const item of items) {
             if (item.type.indexOf('image') === 0) {
-                blob = item.getAsFile();
+                let blob = item.getAsFile();
                 this.sendImageMessage(blob);
             }
         }
