@@ -98,7 +98,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
             window.alert(
                 'Filter changes will be applied after a page reload. Reloading page for the changes to take effect...'
             );
-            document.location.reload();
+            window.location.reload();
         }
     }
 

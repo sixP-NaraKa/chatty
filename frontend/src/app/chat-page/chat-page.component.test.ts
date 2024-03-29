@@ -23,15 +23,22 @@ describe('ChatTabsComponent', () => {
     let websocketServiceMock: Partial<WebsocketService>;
     let userSettingsServiceMock: Partial<UserSettingsService> = {
         loadUserSettings: jest.fn(),
-        currentUserSettingsSubject$: new ReplaySubject<Settings>(1),
     };
+
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation();
 
     beforeEach(async () => {
         userServiceMock = {};
         websocketServiceMock = {
             connect: jest.fn(),
         };
+        userSettingsServiceMock.currentUserSettingsSubject$ = new ReplaySubject(1);
         userSettingsServiceMock.clearUserSettings = jest.fn();
+
+        // https://stackoverflow.com/a/77572311
+        const windowRef: any = window;
+        delete windowRef.location;
+        windowRef.location = { ...window.location, reload: jest.fn() };
 
         await TestBed.configureTestingModule({
             declarations: [
@@ -59,6 +66,7 @@ describe('ChatTabsComponent', () => {
 
     afterEach(async () => {
         jest.clearAllMocks();
+        jest.resetAllMocks();
     });
 
     test('should be created', () => {
@@ -69,6 +77,41 @@ describe('ChatTabsComponent', () => {
         expect(component).toBeTruthy();
         expect(websocketServiceMock.connect).toHaveBeenCalledTimes(1);
         expect(userSettingsServiceMock.loadUserSettings).toHaveBeenCalledTimes(1);
+    });
+
+    test('should be applying settings (no reload)', () => {
+        const fakeSettings: Settings = {
+            embed_yt_videos: true,
+            filter: 'filter',
+            font_size: 'text-xs',
+            settings_id: 1,
+            user_id: 1,
+        };
+        userSettingsServiceMock.currentUserSettingsSubject$?.next(fakeSettings);
+
+        expect(alertSpy).not.toHaveBeenCalled();
+        expect(window.location.reload).not.toHaveBeenCalled();
+    });
+
+    test('should be applying settings (with reload)', () => {
+        const fakeSettings: Settings = {
+            embed_yt_videos: true,
+            filter: 'filter',
+            font_size: 'text-xs',
+            settings_id: 1,
+            user_id: 1,
+        };
+        component.userSettings = {
+            embed_yt_videos: true,
+            filter: '',
+            font_size: 'text-xs',
+            settings_id: 1,
+            user_id: 1,
+        };
+        userSettingsServiceMock.currentUserSettingsSubject$?.next(fakeSettings);
+
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(window.location.reload).toHaveBeenCalledTimes(1);
     });
 
     test('should unsubscribe and clear user settings', () => {
