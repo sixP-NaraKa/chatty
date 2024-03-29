@@ -6,6 +6,6 @@
         "module": "commonjs",
         "types": ["jest", "node", "jest-extended"]
     },
-    "files": ["polyfills.ts"],
-    "include": ["**/*.test.ts", "**/*.d.ts", "../setup-jest.ts"]
+    "files": ["polyfills.ts", "./setup-jest.ts"],
+    "include": ["**/*.test.ts", "**/*.d.ts"]
 }

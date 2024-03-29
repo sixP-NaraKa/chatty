@@ -12,6 +12,7 @@ module.exports = {
             isolatedModules: true,
         },
     },
+    globalSetup: "jest-preset-angular/global-setup",
     // moduleDirectories: ["node_modules", "src", __dirname],
     modulePaths: ["<rootDir>"],
 };
