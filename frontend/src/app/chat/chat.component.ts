@@ -442,7 +442,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     downloadFile(message: ChatMessageWithUser) {
-        // TODO: make/add some type of progress bar?
         this.userService.downloadFile(this.chatroomId, message.file_uuid).subscribe((fileBlob) => {
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(fileBlob);

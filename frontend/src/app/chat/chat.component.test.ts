@@ -258,7 +258,9 @@ describe('ChatTabsComponent', () => {
         let sendMessageSpy: jest.SpyInstance<Observable<ChatMessageWithUser>>;
 
         beforeEach(() => {
-            sendMessageSpy = jest.spyOn(userServiceMock, 'sendMessage').mockReturnValue(of(fakeChatMessageWithUser));
+            sendMessageSpy = jest
+                .spyOn(userServiceMock, 'sendMessage')
+                .mockImplementation(() => of(fakeChatMessageWithUser));
             websocketServiceMock.sendChatMessage = jest.fn();
             component.formGroup.setValue(input);
             component.chatroomId = 1;
@@ -570,7 +572,7 @@ describe('ChatTabsComponent', () => {
 
         test('can fire onFileDrop', fakeAsync(async () => {
             files.push(new File(['12345'], 'test.pdf'));
-            const spy = jest.spyOn(component, 'onFileDrop');
+            const spy = jest.spyOn(component, 'onFileDrop').mockImplementation();
 
             fixture.debugElement.query(By.css('#chatWindow')).triggerEventHandler('onFileDrop', files);
 
@@ -579,17 +581,16 @@ describe('ChatTabsComponent', () => {
     });
 
     test('can download file', () => {
+        const file = new File([], 'test.pdf');
         const anchorElement = document.createElement('a');
-        const anchorElementClickSpy = jest.spyOn(anchorElement, 'click');
+        const anchorElementClickSpy = jest.spyOn(anchorElement, 'click').mockImplementation();
 
-        const downloadFileSpy = jest
-            .spyOn(userServiceMock, 'downloadFile')
-            .mockReturnValue(of(new File([], 'test.pdf')));
+        const downloadFileSpy = jest.spyOn(userServiceMock, 'downloadFile').mockReturnValue(of(file));
 
         const documentSpy = jest.spyOn(document, 'createElement').mockReturnValue(anchorElement);
+        window.URL.createObjectURL = jest.fn().mockReturnValue('https://github.com/chatty/Test_Href');
 
         component.downloadFile(fakeChatMessageWithUser);
-        fixture.detectChanges();
 
         expect(downloadFileSpy).toHaveBeenCalledTimes(1);
         expect(downloadFileSpy).toHaveBeenCalledWith(
@@ -601,7 +602,11 @@ describe('ChatTabsComponent', () => {
         expect(documentSpy).toHaveBeenCalledWith('a');
         expect(documentSpy).toHaveReturnedWith(anchorElement);
 
-        // everything works except this one... Hmm
-        // expect(anchorElementClickSpy).toHaveBeenCalledTimes(1);
+        expect(window.URL.createObjectURL).toHaveBeenCalledWith(file);
+
+        expect(anchorElement.href).toBe('https://github.com/chatty/Test_Href');
+        expect(anchorElement.download).toBe(fakeChatMessageWithUser.msg_content);
+
+        expect(anchorElementClickSpy).toHaveBeenCalledTimes(1);
     });
 });
