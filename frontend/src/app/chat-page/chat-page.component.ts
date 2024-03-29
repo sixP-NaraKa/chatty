@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ChatRoomWithParticipantsExceptSelf, Settings, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserSettingsService } from '../services/user-settings.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-chat-page',
@@ -84,7 +84,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
         this.hideDropdown = true;
     }
 
-    applyFilterSettings(usrSetts: Settings) {
+    private applyFilterSettings(usrSetts: Settings) {
         let shouldReload: boolean = false;
 
         if (this.userSettings !== null && this.userSettings.filter !== usrSetts.filter) {
