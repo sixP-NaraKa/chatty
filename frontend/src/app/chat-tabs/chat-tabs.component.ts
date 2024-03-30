@@ -128,7 +128,7 @@ export class ChatTabsComponent implements AfterContentInit {
     /**
      * Listen for new chatrooms the user is a part of and join their respective websocket rooms.
      */
-    listenForNewChatroomsAndJoinThem() {
+    private listenForNewChatroomsAndJoinThem() {
         // listen for new chatrooms which have been created and the user is a part of.
         // join these chatrooms first, but do not show them in the UI unless there have been messages.
         // listen in a second part (done in the app-chat-tabs component for the moment) to the websocket event "get:message"
@@ -152,7 +152,7 @@ export class ChatTabsComponent implements AfterContentInit {
      * and the websocket room (this happens in the backend directly), but in the UI the room is still there,
      * but not otherwise interactable (e.g. sending/receicing messages will not work).
      */
-    listenForRemoveChatroomAndRemoveChatFromList() {
+    private listenForRemoveChatroomAndRemoveChatFromList() {
         this.wsService.listenForRemoveChatroom().subscribe((chatroomId) => {
             const filteredChatrooms = this.chatrooms.filter((chat) => chat.chatroom_id === chatroomId);
             if (filteredChatrooms.length !== 0) {
@@ -165,7 +165,7 @@ export class ChatTabsComponent implements AfterContentInit {
     /**
      * Listen for new messages from not yet added/visible chatrooms the user might be a part of.
      */
-    listenForNewMessagesFromNotOpenChatrooms() {
+    private listenForNewMessagesFromNotOpenChatrooms() {
         this.wsService.getChatMessage().subscribe((msg) => {
             const chatroomAlreadyShown = this.chatrooms.some((chatroom) => chatroom.chatroom_id === msg.chatroom_id);
             if (!chatroomAlreadyShown) {
@@ -186,7 +186,7 @@ export class ChatTabsComponent implements AfterContentInit {
     /**
      * Listen to new reactions from other chatrooms.
      */
-    listenForNewMessageReactionsFromNotOpenChatrooms() {
+    private listenForNewMessageReactionsFromNotOpenChatrooms() {
         this.wsService.getNewEmoteReaction().subscribe(([chatroomId, messageId, userId, reaction]) => {
             this.addNewUnreadNotificationAndNotifyUser(chatroomId, userId, {
                 type: 'reaction',
@@ -200,7 +200,7 @@ export class ChatTabsComponent implements AfterContentInit {
      *
      * @param chatroomIdFromNotification chatroom ID from the new unread notification/event
      */
-    addNewUnreadNotificationAndNotifyUser(
+    private addNewUnreadNotificationAndNotifyUser(
         chatroomIdFromNotification: number,
         originatedFromUserId: number,
         content: { type: 'message' | 'reaction' | 'call'; data: string }
@@ -232,7 +232,7 @@ export class ChatTabsComponent implements AfterContentInit {
      * @param userId the user Id which started the notification event
      * @param content the content of the event, consists of a type and the data
      */
-    emitNewUnreadNotification(
+    private emitNewUnreadNotification(
         chatroomId: number,
         userId: number,
         content: { type: 'message' | 'reaction' | 'call'; data: string }
