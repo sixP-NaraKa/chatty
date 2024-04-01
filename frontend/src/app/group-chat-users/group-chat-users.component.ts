@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { User, UserIdDisplayName } from '../../../../shared/types/db-dtos';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { User } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
 
 @Component({
@@ -7,7 +7,7 @@ import { UserService } from '../services/user.services';
     templateUrl: './group-chat-users.component.html',
     styleUrls: ['./group-chat-users.component.scss'],
 })
-export class GroupChatUsersComponent implements AfterViewInit {
+export class GroupChatUsersComponent {
     users = new Array<User>();
     @Input() set groupChatUsers(users: Array<User>) {
         this.users = users;
@@ -29,8 +29,6 @@ export class GroupChatUsersComponent implements AfterViewInit {
     constructor(private userService: UserService) {
         this.currentUserId = this.userService.currentUser.userId;
     }
-
-    ngAfterViewInit(): void {}
 
     /**
      * Onclick function to remove a user from the group chat.
