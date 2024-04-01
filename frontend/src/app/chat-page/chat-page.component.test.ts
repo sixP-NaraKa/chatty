@@ -16,7 +16,7 @@ import { SliderComponent } from '../slider/slider.component';
 import { VoiceChatComponent } from '../voice-chat/voice-chat.component';
 import { ChatPageComponent } from './chat-page.component';
 
-describe('ChatTabsComponent', () => {
+describe('ChatPageComponent', () => {
     let component: ChatPageComponent;
     let fixture: ComponentFixture<ChatPageComponent>;
     let userServiceMock: Partial<UserService>;

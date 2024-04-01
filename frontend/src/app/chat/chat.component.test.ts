@@ -17,7 +17,7 @@ import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
 import { ChatComponent } from './chat.component';
 
-describe('ChatTabsComponent', () => {
+describe('ChatComponent', () => {
     let component: ChatComponent;
     let fixture: ComponentFixture<ChatComponent>;
     let userServiceMock = MockService(UserService);
