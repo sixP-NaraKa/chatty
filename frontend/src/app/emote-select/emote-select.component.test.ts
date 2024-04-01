@@ -64,9 +64,6 @@ describe('EmoteSelectComponent', () => {
             expect(component.availableEmotes).toBe(emotes);
             expect(component.filteredEmotes).toBe(emotes);
 
-            expect(component.emoteSearchInputElement).not.toBeNull();
-            expect(component.emoteSearchInputElement.onkeyup).not.toBeNull();
-
             expect(fixture.debugElement.query(By.css('#emotesContainerId')).nativeElement.hidden).toBeFalsy();
             expect(fixture.debugElement.queryAll(By.css('ul li'))).toHaveLength(3);
         });
@@ -120,15 +117,19 @@ describe('EmoteSelectComponent', () => {
         component.availableEmotes = emotes;
         component.filteredEmotes = emotes;
 
-        (fixture.debugElement.query(By.css('#emoteSearchInput')).nativeElement as HTMLInputElement).value =
-            'Test Emote Name 3';
+        const element = fixture.debugElement.query(By.css('#emoteSearchInput')).nativeElement as HTMLInputElement;
+        element.value = 'Test Emote Name 3';
 
-        component.filterEmotes();
+        // or spy on the event.target property and mock the return value to the element above
+        // but this here feels more correct, I guess
+        const event = new Event('input');
+        element.dispatchEvent(event);
+
+        fixture.detectChanges();
 
         expect(component.filteredEmotes).toHaveLength(1);
         expect(component.filteredEmotes).toContain(emotes[2]);
 
-        fixture.detectChanges();
         expect(fixture.debugElement.queryAll(By.css('ul li'))).toHaveLength(1);
     });
 });
