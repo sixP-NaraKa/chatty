@@ -6,7 +6,7 @@ import { UserService } from '../services/user.services';
 import { UserSearchComponent } from '../user-search/user-search.component';
 import { GroupChatUsersComponent } from './group-chat-users.component';
 
-describe('EmoteSelectComponent', () => {
+describe('GroupChatUsersComponent', () => {
     let component: GroupChatUsersComponent;
     let fixture: ComponentFixture<GroupChatUsersComponent>;
     let userServiceMock: Partial<UserService> = {

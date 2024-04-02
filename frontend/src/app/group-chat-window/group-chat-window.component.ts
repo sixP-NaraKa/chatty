@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ChatRoomWithParticipantsExceptSelf, User } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
@@ -9,7 +9,7 @@ import { WebsocketService } from '../services/websocket.service';
     templateUrl: './group-chat-window.component.html',
     styleUrls: ['./group-chat-window.component.scss'],
 })
-export class GroupChatWindowComponent implements OnInit {
+export class GroupChatWindowComponent {
     @Input()
     shouldShowWindow: boolean = false;
 
@@ -26,8 +26,6 @@ export class GroupChatWindowComponent implements OnInit {
     groupChatCreatedEvent = new EventEmitter<ChatRoomWithParticipantsExceptSelf>();
 
     constructor(private userService: UserService, private wsService: WebsocketService) {}
-
-    ngOnInit(): void {}
 
     /**
      * Close the group chat window.
