@@ -11,7 +11,6 @@ import { ApplicationUser } from './auth.service';
 describe('AuthGuard', () => {
     let authGuard: AuthGuard;
     let userService = MockService(UserService);
-    // let userServiceStub: Partial<UserService> = {};
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -24,12 +23,8 @@ describe('AuthGuard', () => {
                     },
                 ]),
             ],
-            // providers: [{ provide: UserService, useValue: userServiceStub }],
             providers: [{ provide: UserService, useValue: userService }],
         });
-
-        // // authGuard = new AuthGuard(routerSpy, userServiceStub as UserService);
-        // // userService = TestBed.inject(UserService);
         authGuard = TestBed.inject(AuthGuard);
     });
 
@@ -41,16 +36,14 @@ describe('AuthGuard', () => {
         expect(authGuard).toBeTruthy();
     });
 
-    test('can activate route', () => {
+    test('should activate route when user is valid', () => {
         ngMocks.stubMember(userService, 'currentUser', {} as unknown as ApplicationUser);
-        // jest.spyOn(userService, 'currentUser', 'get').mockReturnValue({} as ApplicationUser);
         let value = authGuard.canActivate({} as ActivatedRouteSnapshot, fakeRouterState('/test'));
         expect(value).toBeTruthy();
     });
 
-    test('can not activate route', () => {
+    test('should not activate route when is is invalid', () => {
         ngMocks.stubMember(userService, 'currentUser', undefined as unknown as ApplicationUser);
-        // jest.spyOn(userService, 'currentUser', 'get').mockReturnValue(null as unknown as ApplicationUser);
         let value = authGuard.canActivate({} as ActivatedRouteSnapshot, fakeRouterState('/test'));
         expect(value).toBeFalsy();
     });
