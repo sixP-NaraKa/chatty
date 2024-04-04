@@ -1,5 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ApplicationUser } from '../auth/auth.service';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { UserService } from '../services/user.services';
 
 @Component({
@@ -7,16 +6,14 @@ import { UserService } from '../services/user.services';
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
     @Output()
     logOutEvent = new EventEmitter<boolean>();
 
-    currentUser: ApplicationUser;
+    currentUserName: string;
     constructor(private userService: UserService) {
-        this.currentUser = this.userService.currentUser;
+        this.currentUserName = this.userService.currentUser.username;
     }
-
-    ngOnInit(): void {}
 
     /**
      * Logs out the user and emits the logout event to subscribed components for further processing if needed.
