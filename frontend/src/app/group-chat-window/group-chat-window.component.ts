@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ChatRoomWithParticipantsExceptSelf, User } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
@@ -10,11 +10,7 @@ import { WebsocketService } from '../services/websocket.service';
     styleUrls: ['./group-chat-window.component.scss'],
 })
 export class GroupChatWindowComponent {
-    @Input()
     shouldShowWindow: boolean = false;
-
-    @Output()
-    groupChatClosedEvent = new EventEmitter<boolean>();
 
     selectedUsers = new Array<User>();
 
@@ -37,7 +33,6 @@ export class GroupChatWindowComponent {
         this.formGroup.reset();
 
         this.shouldShowWindow = false;
-        this.groupChatClosedEvent.emit(false);
     }
 
     userSelection(user: User) {

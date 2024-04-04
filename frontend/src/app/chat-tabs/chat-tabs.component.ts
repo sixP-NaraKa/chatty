@@ -17,8 +17,6 @@ export class ChatTabsComponent implements AfterContentInit {
     @Input()
     filterOutEmpty1on1Chats: boolean = true;
 
-    showGroupChatCreateWindow: boolean = false;
-
     chatrooms = new Array<ChatRoomWithParticipantsExceptSelf>();
 
     selectedChatId: number = -1;
@@ -247,21 +245,6 @@ export class ChatTabsComponent implements AfterContentInit {
             content: content.data,
             date: new Date(Date.now()),
         });
-    }
-
-    /**
-     * Notifies the group-chat-window component to show the window.
-     */
-    onCreateGroupChatButtonClick() {
-        this.showGroupChatCreateWindow = true;
-    }
-
-    /**
-     * Catches the event emitted from the group-chat-window component,
-     * when the group chat window has been closed.
-     */
-    onCreateGroupChatClosed() {
-        this.showGroupChatCreateWindow = false;
     }
 
     /**

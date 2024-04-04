@@ -134,16 +134,12 @@ describe('ChatPageComponent', () => {
                 chatroom_id: 1,
             };
             websocketServiceMock.joinChatroom = jest.fn();
-            component.groupChatParticipants.length = 1;
-            component.hideDropdown = false;
 
             component.displayChat(chat as ChatRoomWithParticipantsExceptSelf);
 
             expect(websocketServiceMock.joinChatroom).toHaveBeenCalledTimes(1);
             expect(websocketServiceMock.joinChatroom).toHaveBeenCalledWith(chat.chatroom_id);
             expect(component.chatroom).toBe(chat as ChatRoomWithParticipantsExceptSelf);
-            expect(component.groupChatParticipants.length).toBe(0);
-            expect(component.hideDropdown).toBeTruthy();
         });
 
         test('should fire loadChat', () => {
@@ -160,97 +156,6 @@ describe('ChatPageComponent', () => {
     });
 
     describe('group chat', () => {
-        test('should show users in group chat', () => {
-            const chat: Partial<ChatRoomWithParticipantsExceptSelf> = {
-                chatroom_id: 1,
-                chatrooms: {
-                    chatroom_id: 1,
-                    created_at: new Date(),
-                    created_by: 1,
-                    isgroup: true,
-                    name: 'Test Group',
-                    participants: [
-                        {
-                            users: {
-                                user_id: 1,
-                                display_name: 'Test User',
-                                creation_date: new Date(),
-                            },
-                        },
-                    ],
-                },
-            };
-            component.chatroom = chat as ChatRoomWithParticipantsExceptSelf;
-
-            component.showUsersForGroupChat();
-
-            expect(component.groupChatParticipants.length).not.toBe(0);
-            expect(component.hideDropdown).toBeFalsy();
-        });
-
-        test('should hide users in group chat', () => {
-            const chat: Partial<ChatRoomWithParticipantsExceptSelf> = {
-                chatroom_id: 1,
-                chatrooms: {
-                    chatroom_id: 1,
-                    created_at: new Date(),
-                    created_by: 1,
-                    isgroup: true,
-                    name: 'Test Group',
-                    participants: [
-                        {
-                            users: {
-                                user_id: 1,
-                                display_name: 'Test User',
-                                creation_date: new Date(),
-                            },
-                        },
-                    ],
-                },
-            };
-            component.chatroom = chat as ChatRoomWithParticipantsExceptSelf;
-
-            // call it twice, because then it is hidden again
-            component.showUsersForGroupChat();
-            expect(component.groupChatParticipants.length).not.toBe(0);
-            expect(component.hideDropdown).toBeFalsy();
-
-            component.showUsersForGroupChat();
-            expect(component.groupChatParticipants.length).toBe(0);
-            expect(component.hideDropdown).toBeTruthy();
-        });
-
-        test('should call show/hide users button when fired on click', () => {
-            const chat: Partial<ChatRoomWithParticipantsExceptSelf> = {
-                chatroom_id: 1,
-                chatrooms: {
-                    chatroom_id: 1,
-                    created_at: new Date(),
-                    created_by: 1,
-                    isgroup: true,
-                    name: 'Test Group',
-                    participants: [
-                        {
-                            users: {
-                                user_id: 1,
-                                display_name: 'Test User',
-                                creation_date: new Date(),
-                            },
-                        },
-                    ],
-                },
-            };
-            component.chatroom = chat as ChatRoomWithParticipantsExceptSelf;
-            // detect changes so the *ngIf directives are correctly applied
-            fixture.detectChanges();
-
-            const spy = jest.spyOn(component, 'showUsersForGroupChat').mockImplementation(() => {});
-
-            fixture.debugElement.query(By.css('#chatHeaderNavBarButtons div button')).triggerEventHandler('click', {});
-
-            expect(spy).toHaveBeenCalledTimes(1);
-        });
-
         test('should remove user from group chat', () => {
             const userToRemove = {
                 user_id: 2,

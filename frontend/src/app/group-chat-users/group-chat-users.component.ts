@@ -8,12 +8,11 @@ import { UserService } from '../services/user.services';
     styleUrls: ['./group-chat-users.component.scss'],
 })
 export class GroupChatUsersComponent {
-    users = new Array<User>();
-    @Input() set groupChatUsers(users: Array<User>) {
+    users: { users: User }[] = [];
+    @Input() set groupChatUsers(users: { users: User }[]) {
         this.users = users;
     }
 
-    @Input()
     hideDropdown: boolean = true;
 
     @Input()
@@ -35,17 +34,14 @@ export class GroupChatUsersComponent {
      *
      * @param user the user to remove from the group chat
      */
-    onRemoveParticipant(user: User) {
-        const idxOf = this.users.indexOf(user);
-        this.users.splice(idxOf, 1);
-        this.removeUserFromGroupChat.emit(user);
+    onRemoveParticipant(user: { users: User }) {
+        this.removeUserFromGroupChat.emit(user.users);
     }
 
     onUserSelection(user: User) {
-        if (this.users.some((u) => u.user_id === user.user_id)) {
+        if (this.users.some((u) => u.users.user_id === user.user_id)) {
             return;
         }
-        // this.users.push(user); // no need to push here, as we do that already in the chat-page component (we would do it twice therefore)
         this.addUserToGroupChatEvent.emit(user);
     }
 }

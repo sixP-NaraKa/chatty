@@ -323,30 +323,6 @@ describe('ChatTabsComponent', () => {
         });
     });
 
-    test('should show group chat creation window + should fire on click', () => {
-        component.onCreateGroupChatButtonClick();
-        expect(component.showGroupChatCreateWindow).toBeTruthy();
-
-        component.showGroupChatCreateWindow = false;
-        const spy = jest.spyOn(component, 'onCreateGroupChatButtonClick');
-
-        fixture.debugElement.query(By.css('.user-search-group-chat button')).triggerEventHandler('click', {});
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(component.showGroupChatCreateWindow).toBeTruthy();
-    });
-
-    test('should hide group chat creation window + should fire on click', () => {
-        component.onCreateGroupChatClosed();
-        expect(component.showGroupChatCreateWindow).toBeFalsy();
-
-        component.showGroupChatCreateWindow = true;
-        const spy = jest.spyOn(component, 'onCreateGroupChatClosed');
-
-        fixture.debugElement.query(By.css('app-group-chat-window')).triggerEventHandler('groupChatClosedEvent', {});
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(component.showGroupChatCreateWindow).toBeFalsy();
-    });
-
     test('should create group chat + should fire on click', () => {
         const chatroom: Partial<ChatRoomWithParticipantsExceptSelf> = {
             chatroom_id: 100,

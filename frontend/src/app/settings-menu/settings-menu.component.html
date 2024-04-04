@@ -1,12 +1,22 @@
+<button
+    type="button"
+    title="Settings"
+    class="h-6 fa-solid fa-gear text-violet-200 hover:text-violet-400"
+    (click)="shouldShowMenu = !shouldShowMenu"
+></button>
 <div
+    *ngIf="shouldShowMenu"
     class="settings-menu-blur z-50 absolute top-0 left-0 flex items-center h-screen w-screen"
-    [class.hidden]="shouldShowMenu === false"
     [class.flex]="shouldShowMenu === true"
 >
     <div
         class="settings-menu-window relative items-center w-[50%] min-w-fit h-64 px-4 mx-auto border-2 border-gray-700"
     >
-        <button type="button" class="absolute top-0 right-0 p-2 fa-solid fa-xmark" (click)="closeMenu()"></button>
+        <button
+            type="button"
+            class="absolute top-0 right-0 p-2 fa-solid fa-xmark"
+            (click)="shouldShowMenu = false"
+        ></button>
         <p class="pt-8"></p>
 
         <form

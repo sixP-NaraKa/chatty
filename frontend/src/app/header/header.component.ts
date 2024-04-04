@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserService } from '../services/user.services';
 
@@ -11,11 +10,6 @@ import { UserService } from '../services/user.services';
 export class HeaderComponent implements OnInit {
     @Output()
     logOutEvent = new EventEmitter<boolean>();
-
-    @Output()
-    userSelectionEvent = new EventEmitter<User>();
-
-    showMenu: boolean = false;
 
     currentUser: ApplicationUser;
     constructor(private userService: UserService) {
@@ -30,20 +24,5 @@ export class HeaderComponent implements OnInit {
     logout() {
         this.logOutEvent.emit(true);
         this.userService.logout();
-    }
-
-    /**
-     * Shows the settings menu.
-     */
-    onMenuButtonClick() {
-        this.showMenu = true;
-    }
-
-    /**
-     * Catches the event emitted from the settings-menu component,
-     * when the settings menu has been closed.
-     */
-    onSettingsMenuClosed() {
-        this.showMenu = false;
     }
 }

@@ -6,13 +6,7 @@
                 <b class="text-violet-200">{{ currentUser.username }}</b>
             </p>
             <div class="flex space-x-4">
-                <button
-                    type="menu"
-                    title="Settings"
-                    class="h-6 fa-solid fa-gear text-violet-200 hover:text-violet-400"
-                    (click)="onMenuButtonClick()"
-                ></button>
-                <!-- <app-settings-menu [shouldShowMenu]="showMenu"></app-settings-menu> -->
+                <app-settings-menu class="z-50"></app-settings-menu>
                 <button
                     type="button"
                     (click)="logout()"
@@ -23,8 +17,3 @@
         </div>
     </div>
 </header>
-<app-settings-menu
-    [shouldShowMenu]="showMenu"
-    (settingsMenuClosedEvent)="onSettingsMenuClosed()"
-    class="z-50"
-></app-settings-menu>

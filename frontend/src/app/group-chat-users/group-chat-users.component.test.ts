@@ -17,19 +17,23 @@ describe('GroupChatUsersComponent', () => {
         },
     };
 
-    let fakeUsers: User[];
+    let fakeUsers: { users: User }[];
 
     beforeEach(async () => {
         fakeUsers = [
             {
-                creation_date: new Date(),
-                display_name: 'Test Display Name',
-                user_id: 1,
+                users: {
+                    creation_date: new Date(),
+                    display_name: 'Test Display Name',
+                    user_id: 1,
+                },
             },
             {
-                creation_date: new Date(),
-                display_name: 'Test Display Name 2',
-                user_id: 2,
+                users: {
+                    creation_date: new Date(),
+                    display_name: 'Test Display Name 2',
+                    user_id: 2,
+                },
             },
         ];
 
@@ -43,7 +47,8 @@ describe('GroupChatUsersComponent', () => {
         fixture.detectChanges();
 
         component.groupChatUsers = fakeUsers;
-        component.groupChatCreatedBy = fakeUsers[0].user_id;
+        component.groupChatCreatedBy = fakeUsers[0].users.user_id;
+        component.hideDropdown = true;
     });
 
     afterEach(async () => {
@@ -54,26 +59,51 @@ describe('GroupChatUsersComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    test('should remove participant', () => {
+    test('should show dropdown', () => {
+        const button = fixture.debugElement.query(By.css('button'));
+        button.triggerEventHandler('click', {});
+        fixture.detectChanges();
+
+        expect(component.hideDropdown).toBeFalsy();
+        expect(button.nativeElement.innerHTML.trim()).toBe('Hide Users');
+    });
+
+    test('should hide dropdown', () => {
+        const button = fixture.debugElement.query(By.css('button'));
+        button.triggerEventHandler('click', {});
+        fixture.detectChanges();
+
+        expect(component.hideDropdown).toBeFalsy();
+        expect(button.nativeElement.innerHTML.trim()).toBe('Hide Users');
+
+        // do the same again to hide the dropdown
+        button.triggerEventHandler('click', {});
+        fixture.detectChanges();
+
+        expect(component.hideDropdown).toBeTruthy();
+        expect(button.nativeElement.innerHTML.trim()).toBe('Show Users');
+    });
+
+    test('should emit removal of participant', () => {
         const spy = jest.spyOn(component.removeUserFromGroupChat, 'emit').mockImplementation();
         const user = fakeUsers[1];
         component.onRemoveParticipant(user);
 
-        expect(component.users).toHaveLength(1);
-        expect(spy).toBeCalledWith(user);
+        expect(spy).toHaveBeenCalledWith(user.users);
     });
 
     test('should fire onRemoveParticipant on click', () => {
+        component.hideDropdown = false;
         const spy = jest.spyOn(component, 'onRemoveParticipant').mockImplementation();
         const user = fakeUsers[1];
 
         fixture.detectChanges();
         fixture.debugElement.queryAll(By.css('.group-chat-hr button'))[1].triggerEventHandler('click', user);
 
-        expect(spy).toBeCalledWith(user);
+        expect(spy).toHaveBeenCalledWith(user);
     });
 
-    test('should not add/emit new user on selection when user was already added', () => {
+    test('should not emit new user on selection when user was already added', () => {
         const user: User = {
             creation_date: new Date(),
             display_name: 'Test Display Name 2',
@@ -84,7 +114,7 @@ describe('GroupChatUsersComponent', () => {
         expect(component.users).toHaveLength(2);
     });
 
-    test('should add/emit new user on selection', () => {
+    test('should emit new user on selection', () => {
         const spy = jest.spyOn(component.addUserToGroupChatEvent, 'emit').mockImplementation();
         const user: User = {
             creation_date: new Date(),
@@ -93,10 +123,11 @@ describe('GroupChatUsersComponent', () => {
         };
         component.onUserSelection(user);
 
-        expect(spy).toBeCalledWith(user);
+        expect(spy).toHaveBeenCalledWith(user);
     });
 
     test('should fire onUserSelection on selection event', () => {
+        component.hideDropdown = false;
         const spy = jest.spyOn(component, 'onUserSelection').mockImplementation();
         const user: User = {
             creation_date: new Date(),
@@ -107,15 +138,17 @@ describe('GroupChatUsersComponent', () => {
         fixture.detectChanges();
         fixture.debugElement.query(By.css('app-user-search')).triggerEventHandler('userSelectionEvent', user);
 
-        expect(spy).toBeCalledWith(user);
+        expect(spy).toHaveBeenCalledWith(user);
     });
 
     test('should highlight creator', () => {
+        component.hideDropdown = false;
         fixture.detectChanges();
         expect(fixture.debugElement.query(By.css('.fa-star.text-yellow-300'))).not.toBeUndefined();
     });
 
     test('should show all users', () => {
+        component.hideDropdown = false;
         fixture.detectChanges();
         expect(fixture.debugElement.queryAll(By.css('div.group-chat-hr'))).toHaveLength(2);
     });

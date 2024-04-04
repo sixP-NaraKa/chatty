@@ -58,7 +58,6 @@ describe('GroupChatWindowComponent', () => {
     });
 
     test('should close menu', () => {
-        const spy = jest.spyOn(component.groupChatClosedEvent, 'emit').mockImplementation();
         component.selectedUsers.push(...fakeUsers);
         component.formGroup.controls['groupChatName'].setValue('Test Group Name');
         component.formGroup.markAsTouched();
@@ -70,10 +69,10 @@ describe('GroupChatWindowComponent', () => {
         expect(component.formGroup.value.groupChatName).toBeNull();
         expect(component.formGroup.touched).toBeFalsy();
         expect(component.shouldShowWindow).toBeFalsy();
-        expect(spy).toHaveBeenCalledWith(false);
     });
 
     test('should add selected user', () => {
+        component.shouldShowWindow = true;
         component.userSelection(fakeUsers[0]);
         expect(component.selectedUsers).toHaveLength(1);
 
@@ -83,8 +82,10 @@ describe('GroupChatWindowComponent', () => {
     });
 
     test('should fire userSelectionEvent', () => {
+        component.shouldShowWindow = true;
         const spy = jest.spyOn(component, 'userSelection').mockImplementation();
 
+        fixture.detectChanges();
         fixture.debugElement.query(By.css('app-user-search')).triggerEventHandler('userSelectionEvent', fakeUsers[0]);
 
         expect(spy).toHaveBeenCalledWith(fakeUsers[0]);
@@ -92,6 +93,7 @@ describe('GroupChatWindowComponent', () => {
     });
 
     test('should remove user', () => {
+        component.shouldShowWindow = true;
         component.selectedUsers.push(fakeUsers[0]);
         component.removeUser(fakeUsers[0]);
         expect(component.selectedUsers).toHaveLength(0);
@@ -102,6 +104,7 @@ describe('GroupChatWindowComponent', () => {
     });
 
     test('should fire removeUser on click', () => {
+        component.shouldShowWindow = true;
         const spy = jest.spyOn(component, 'removeUser').mockImplementation();
         component.selectedUsers.push(fakeUsers[0]);
 
@@ -133,8 +136,10 @@ describe('GroupChatWindowComponent', () => {
     });
 
     test('should fire onSubmit', () => {
+        component.shouldShowWindow = true;
         const spy = jest.spyOn(component, 'onSubmit').mockImplementation();
 
+        fixture.detectChanges();
         fixture.debugElement.query(By.css('form')).triggerEventHandler('ngSubmit', {});
 
         expect(spy).toHaveBeenCalledTimes(1);
@@ -142,11 +147,15 @@ describe('GroupChatWindowComponent', () => {
     });
 
     test('should disable submit button when no users selected, group name is empty or form is not valid', () => {
+        component.shouldShowWindow = true;
+        fixture.detectChanges();
+
         const button = fixture.debugElement.query(By.css('form > button')).nativeElement;
         expect(button.disabled).toBeTruthy();
     });
 
     test('should disable submit button when users selected, but group name is empty or form is not valid', () => {
+        component.shouldShowWindow = true;
         component.selectedUsers.push(fakeUsers[0]);
         fixture.detectChanges();
 
@@ -155,6 +164,7 @@ describe('GroupChatWindowComponent', () => {
     });
 
     test('should enable submit button when users selected, group name is not empty and form is valid', () => {
+        component.shouldShowWindow = true;
         component.selectedUsers.push(fakeUsers[0]);
         component.formGroup.controls['groupChatName'].setValue('Test Group Name');
         fixture.detectChanges();
