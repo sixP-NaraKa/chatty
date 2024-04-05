@@ -1,16 +1,7 @@
 <app-header (logOutEvent)="logout()"></app-header>
 
 <div id="slidersContainer" class="pt-2 pb-4">
-    <div>
-        <app-slider [slideFromLeft]="true" [showArrowIcons]="false">
-            <i class="sliderContentInButtonIcon fa-solid fa-bell"> {{ notificationCounter }}</i>
-            <i class="sliderContentOutButtonIcon fa-solid fa-bell"> {{ notificationCounter }}</i>
-            <app-notification-summary
-                class="contentToSlide"
-                (notificationCounterEvent)="onNotificationCounterChange($event)"
-            ></app-notification-summary>
-        </app-slider>
-    </div>
+    <app-notification-summary></app-notification-summary>
     <app-voice-chat [setChatroom]="this.chatroom"></app-voice-chat>
 </div>
 

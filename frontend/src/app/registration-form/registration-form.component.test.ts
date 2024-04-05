@@ -42,6 +42,7 @@ describe('RegistrationFormComponent', () => {
         fixture.detectChanges();
 
         jest.spyOn(window, 'alert').mockImplementation();
+        jest.spyOn(console, 'error').mockImplementation();
     });
 
     afterEach(async () => {

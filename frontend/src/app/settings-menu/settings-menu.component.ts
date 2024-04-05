@@ -40,7 +40,6 @@ export class SettingsMenuComponent implements OnDestroy {
 
     constructor(private userService: UserService, private settingsService: UserSettingsService) {
         this.currentUserSettingsSubscription = this.settingsService.currentUserSettingsSubject$.subscribe((stts) => {
-            console.log(stts);
             if (stts == null) return;
             this.userSettings = stts;
             this.settingsMenuFormGroup.setValue({

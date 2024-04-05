@@ -143,9 +143,4 @@ export class ChatPageComponent implements OnInit, OnDestroy {
             this.wsService.addUserToChatroom(this.chatroom, user.user_id);
         });
     }
-
-    notificationCounter: number = 0;
-    onNotificationCounterChange(count: number) {
-        this.notificationCounter = count;
-    }
 }

@@ -309,31 +309,4 @@ describe('ChatPageComponent', () => {
             expect(spy).toHaveBeenCalledTimes(1);
         });
     });
-
-    describe('notification counter', () => {
-        test('should change notification counter', () => {
-            expect(component.notificationCounter).toBe(0);
-            component.onNotificationCounterChange(10);
-            expect(component.notificationCounter).toBe(10);
-
-            fixture.detectChanges();
-            expect(
-                fixture.debugElement.query(By.css('app-slider .sliderContentInButtonIcon')).nativeElement.innerHTML
-            ).toBe(' 10');
-            expect(
-                fixture.debugElement.query(By.css('app-slider .sliderContentOutButtonIcon')).nativeElement.innerHTML
-            ).toBe(' 10');
-        });
-
-        test('should change notification counter when fired via event', () => {
-            expect(component.notificationCounter).toBe(0);
-            const spy = jest.spyOn(component, 'onNotificationCounterChange').mockImplementation();
-
-            fixture.debugElement
-                .query(By.css('app-notification-summary'))
-                .triggerEventHandler('notificationCounterEvent', 10);
-
-            expect(spy).toHaveBeenCalledWith(10);
-        });
-    });
 });
