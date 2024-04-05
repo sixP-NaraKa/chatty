@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Notification } from '../../../../shared/types/db-dtos';
 import { NotificationService } from '../services/notification.service';
-import { UserService } from '../services/user.services';
 
 @Component({
     selector: 'app-notification-summary',
@@ -17,7 +16,7 @@ export class NotificationSummaryComponent implements OnDestroy {
 
     unreadNotifications = new Array<Notification>();
 
-    constructor(private userService: UserService, private notificationService: NotificationService) {
+    constructor(private notificationService: NotificationService) {
         // get all notifications which were previously saved upon start
         this.notificationService.getAllNotificationsForUser().subscribe((notifs) => {
             this.unreadNotifications = this.unreadNotifications.concat(notifs);
