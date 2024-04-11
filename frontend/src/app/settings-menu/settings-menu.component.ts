@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Settings } from '../../../../shared/types/db-dtos';
@@ -14,12 +14,6 @@ export class SettingsMenuComponent implements OnDestroy {
     userSettings!: Settings;
 
     shouldShowMenu: boolean = false;
-
-    /**
-     * @deprecated
-     */
-    @Output()
-    applySettingsEvent = new EventEmitter<Settings>();
 
     settingsMenuFormGroup: FormGroup = new FormGroup({
         filterRadio: new FormControl(this.userSettings?.filter, Validators.required),
@@ -52,7 +46,6 @@ export class SettingsMenuComponent implements OnDestroy {
 
     ngOnDestroy(): void {
         this.currentUserSettingsSubscription.unsubscribe();
-        console.log('des');
     }
 
     /**
@@ -65,8 +58,6 @@ export class SettingsMenuComponent implements OnDestroy {
         this.userSettings.embed_yt_videos = this.settingsMenuFormGroup.value.embedYouTubeVideos as boolean;
         // save the new settings in the db
         this.userService.updateUserSettings(this.userSettings);
-        // emit the user settings
-        this.applySettingsEvent.emit(this.userSettings);
         this.settingsService.currentUserSettingsSubject$.next(this.userSettings);
     }
 }
