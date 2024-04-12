@@ -63,6 +63,7 @@ export class SliderComponent implements OnInit {
         } else if (element.classList.contains(this.selectedClass)) {
             element.classList.remove(this.selectedClass);
             element.classList.add(this.dismissedClass);
+            // TODO: set display = "none"?
         }
     }
 }
