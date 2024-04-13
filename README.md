@@ -1,7 +1,8 @@
 # Chatty
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.7.
+frontend coverage: [![frontend codecov](https://codecov.io/gh/sixP-NaraKa/chatty/graph/badge.svg?token=P5QF2BPNTK)](https://codecov.io/gh/sixP-NaraKa/chatty)
 
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.7.
 
 ## Disclaimer
 
@@ -13,37 +14,34 @@ Many "do's and don'ts" have been learned during the course of this project, so e
 
 All in all, this project was fun to implement!
 
-
 ## Features
 
 Here are the things "chatty" can do:
 
-- User registering and login
-- 1 on 1 chats
-    - message reactions
-    - emotes
-    - URL highlighting
-    - copy-paste images
-    - display images from URLs (jpg, jpeg, png, gif, tiff, bmp)
-    - pagination via infinite scrolling
-    - file sharing/uploading via drag-and-drop into a chat
-    - embed YouTube videos if setting enabled (placed at the end of messages)
-- Group chats
-    - adding and removing people
-- 1 on 1 voice chats (via WebSockets)
-- notifications (e.g. missed messages, reactions or calls)
-- mobile-friendly layout (on smaller screen sizes)
-- ...
+-   User registering and login
+-   1 on 1 chats
+    -   message reactions
+    -   emotes
+    -   URL highlighting
+    -   copy-paste images
+    -   display images from URLs (jpg, jpeg, png, gif, tiff, bmp)
+    -   pagination via infinite scrolling
+    -   file sharing/uploading via drag-and-drop into a chat
+    -   embed YouTube videos if setting enabled (placed at the end of messages)
+-   Group chats
+    -   adding and removing people
+-   1 on 1 voice chats (via WebSockets)
+-   notifications (e.g. missed messages, reactions or calls)
+-   mobile-friendly layout (on smaller screen sizes)
+-   ...
 
 ### Possibly upcoming
 
-- group voice chats (not sure if the current implementation would support this to some degree already)
-
+-   group voice chats (not sure if the current implementation would support this to some degree already)
 
 ## Development server
 
 Run `npm run serve` for a dev server. Navigate to `http://localhost:4300/`. The application will automatically reload if you change any of the source files.
-
 
 ## Running it locally
 
@@ -68,7 +66,6 @@ If this is not wanted, simply remove the affecting lines of code.
 
 File: [main.ts](https://github.com/sixP-NaraKa/chatty/blob/main/backend/src/main.ts).
 
-
 ### Database
 
 A `.env` file with a `DATABASE_URL` property is required for the usage of Prisma. This `.env` file should reside in the root directory of the application.
@@ -76,7 +73,6 @@ A `.env` file with a `DATABASE_URL` property is required for the usage of Prisma
 chatty uses the database tables mentioned in the [schema.prisma](https://github.com/sixP-NaraKa/chatty/blob/main/backend/prisma/schema.prisma) file.
 
 The schema leaves quite a bit to be desired (:D), but it functions as needed.
-
 
 ## Screenshots
 
