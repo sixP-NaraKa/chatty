@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
 import { ChatMessageWithUser, Emote, MessageReaction, Settings } from '../../../../shared/types/db-dtos';
@@ -201,8 +201,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
      * Sends a message to the backend for inserting, as well as sending the chat message over the
      * correct websocket room.
      */
-    formGroup = new FormGroup({
-        messageInput: new FormControl('', Validators.required),
+    formGroup = new UntypedFormGroup({
+        messageInput: new UntypedFormControl('', Validators.required),
     });
     sendMessage() {
         if (this.chatroomId !== -1) {

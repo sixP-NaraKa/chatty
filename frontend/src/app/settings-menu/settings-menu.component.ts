@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Settings } from '../../../../shared/types/db-dtos';
 import { UserSettingsService } from '../services/user-settings.service';
@@ -15,10 +15,10 @@ export class SettingsMenuComponent implements OnDestroy {
 
     shouldShowMenu: boolean = false;
 
-    settingsMenuFormGroup: FormGroup = new FormGroup({
-        filterRadio: new FormControl(this.userSettings?.filter, Validators.required),
-        fontSize: new FormControl(this.userSettings?.font_size, Validators.required),
-        embedYouTubeVideos: new FormControl(this.userSettings?.embed_yt_videos, Validators.required),
+    settingsMenuFormGroup: UntypedFormGroup = new UntypedFormGroup({
+        filterRadio: new UntypedFormControl(this.userSettings?.filter, Validators.required),
+        fontSize: new UntypedFormControl(this.userSettings?.font_size, Validators.required),
+        embedYouTubeVideos: new UntypedFormControl(this.userSettings?.embed_yt_videos, Validators.required),
     });
 
     availableFontSizes = [

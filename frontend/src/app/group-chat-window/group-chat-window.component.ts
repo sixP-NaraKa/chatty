@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ChatRoomWithParticipantsExceptSelf, User } from '../../../../shared/types/db-dtos';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
@@ -14,8 +14,8 @@ export class GroupChatWindowComponent {
 
     selectedUsers = new Array<User>();
 
-    formGroup = new FormGroup({
-        groupChatName: new FormControl('', Validators.required),
+    formGroup = new UntypedFormGroup({
+        groupChatName: new UntypedFormControl('', Validators.required),
     });
 
     @Output()

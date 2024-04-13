@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first } from 'rxjs';
 import { UserService } from '../services/user.services';
@@ -16,10 +16,10 @@ export class RegistrationFormComponent implements OnInit {
         (document.getElementById('username') as HTMLInputElement).focus();
     }
 
-    registrationFormGroup = new FormGroup({
-        usernameInput: new FormControl('', Validators.required),
-        passwordInput: new FormControl('', Validators.required),
-        repeatPasswordInput: new FormControl('', Validators.required),
+    registrationFormGroup = new UntypedFormGroup({
+        usernameInput: new UntypedFormControl('', Validators.required),
+        passwordInput: new UntypedFormControl('', Validators.required),
+        repeatPasswordInput: new UntypedFormControl('', Validators.required),
     });
 
     registrationErrorMessage: string = '';
