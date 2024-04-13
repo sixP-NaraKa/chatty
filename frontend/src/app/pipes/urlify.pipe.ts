@@ -9,8 +9,7 @@ export class UrlifyPipe implements PipeTransform {
     }
 
     // https://urlregex.com/
-    urlRegex =
-        /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
+    urlRegex = /(https:\/\/|http:\/\/)\S+/;
     /**
      * Helper method to highlight URLs in a given message. Returns the new replaced message with, if available, highlighted URLs.
      * Also checks if the matched message is a "valid" image URL and constructs an <img> tag out of it.
