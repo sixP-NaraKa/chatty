@@ -1,18 +1,17 @@
-var preset = require("jest-preset-angular/jest-preset");
+// const { pathsToModuleNameMapper } = require("ts-jest");
+// const { paths } = require("./tsconfig.json").compilerOptions;
+
+// globalThis.ngJest = {
+//     // skipNgcc: false,
+//     tsconfig: "tsconfig.spec.json",
+// };
+
 module.exports = {
-    ...preset,
+    // globalSetup: "jest-preset-angular/global-setup",
     preset: "jest-preset-angular",
-    setupFilesAfterEnv: ["./setup-jest.js"],
-    testMatch: ["**/*.test.ts"],
-    globals: {
-        ...preset.globals,
-        "ts-jest": {
-            ...preset.globals["ts-jest"],
-            tsconfig: "./tsconfig.test.json",
-            isolatedModules: true,
-        },
-    },
-    globalSetup: "jest-preset-angular/global-setup",
-    // moduleDirectories: ["node_modules", "<rootDir"],
-    modulePaths: ["<rootDir>"],
+    setupFilesAfterEnv: ["<rootDir>/setup-jest.js"],
+    // moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: "<rootDir>" }),
+    testEnvironment: "jsdom",
+    modulePaths: ["./"],
+    moduleFileExtensions: ["ts", "html", "js", "json", "mjs"],
 };

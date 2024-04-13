@@ -1,11 +1,7 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
     "compileOnSave": false,
     "compilerOptions": {
         "baseUrl": "./",
-        "paths": {
-            "tslib": ["node_modules/tslib/tslib.d.ts"]
-        },
         "outDir": "./dist/out-tsc",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
@@ -30,5 +26,6 @@
         "strictInjectionParameters": true,
         "strictInputAccessModifiers": true,
         "strictTemplates": true
-    }
+    },
+    "exclude": ["node_modules"]
 }

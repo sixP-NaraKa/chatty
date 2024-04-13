@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../out-tsc/spec",
+        "types": ["jest"],
+        "target": "ES2020",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true
+    },
+    "include": ["src/**/*.test.ts", "**/*.d.ts"]
+}

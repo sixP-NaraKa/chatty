@@ -3,12 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import config from 'src/environments/config';
 import {
-    Settings,
     ChatMessageWithUser,
     ChatRoomWithParticipantsExceptSelf,
-    User,
     Emote,
     MessageReaction,
+    Settings,
+    User,
 } from '../../../../shared/types/db-dtos';
 import { ApplicationUser, AuthService } from '../auth/auth.service';
 
