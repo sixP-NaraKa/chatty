@@ -14,8 +14,6 @@ export class EmoteSelectComponent implements AfterViewInit {
     @Output()
     emoteSelectedEvent = new EventEmitter<Emote>();
 
-    emoteSearchInputElement!: HTMLInputElement;
-
     // emotes
     availableEmotes = new Array<Emote>();
     filteredEmotes = new Array<Emote>();
@@ -28,18 +26,14 @@ export class EmoteSelectComponent implements AfterViewInit {
             this.availableEmotes = emotes;
             this.filteredEmotes = this.availableEmotes;
         });
-
-        // get input element to add filter listener
-        this.emoteSearchInputElement = document.getElementById('emoteSearchInput') as HTMLInputElement;
-        this.emoteSearchInputElement.onkeyup = () => this.filterEmotes();
     }
 
     emoteSelect(emote: Emote) {
         this.emoteSelectedEvent.emit(emote);
     }
 
-    filterEmotes() {
-        const input = this.emoteSearchInputElement.value;
+    filterEmotes(event: Event) {
+        const input = (event.target as HTMLInputElement).value;
         this.filteredEmotes = this.availableEmotes.filter((emote) => emote.name.includes(input));
     }
 }

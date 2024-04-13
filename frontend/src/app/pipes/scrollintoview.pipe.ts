@@ -15,7 +15,7 @@ export class ScrollintoviewPipe implements PipeTransform {
         return value;
     }
 
-    scrollToLatestMessage() {
+    private scrollToLatestMessage() {
         setTimeout(function () {
             const lastMessageDiv = Array.from(document.getElementsByClassName('chat-message-div')).pop();
             lastMessageDiv?.scrollIntoView({ behavior: 'smooth' });

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from './prisma/prisma.service.js';
 import {
-    User,
+    ChatMessageWithUser,
     ChatRoomWithParticipantsExceptSelf,
     ChatroomWithMessages,
-    ChatMessageWithUser,
+    Emote,
     MessageReaction,
     Notification,
-    Emote,
+    User,
 } from '../../shared/types/db-dtos.js';
+import { PrismaService } from './prisma/prisma.service.js';
 
 const includeChatroomWithParticipantsExceptSelf = (userId: number) => {
     return {
@@ -320,7 +320,7 @@ export class AppService {
                 },
             },
         });
-        return participant.user_id === userId && participant.chatroom_id === chatroomId;
+        return participant?.user_id === userId && participant.chatroom_id === chatroomId;
     }
 
     /**

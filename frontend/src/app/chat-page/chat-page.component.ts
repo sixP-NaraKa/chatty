@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ChatRoomWithParticipantsExceptSelf, Settings, User } from '../../../../shared/types/db-dtos';
 import { ApplicationUser } from '../auth/auth.service';
 import { UserSettingsService } from '../services/user-settings.service';
 import { UserService } from '../services/user.services';
 import { WebsocketService } from '../services/websocket.service';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-chat-page',
@@ -78,13 +78,9 @@ export class ChatPageComponent implements OnInit, OnDestroy {
         this.wsService.joinChatroom(chat.chatroom_id);
         this.chatroomIdToLoad = chat.chatroom_id;
         this.chatroom = chat;
-
-        // set group chat participants/users to null
-        this.groupChatParticipants.length = 0;
-        this.hideDropdown = true;
     }
 
-    applyFilterSettings(usrSetts: Settings) {
+    private applyFilterSettings(usrSetts: Settings) {
         let shouldReload: boolean = false;
 
         if (this.userSettings !== null && this.userSettings.filter !== usrSetts.filter) {
@@ -98,23 +94,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
             window.alert(
                 'Filter changes will be applied after a page reload. Reloading page for the changes to take effect...'
             );
-            document.location.reload();
-        }
-    }
-
-    groupChatParticipants = new Array<User>();
-    hideDropdown: boolean = true;
-    /**
-     * On button click, shows the users which are part of the current opened group chat.
-     */
-    showUsersForGroupChat() {
-        if (this.groupChatParticipants.length === 0) {
-            this.hideDropdown = !this.hideDropdown;
-            this.groupChatParticipants = new Array<User>();
-            this.chatroom.chatrooms.participants.forEach((user) => this.groupChatParticipants.push(user.users));
-        } else {
-            this.hideDropdown = true;
-            this.groupChatParticipants.length = 0;
+            window.location.reload();
         }
     }
 
@@ -156,18 +136,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     onAddParticipantToGroupChat(user: User) {
         const chatroomIdToAddUsersTo = this.chatroom.chatroom_id;
 
-        // add the new user to the locally stored list(s)
-        this.groupChatParticipants.push(user);
         this.chatroom.chatrooms.participants.push({ users: user });
 
         // notify user via websocket(s), and store in db
         this.userService.addUsersToGroupChat(user.user_id, chatroomIdToAddUsersTo).subscribe((_) => {
             this.wsService.addUserToChatroom(this.chatroom, user.user_id);
         });
-    }
-
-    notificationCounter: number = 0;
-    onNotificationCounterChange(count: number) {
-        this.notificationCounter = count;
     }
 }

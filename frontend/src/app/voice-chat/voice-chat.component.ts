@@ -14,10 +14,9 @@ export class VoiceChatComponent implements AfterViewInit {
     isInCall: boolean = false;
     inCallWithChatroom!: ChatRoomWithParticipantsExceptSelf;
     // a flag to look if a call request is already in progress, since we only want to allow one request at a time to be made by one user
-    // (and therefore we only allow once active voice chat)
+    // (and therefore we only allow one active voice chat)
     callRequestInProgress: boolean = false;
     callingChatroomUser: string = '';
-    // callingChatroomUserId: number = -1;
 
     currentChatroom!: ChatRoomWithParticipantsExceptSelf;
     @Input()
@@ -46,7 +45,7 @@ export class VoiceChatComponent implements AfterViewInit {
         this.listenForVoiceChatRequests();
     }
 
-    listenForVoiceChatRequests() {
+    private listenForVoiceChatRequests() {
         this.wsService.getVoiceChatRequest().subscribe(async (msg) => {
             switch (msg.type) {
                 case 'request':
@@ -101,7 +100,7 @@ export class VoiceChatComponent implements AfterViewInit {
      *
      * @param isTimer if a timer should be used to stop the audio from playing
      */
-    playRingtone(isTimer: boolean) {
+    private playRingtone(isTimer: boolean) {
         this.audioIncomingCall.loop = true;
         this.audioIncomingCall.play();
         if (isTimer) {
@@ -114,7 +113,7 @@ export class VoiceChatComponent implements AfterViewInit {
     /**
      * Helper function to stop the ringtone from playing.
      */
-    stopRingtone() {
+    private stopRingtone() {
         this.audioIncomingCall.pause();
         this.audioIncomingCall.currentTime = 0;
     }
@@ -125,7 +124,7 @@ export class VoiceChatComponent implements AfterViewInit {
      *
      * @param room the chatroom to display information for
      */
-    showNotificationOfVoiceChatRequest(room: ChatRoomWithParticipantsExceptSelf) {
+    private showNotificationOfVoiceChatRequest(room: ChatRoomWithParticipantsExceptSelf) {
         const divId = Math.random().toString().substring(2, 8);
         this.notifsCurrentlyActiveMap.set(divId, room);
         (this.notifDivElement.nativeElement as HTMLDivElement).style.display = 'block';
@@ -139,7 +138,7 @@ export class VoiceChatComponent implements AfterViewInit {
      *
      * @param divId the id of the div
      */
-    removeNotification(divId: string, chatroomId: number) {
+    private removeNotification(divId: string, chatroomId: number) {
         if (this.notifsCurrentlyActiveMap.has(divId)) {
             this.notifsCurrentlyActiveMap.delete(divId);
             const div = document.getElementById(divId) as HTMLDivElement;
@@ -185,21 +184,6 @@ export class VoiceChatComponent implements AfterViewInit {
             chatroomId: chatroomId,
             userId: this.userService.currentUser.userId,
         });
-    }
-
-    /**
-     * On click method for the slide-in / slide-out functionality.
-     */
-    onVoiceChatSliderClick() {
-        const element = document.getElementById('slideContent') as HTMLDivElement;
-        if (element.classList.contains('dismiss')) {
-            element.classList.remove('dismiss');
-            element.classList.add('selected');
-            element.style.display = 'block';
-        } else if (element.classList.contains('selected')) {
-            element.classList.remove('selected');
-            element.classList.add('dismiss');
-        }
     }
 
     audioDevices = new Array<MediaDeviceInfo>();

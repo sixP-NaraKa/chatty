@@ -1,7 +1,14 @@
+<button
+    type="menu"
+    title="New Group Chat"
+    class="h-6 fa-solid fa-people-group px-2 border-l-2 border-gray-700 hover:bg-gray-600 text-yellow-300"
+    (click)="shouldShowWindow = !shouldShowWindow"
+>
+    <span>+</span>
+</button>
 <div
+    *ngIf="shouldShowWindow"
     class="settings-menu-blur z-50 absolute top-0 left-0 flex items-center h-screen w-screen min-w-[256px]"
-    [class.hidden]="shouldShowWindow === false"
-    [class.flex]="shouldShowWindow === true"
 >
     <div
         class="settings-menu-window relative items-center w-[50%] min-w-[256px] h-fit px-4 mx-auto border-2 border-gray-700"

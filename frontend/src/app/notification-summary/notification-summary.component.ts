@@ -1,53 +1,44 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Notification } from '../../../../shared/types/db-dtos';
 import { NotificationService } from '../services/notification.service';
-import { UserService } from '../services/user.services';
 
 @Component({
     selector: 'app-notification-summary',
     templateUrl: './notification-summary.component.html',
     styleUrls: ['./notification-summary.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Default,
 })
-export class NotificationSummaryComponent implements OnInit {
+export class NotificationSummaryComponent implements OnDestroy {
     unreadSubscription: Subscription;
-
-    @Output()
-    notificationCounterEvent = new EventEmitter<number>();
 
     notificationCounter = 0;
 
     unreadNotifications = new Array<Notification>();
 
-    constructor(private userService: UserService, private notificationService: NotificationService) {
+    constructor(private notificationService: NotificationService) {
         // get all notifications which were previously saved upon start
         this.notificationService.getAllNotificationsForUser().subscribe((notifs) => {
             this.unreadNotifications = this.unreadNotifications.concat(notifs);
             this.notificationCounter = this.unreadNotifications.length;
-            this.notificationCounterEvent.emit(this.notificationCounter);
         });
 
         // subscribe to the Observable to get new notifications during runtime
         this.unreadSubscription = this.notificationService.unreadNotification$.subscribe((unreadNotif) => {
             this.notificationCounter++;
-            this.notificationCounterEvent.emit(this.notificationCounter);
             this.unreadNotifications.push(unreadNotif);
         });
     }
-
-    ngOnInit(): void {}
 
     ngOnDestroy() {
         this.unreadSubscription.unsubscribe();
     }
 
     onNotificationDelete(notif: Notification) {
-        this.notificationService.deleteNotification(notif.notification_id).subscribe((event) => {
+        this.notificationService.deleteNotification(notif.notification_id).subscribe((_) => {
             const idxOf = this.unreadNotifications.indexOf(notif);
             this.unreadNotifications.splice(idxOf, 1);
             this.notificationCounter--;
-            this.notificationCounterEvent.emit(this.notificationCounter);
         });
     }
 

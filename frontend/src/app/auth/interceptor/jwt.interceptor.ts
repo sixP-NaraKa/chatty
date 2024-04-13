@@ -1,13 +1,13 @@
 import {
-    HttpInterceptor,
-    HttpRequest,
-    HttpHandler,
-    HttpEvent,
     HTTP_INTERCEPTORS,
+    HttpEvent,
+    HttpHandler,
+    HttpInterceptor,
     HttpParams,
+    HttpRequest,
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { UserService } from 'src/app/services/user.services';
 
 @Injectable({

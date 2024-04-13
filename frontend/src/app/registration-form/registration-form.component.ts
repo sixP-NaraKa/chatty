@@ -26,13 +26,13 @@ export class RegistrationFormComponent implements OnInit {
 
     onRegistrationSubmit() {
         this.registrationErrorMessage = '';
-        const username = this.registrationFormGroup.value.usernameInput as string;
-        const password = this.registrationFormGroup.value.passwordInput as string;
         if (!this.arePasswordsEqualAndUsernameSupplied()) {
             this.registrationErrorMessage = 'Passwords do not match.';
             return;
         }
 
+        const username = this.registrationFormGroup.value.usernameInput as string;
+        const password = this.registrationFormGroup.value.passwordInput as string;
         this.userService
             .register(username, password)
             .pipe(first())
@@ -42,12 +42,8 @@ export class RegistrationFormComponent implements OnInit {
                     this.router.navigate(['/login']);
                 },
                 (error) => {
-                    console.log(error);
-                    if (error as string) {
-                        this.registrationErrorMessage = error.error.message;
-                    } else {
-                        this.registrationErrorMessage = 'Unknown problem. Try again later.';
-                    }
+                    console.error(error);
+                    this.registrationErrorMessage = error?.error?.message ?? 'Unknown problem. Try again later.';
                 }
             );
     }
