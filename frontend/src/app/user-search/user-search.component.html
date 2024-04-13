@@ -2,15 +2,14 @@
     <input
         #userSearchInput
         type="text"
-        id="{{ userSearchInputElementId }}"
         placeholder="Search for users..."
         class="bg-transparent w-full h-6 px-2 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden text-xs md:text-base"
+        (input)="filterUsers()"
     />
-    <div #searchResultsetDiv id="{{ searchResultSetDivElementId }}">
+    <div #searchResultsetDiv>
         <ul
             #searchResultsetUL
             *ngIf="filteredUsers.length !== 0"
-            id="{{ searchResultSetULElementId }}"
             class="bg-transparent search-scrollbar flex flex-auto flex-col gap-y-1.5 z-50 w-full max-h-32 px-4 pb-2 border-b border-gray-200 rounded overflow-y-auto overflow-x-hidden"
         >
             <li
