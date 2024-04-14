@@ -90,11 +90,11 @@
                 "test": {
                     "builder": "@angular-builders/jest:run",
                     "options": {
-                        "tsConfig": "tsconfig.test.json"
+                        "tsConfig": "tsconfig.spec.json",
+                        "polyfills": ["zone.js", "zone.js/testing"]
                     }
                 }
             }
         }
-    },
-    "defaultProject": "chatty"
+    }
 }

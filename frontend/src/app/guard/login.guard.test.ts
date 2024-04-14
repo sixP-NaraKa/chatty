@@ -2,7 +2,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MockService } from 'ng-mocks';
+import { MockComponent, MockService } from 'ng-mocks';
 import { ChatPageComponent } from '../chat-page/chat-page.component';
 import { UserService } from '../services/user.services';
 import { LoginGuard } from './login.guard';
@@ -18,7 +18,7 @@ describe('LoginGuard', () => {
                 RouterTestingModule.withRoutes([
                     {
                         path: 'chat',
-                        component: ChatPageComponent,
+                        component: MockComponent(ChatPageComponent),
                     },
                 ]),
             ],

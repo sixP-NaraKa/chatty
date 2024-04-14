@@ -1,18 +1,21 @@
-var preset = require("jest-preset-angular/jest-preset");
 module.exports = {
-    ...preset,
+    // globalSetup: "jest-preset-angular/global-setup",
     preset: "jest-preset-angular",
-    setupFilesAfterEnv: ["./setup-jest.js"],
-    testMatch: ["**/*.test.ts"],
-    globals: {
-        ...preset.globals,
-        "ts-jest": {
-            ...preset.globals["ts-jest"],
-            tsconfig: "./tsconfig.test.json",
-            isolatedModules: true,
-        },
+    setupFilesAfterEnv: ["<rootDir>/setup-jest.js"],
+    // moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: "<rootDir>" }),
+    testEnvironment: "jsdom",
+    modulePaths: ["./"],
+    roots: ["<rootDir>/src"],
+    // moduleFileExtensions: ["ts", "html", "js", "json", "mjs"],
+    transform: {
+        // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
+        // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
+        "^.+\\.tsx?$": [
+            "ts-jest",
+            {
+                isolatedModules: true,
+                tsconfig: "tsconfig.spec.json",
+            },
+        ],
     },
-    globalSetup: "jest-preset-angular/global-setup",
-    // moduleDirectories: ["node_modules", "src", __dirname],
-    modulePaths: ["<rootDir>"],
 };

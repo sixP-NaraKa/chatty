@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first } from 'rxjs';
 import { UserService } from '../services/user.services';
@@ -16,9 +16,9 @@ export class LoginFormComponent implements OnInit {
         (document.getElementById('username') as HTMLInputElement).focus();
     }
 
-    loginFormGroup = new FormGroup({
-        usernameInput: new FormControl('', Validators.required),
-        passwordInput: new FormControl('', Validators.required),
+    loginFormGroup = new UntypedFormGroup({
+        usernameInput: new UntypedFormControl('', Validators.required),
+        passwordInput: new UntypedFormControl('', Validators.required),
     });
 
     loginErrorMessage: string = '';
