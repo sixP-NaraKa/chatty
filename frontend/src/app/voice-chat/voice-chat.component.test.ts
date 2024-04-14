@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng-mocks';
 import { of } from 'rxjs';
 import { DeepPartial } from 'utils/test';
@@ -86,7 +86,6 @@ describe('VoiceChatComponent', () => {
         voiceChatRequest.type = 'request';
         websocketService.getVoiceChatRequest = jest.fn().mockImplementation(() => of(voiceChatRequest));
         await component.ngAfterViewInit();
-        flush(); // up here or down below, both seem to work
 
         expect(websocketService.getVoiceChatRequest).toHaveBeenCalledTimes(1);
         expect(userServiceMock.getSingleChatroomForUserWithParticipantsExceptSelf).toHaveBeenCalledTimes(1);

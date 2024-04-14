@@ -12,6 +12,7 @@
         "test": "jest",
         "test-watch": "jest --only-changed",
         "test-watch-log": "jest --only-changed --silent=false",
+        "test:no-cache": "jest --no-cache",
         "prettier:write": "prettier --write .",
         "prettier:write-cache": "prettier --cache --write ."
     },

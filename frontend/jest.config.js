@@ -1,11 +1,3 @@
-// const { pathsToModuleNameMapper } = require("ts-jest");
-// const { paths } = require("./tsconfig.json").compilerOptions;
-
-// globalThis.ngJest = {
-//     // skipNgcc: false,
-//     tsconfig: "tsconfig.spec.json",
-// };
-
 module.exports = {
     // globalSetup: "jest-preset-angular/global-setup",
     preset: "jest-preset-angular",
@@ -13,5 +5,17 @@ module.exports = {
     // moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: "<rootDir>" }),
     testEnvironment: "jsdom",
     modulePaths: ["./"],
-    moduleFileExtensions: ["ts", "html", "js", "json", "mjs"],
+    roots: ["<rootDir>/src"],
+    // moduleFileExtensions: ["ts", "html", "js", "json", "mjs"],
+    transform: {
+        // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
+        // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
+        "^.+\\.tsx?$": [
+            "ts-jest",
+            {
+                isolatedModules: true,
+                tsconfig: "tsconfig.spec.json",
+            },
+        ],
+    },
 };
