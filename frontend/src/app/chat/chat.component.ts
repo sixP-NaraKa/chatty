@@ -405,11 +405,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
      *
      * @param files files that were drag-and-dropped into the chat area
      */
-    async onFileDrop(files: Array<File>) {
+    async onFileDrop(files: Array<File> | FileList) {
         for (let file of files) {
             if (file.size === 0) {
-                this.toastrService.error('File is either empty or a folder.', 'Invalid Upload');
-            } else if (file.size < 20 * 1024 * 1024) {
+                this.toastrService.error(`File ${file.name} is either empty or a folder.`, 'Invalid Upload');
+            } else if (file.size < 2000 * 1024 * 1024) {
                 const blob = file.slice(0, 16);
                 this.userService.validateFileType(blob).subscribe(([isValid, result]) => {
                     if (!isValid) {
@@ -436,7 +436,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
                         .subscribe((msg) => this.messageSubscribeCallback(msg));
                 });
             } else {
-                this.toastrService.error('File is bigger than 20MB.', 'Invalid file size');
+                this.toastrService.error(`File ${file.name} is bigger than 2GB.`, 'Invalid file size');
             }
         }
     }
@@ -448,5 +448,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
             link.download = `${message.msg_content}`;
             link.click();
         });
+    }
+
+    async uploadFile(event: any) {
+        await this.onFileDrop(event.target.files);
+        // setting the value to null allows the user to upload the same file back to back
+        event.target.value = null;
     }
 }

@@ -27,6 +27,7 @@ Here are the things "chatty" can do:
     -   display images from URLs (jpg, jpeg, png, gif, tiff, bmp)
     -   pagination via infinite scrolling
     -   file sharing/uploading via drag-and-drop into a chat
+    -   file uploading via button
     -   embed YouTube videos if setting enabled (placed at the end of messages)
 -   Group chats
     -   adding and removing people

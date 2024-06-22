@@ -511,18 +511,18 @@ describe('ChatComponent', () => {
             await component.onFileDrop(files);
 
             expect(errorToastSpy).toHaveBeenCalledTimes(1);
-            expect(errorToastSpy).toHaveBeenCalledWith('File is either empty or a folder.', 'Invalid Upload');
+            expect(errorToastSpy).toHaveBeenCalledWith('File test.pdf is either empty or a folder.', 'Invalid Upload');
         }));
 
         test('can show error notification when file size is too big', fakeAsync(async () => {
             const file = new File(['12345'], 'test.pdf');
-            jest.spyOn(file, 'size', 'get').mockReturnValue(20 * 1024 * 1024);
+            jest.spyOn(file, 'size', 'get').mockReturnValue(2000 * 1024 * 1024);
             files.push(file);
 
             await component.onFileDrop(files);
 
             expect(errorToastSpy).toHaveBeenCalledTimes(1);
-            expect(errorToastSpy).toHaveBeenCalledWith('File is bigger than 20MB.', 'Invalid file size');
+            expect(errorToastSpy).toHaveBeenCalledWith('File test.pdf is bigger than 2GB.', 'Invalid file size');
         }));
 
         test('can show error notification when file type is unknown', fakeAsync(async () => {
@@ -578,6 +578,17 @@ describe('ChatComponent', () => {
 
             expect(spy).toHaveBeenCalledTimes(1);
         }));
+    });
+
+    // test as second last, because otherwise the test fails with a HierarchyRequestError - something to do with the "can download file" test I suppose?
+    test('can upload files manually', () => {
+        let event = new Event('change');
+        const element = fixture.debugElement.query(By.css('#fileUploadInput')).nativeElement as HTMLInputElement;
+
+        const spy = jest.spyOn(component, 'onFileDrop').mockImplementation();
+        element.dispatchEvent(event);
+
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 
     test('can download file', () => {

@@ -104,7 +104,7 @@
             required
             formControlName="messageInput"
             (paste)="onPaste($event)"
-            class="bg-transparent w-[75%] h-full px-2 placeholder:text-violet-200 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden border-r-2 border-gray-700"
+            class="bg-transparent w-[67.5%] h-full px-2 placeholder:text-violet-200 focus:outline-none whitespace-nowrap text-ellipsis overflow-hidden border-r-2 border-gray-700"
             placeholder="Write your message..."
             autofocus
         />
@@ -117,6 +117,16 @@
             class="w-[17.5%] h-full border-l-2 border-gray-700 text-violet-200 whitespace-nowrap text-ellipsis overflow-hidden z-40 hover:bg-gray-600"
         >
             Send
+        </button>
+        <input #fileUpload id="fileUploadInput" type="file" class="hidden" (change)="uploadFile($event)" multiple />
+        <button
+            #uploadButton
+            type="button"
+            class="w-[7.5%] h-full border-l-2 border-gray-700 text-violet-200"
+            (click)="fileUpload.click()"
+            title="Upload files"
+        >
+            <i class="fa-solid fa-paperclip"></i>
         </button>
     </form>
 </div>
