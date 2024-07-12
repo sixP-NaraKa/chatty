@@ -1,3 +1,4 @@
+import { JwtService } from '@nestjs/jwt';
 import {
     WebSocketGateway,
     WebSocketServer,
@@ -33,7 +34,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     userIdsConnected = new Array<number>();
     connectedClients = new Map<number, any>();
 
-    constructor(private authService: AuthService, private userService: UsersService) {}
+    constructor(private authService: AuthService, private userService: UsersService, private jwtService: JwtService) { }
 
     async handleConnection(client: any, ...args: any[]) {
         // verify user before connecting them - similar to verfiy-user.middleware
@@ -66,12 +67,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // this could be done before adding to the local list, but it does not matter too much
         client.emit('changed-availabilities', this.userIdsConnected);
     }
+
     async handleDisconnect(client: any) {
         this.numConnections--;
         console.log('disconnected, num conn => ', this.numConnections);
 
         // notify users of logout, to display corresponding statuses
-        const jwtUser = await this.authService.verifyToken(client.handshake.auth.token);
+        const jwtUser = await this.jwtService.decode<{ username: string; sub: number; iat: number; exp: number }>(client.handshake.auth.token);
         const idxOf = this.userIdsConnected.indexOf(jwtUser.sub);
         this.userIdsConnected.splice(idxOf, 1);
         this.connectedClients.delete(jwtUser.sub);

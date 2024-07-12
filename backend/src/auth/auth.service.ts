@@ -8,7 +8,7 @@ import { jwtConstants } from './constants.js';
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UsersService, private jwtService: JwtService) {}
+    constructor(private usersService: UsersService, private jwtService: JwtService) { }
 
     async validateUser(username: string, passw: string): Promise<User | undefined> {
         const user = await this.usersService.findOne(username);
@@ -32,7 +32,7 @@ export class AuthService {
     async login(user: User) {
         const payload = { username: user.display_name, sub: user.user_id };
         return {
-            access_token: this.jwtService.sign(payload, {
+            access_token: await this.jwtService.signAsync(payload, {
                 secret: jwtConstants.secret ?? process.env.JWT_SECRET,
             }),
             username: user.display_name,
@@ -41,7 +41,7 @@ export class AuthService {
     }
 
     async verifyToken(token: string): Promise<{ username: string; sub: number; iat: number; exp: number }> {
-        return this.jwtService.verify(token, {
+        return await this.jwtService.verifyAsync(token, {
             secret: jwtConstants.secret ?? process.env.JWT_SECRET,
         });
     }
