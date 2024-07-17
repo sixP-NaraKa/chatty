@@ -1,4 +1,4 @@
-<header class="min-w-[240px] h-8 pt-1 border-b border-violet-200">
+<header class="min-w-[320px] h-10 pt-1 border-b border-violet-200">
     <div class="px-4">
         <div class="flex flex-auto justify-between space-x-4">
             <p class="pr-4 text-lg whitespace-pre">
@@ -6,12 +6,12 @@
                 <b class="text-violet-200">{{ currentUserName }}</b>
             </p>
             <div class="flex space-x-4">
-                <app-settings-menu class="z-50"></app-settings-menu>
+                <app-settings-menu class="z-50 text-lg md:text-xl"></app-settings-menu>
                 <button
                     type="button"
                     (click)="logout()"
                     title="Logout"
-                    class="h-6 w-fit bg-violet-200 text-black rounded px-2 hover:bg-violet-400 fa-solid fa-arrow-right-from-bracket"
+                    class="h-fit text-2xl w-fit bg-violet-200 text-black rounded px-2 hover:bg-violet-400 fa-solid fa-arrow-right-from-bracket"
                 ></button>
             </div>
         </div>

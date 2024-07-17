@@ -1,10 +1,10 @@
 <app-slider [slideFromLeft]="true" [showArrowIcons]="false">
-    <i class="sliderContentInButtonIcon fa-solid fa-bell"> {{ notificationCounter }}</i>
-    <i class="sliderContentOutButtonIcon fa-solid fa-bell"> {{ notificationCounter }}</i>
+    <i class="sliderContentInButtonIcon fa-solid fa-bell text-xl"> {{ notificationCounter }}</i>
+    <i class="sliderContentOutButtonIcon fa-solid fa-bell text-xl"> {{ notificationCounter }}</i>
 
-    <div class="contentToSlide">
+    <div class="contentToSlide text-base">
         <div *ngFor="let notif of unreadNotifications" class="pb-2 border-b-2 border-gray-700">
-            <p class="text-sm font-bold underline">
+            <p class="font-bold underline">
                 {{ notif.chatrooms.isgroup ? notif.chatrooms.name : notif.originated_from_user.display_name }} ({{
                     notif.type
                 }})

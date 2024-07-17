@@ -1,14 +1,14 @@
 <app-slider [slideFromRight]="true" [shouldFadeSliderButton]="this.isInCall">
     <!-- ngContent projection on "sliderContentInButtonIcon" selector -->
-    <i *ngIf="!this.isInCall" class="sliderContentInButtonIcon fa-solid fa-phone"></i>
-    <i *ngIf="this.isInCall" class="sliderContentInButtonIcon fa-solid fa-phone-volume"></i>
+    <i *ngIf="!this.isInCall" class="sliderContentInButtonIcon fa-solid fa-phone text-xl"></i>
+    <i *ngIf="this.isInCall" class="sliderContentInButtonIcon fa-solid fa-phone-volume text-xl"></i>
 
     <!-- ngContent projection on "sliderContentOutButtonIcon" selector -->
-    <i *ngIf="!this.isInCall" class="sliderContentOutButtonIcon fa-solid fa-phone-flip"></i>
-    <i *ngIf="this.isInCall" class="sliderContentOutButtonIcon fa-solid fa-phone-volume"></i>
+    <i *ngIf="!this.isInCall" class="sliderContentOutButtonIcon fa-solid fa-phone-flip text-xl"></i>
+    <i *ngIf="this.isInCall" class="sliderContentOutButtonIcon fa-solid fa-phone-volume text-xl"></i>
 
     <!-- ngContent projection on "contentToSlide" selector -->
-    <div class="contentToSlide">
+    <div class="contentToSlide text-base">
         <audio id="audioPlaybackElement" autoplay="true" controls="false" class="h-0 w-0 bg-red-400"></audio>
         <p *ngIf="!currentChatroom && !this.isInCall" class="flex space-x-2 py-2">
             <i class="fa-solid fa-info px-1.5 text-blue-400 border border-blue-400 rounded-full"></i>
