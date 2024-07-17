@@ -14,7 +14,7 @@
     <div *ngFor="let message of chatroomMessages" class="chat-message-div pb-6 pt-2 px-2 sm:mb-4">
         <p
             id="messageContainer"
-            class="w-fit max-w-md break-words text-ellipsis overflow-hidden px-2 py-1 rounded-lg"
+            class="w-fit max-w-56 xxs:max-w-xs xs:max-w-md sm:max-w-xs md:max-w-md break-words text-ellipsis overflow-hidden px-2 py-1 rounded-lg"
             [class.mr-auto]="message.user_id !== currentUser.userId"
             [class.ml-auto]="message.user_id === currentUser.userId"
             [class.chat-participant-message]="message.user_id !== currentUser.userId"
@@ -24,14 +24,14 @@
                 <span class="flex gap-4" [innerHTML]="populateMessageHeader(message)"></span>
                 <span
                     *ngIf="message.user_id === currentUser.userId"
-                    class="deleteMessageSpan not-italic text-xs ml-auto"
+                    class="deleteMessageSpan not-italic text-base ml-auto"
                     (click)="deleteMessage(message)"
                 >
                     <button class="deleteMessageButton fa-regular fa-trash-can text-red-400"></button>
                 </span>
             </span>
             <span *ngIf="!message.isimage && !message.isfile">
-                <span [innerHTML]="message.msg_content | urlify"></span>
+                <span [innerHTML]="message.msg_content | urlify" class="messageContent max-w-full sm:min-w-full"></span>
                 <span *ngIf="embedYouTubeVideos">
                     <span *ngFor="let url of message.msg_content | embed">
                         <iframe
@@ -49,7 +49,7 @@
                     <img
                         [src]="srcUrl"
                         alt="Loading image..."
-                        class="max-h-80 cursor-pointer"
+                        class="max-h-80 max-w-full sm:min-h-[240px] sm:min-w-full cursor-pointer"
                         (click)="openImage($event)"
                     />
                 </ng-container>
@@ -91,7 +91,7 @@
     (emoteSelectedEvent)="onEmoteSelect($event)"
     class="absolute bottom-0 right-0 w-full"
 ></app-emote-select>
-<div class="absolute bottom-0 w-full h-fit text-xs md:text-base">
+<div class="absolute bottom-0 w-full h-fit">
     <form
         [formGroup]="formGroup"
         (ngSubmit)="sendMessage()"

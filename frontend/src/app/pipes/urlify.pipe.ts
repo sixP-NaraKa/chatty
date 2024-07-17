@@ -21,7 +21,11 @@ export class UrlifyPipe implements PipeTransform {
         return this.replaceWhenMatched(msg, (match) => {
             const isImageUrl = this.isImageUrl(match);
             const html = `<a href="${match}" target="_blank" rel="noreferrer noopener" class="text-blue-500">${match}</a>
-            ${isImageUrl ? `<img src="${match}" alt="Loading image..." class="max-h-80">` : ''}`;
+            ${
+                isImageUrl
+                    ? `<img src="${match}" alt="Loading image..." class="max-h-80 max-w-full sm:min-h-[240px] sm:min-w-full cursor-pointer">`
+                    : ''
+            }`;
             return html;
         });
     }
