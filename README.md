@@ -67,6 +67,10 @@ If this is not wanted, simply remove the affecting lines of code.
 
 File: [main.ts](https://github.com/sixP-NaraKa/chatty/blob/main/backend/src/main.ts).
 
+Set the property `NODE_ENV` to `development` to develop locally and to `production` for deployments.
+
+When `NODE_ENV` is set to `production`, the property `FRONTEND_DIST` has to be set. This ensures that the frontend and backend are served from the same port (no CORS required). This property points to the Angular build output (`frontend/dist/...`).
+
 ### Database
 
 A `.env` file with a `DATABASE_URL` property is required for the usage of Prisma. This `.env` file should reside in the root directory of the application.
